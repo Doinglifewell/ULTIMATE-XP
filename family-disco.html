@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ultimate Family Disco — Ultimate Experiences</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orchid:#6A14DB;--violet:#B354F1;--orange:#FF9F46;--green:#28B79D;--pink:#FF1B9A;
+  --gold:#FFD166;--gold-dim:#c9952a;
+  --bg:#07070a;--d1:#0d0d10;--d2:#141418;--d3:#1c1c22;--d4:#26262e;
+  --bdr:#2e2e38;--muted:#6b6b80;--dim:#9999b0;--txt:#ffffff;
+  --nav-bg:rgba(7,7,10,0.95);
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --display:'Bebas Neue',Impact,sans-serif;
+  --fun:'Fredoka One',cursive;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
+
+/* ── CONFETTI ── */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:visible}
+.confetti-dot{position:absolute;border-radius:50%;animation:confettiFall linear infinite}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:0}10%{opacity:0.7}90%{opacity:0.5}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-inner{display:flex;align-items:center;padding:0 24px;height:60px;gap:16px}
+.nav-wordmark{font-family:var(--display);font-size:22px;letter-spacing:.08em;color:#fff;text-decoration:none;line-height:1}
+.nav-wordmark span{color:var(--gold)}
+.nav-links{display:flex;gap:2px;margin-left:auto}
+.nav-link{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-link:hover,.nav-link.active{color:var(--gold)}
+.nav-cta{
+  position:relative;
+  margin-left:8px;
+  padding:11px 24px 11px 20px;
+  /* Chrome metallic gradient */
+  background:linear-gradient(
+    160deg,
+    #f0f0ff 0%,
+    #d8d0f8 20%,
+    #ffffff 38%,
+    #c0b8e8 55%,
+    #e8e0ff 72%,
+    #f8f8ff 85%,
+    #d0c8f0 100%
+  );
+  color:#1a0d35;
+  /* Blob border-radius */
+  border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
+  font-size:13px;font-weight:900;
+  text-decoration:none;white-space:nowrap;flex-shrink:0;
+  letter-spacing:.04em;
+  border:1.5px solid rgba(255,255,255,.95);
+  box-shadow:
+    0 2px 12px rgba(179,84,241,.35),
+    0 0 0 1px rgba(179,84,241,.2),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -1px 0 rgba(100,80,160,.2);
+  transition:all .22s cubic-bezier(0.34,1.56,0.64,1);
+  overflow:hidden;
+  animation:blobMorph 5s ease-in-out infinite;
+}
+@keyframes blobMorph{
+  0%,100%{border-radius:60% 40% 55% 45% / 50% 55% 45% 50%}
+  25%    {border-radius:45% 55% 40% 60% / 55% 45% 55% 45%}
+  50%    {border-radius:55% 45% 60% 40% / 45% 55% 45% 55%}
+  75%    {border-radius:40% 60% 45% 55% / 55% 45% 50% 50%}
+}
+.nav-cta::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:52%;
+  background:linear-gradient(180deg,rgba(255,255,255,.75) 0%,transparent 100%);
+  pointer-events:none;
+}
+.nav-cta:hover{
+  transform:scale(1.06);
+  box-shadow:0 4px 20px rgba(179,84,241,.5),0 0 0 1.5px rgba(179,84,241,.6),inset 0 1px 0 rgba(255,255,255,.95);
+  border-radius:50% 50% 55% 45% / 50% 55% 45% 50%;
+}
+.nav-hamburger{display:none;background:none;border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--txt);font-size:16px;line-height:1;-webkit-tap-highlight-color:transparent}
+.nav-drawer{display:none;position:fixed;top:60px;left:0;right:0;background:var(--d1);border-bottom:1px solid var(--bdr);padding:16px 20px;flex-direction:column;gap:4px;z-index:199}
+.nav-drawer.open{display:flex}
+.nav-drawer a{padding:14px 16px;font-size:15px;font-weight:600;color:var(--muted);text-decoration:none;border-radius:10px;display:block}
+.nav-drawer .nav-drawer-cta{text-align:center;margin-top:8px;background:linear-gradient(135deg,var(--orchid),var(--violet));color:#fff;font-weight:800}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 24px 80px;position:relative;overflow:visible}
+.hero-bg{position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 10% 50%, rgba(106,20,219,.2) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 70% at 90% 40%, rgba(179,84,241,.12) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(255,209,102,.08) 0%, transparent 60%);
+  animation:heroPulse 6s ease-in-out infinite alternate}
+@keyframes heroPulse{0%{opacity:.7}100%{opacity:1}}
+.hero-content{position:relative;z-index:1;max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;width:100%}
+.hero-left{}
+.hero-event-tag{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);border-radius:100px;padding:6px 14px;margin-bottom:24px}
+.hero-headline{font-family:var(--display);font-size:clamp(56px,10vw,112px);line-height:.9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+.hero-headline .v{color:var(--violet)}
+.hero-headline .g{color:var(--gold)}
+.hero-tagline{font-family:var(--fun);font-size:clamp(17px,2.5vw,22px);color:var(--dim);margin-bottom:20px;line-height:1.4}
+.hero-detail{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.hero-detail svg{color:var(--gold);flex-shrink:0}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn-gold{display:inline-flex;align-items:center;gap:8px;padding:15px 28px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#07070a;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;transition:all .2s;box-shadow:0 8px 24px rgba(255,209,102,.25)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,209,102,.35)}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:15px 28px;background:linear-gradient(135deg,var(--orchid),var(--violet));color:#fff;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;transition:all .2s;box-shadow:0 8px 24px rgba(179,84,241,.25)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(179,84,241,.35)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:15px 24px;border:1px solid var(--bdr);color:var(--dim);border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;transition:all .15s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--txt)}
+
+/* ── HERO VISUAL ── */
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative}
+.headset-wrap{position:relative;width:300px;height:300px;display:flex;align-items:center;justify-content:center}
+.headset-glow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(ellipse,rgba(106,20,219,.3) 0%,rgba(179,84,241,.1) 50%,transparent 70%);animation:glowPulse 3s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.1);opacity:1}}
+/* Sound rings */
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(179,84,241,.1);animation:ringPulse 4s ease-in-out infinite}
+.ring:nth-child(1){width:160px;height:160px;animation-delay:0s}
+.ring:nth-child(2){width:220px;height:220px;animation-delay:.8s;border-color:rgba(255,209,102,.08)}
+.ring:nth-child(3){width:280px;height:280px;animation-delay:1.6s}
+.ring:nth-child(4){width:340px;height:340px;animation-delay:2.4s;border-color:rgba(255,209,102,.06)}
+@keyframes ringPulse{0%,100%{transform:scale(.96);opacity:.4}50%{transform:scale(1.02);opacity:1}}
+
+/* ── SECTION ── */
+.section{padding:80px 24px;max-width:1100px;margin:0 auto}
+.section-label{font-size:10px;font-weight:900;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-label::before{content:'';width:20px;height:1px;background:var(--gold);opacity:.6}
+.section-title{font-family:var(--display);font-size:clamp(36px,6vw,72px);line-height:.95;letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}
+.section-body{font-size:16px;color:var(--dim);line-height:1.8;max-width:600px}
+
+/* ── EVENTS GRID ── */
+.events-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:40px}
+.event-card{border-radius:18px;overflow:visible;text-decoration:none;display:block;position:relative;transition:transform .2s}
+.event-card:hover{transform:translateY(-4px)}
+
+.event-card-featured{background:transparent;border:none}
+.event-card-hot{background:linear-gradient(135deg,#1a0010,#35001e);border:1px solid rgba(255,27,154,.25)}
+.event-card-soon{background:var(--d2);border:1px solid var(--bdr)}
+
+.event-card-inner{padding:32px;position:relative;z-index:1}
+.event-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:18px}
+.event-title{font-family:var(--display);font-size:clamp(30px,4vw,48px);line-height:1;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+.event-date{font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.event-body{font-size:13px;color:var(--dim);line-height:1.9}
+/* ec- aliases — same breathing space */
+.ec-inner{padding:32px;position:relative;z-index:1}
+.ec-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:18px}
+.ec-title{font-family:var(--display);font-size:clamp(30px,4vw,48px);line-height:1;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+.ec-date{font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.ec-body{font-size:13px;color:var(--dim);line-height:1.9}
+
+/* ── HOW IT WORKS ── */
+.how-strip{background:var(--d1);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+.how-inner{max-width:1100px;margin:0 auto;padding:80px 24px}
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;margin-top:48px}
+.how-step{background:var(--d1);padding:28px 24px}
+.how-step-n{font-family:var(--display);font-size:48px;color:rgba(255,209,102,.12);line-height:1;margin-bottom:12px;letter-spacing:.04em}
+.how-step-icon{margin-bottom:12px;color:var(--gold)}
+.how-step-title{font-size:14px;font-weight:800;margin-bottom:8px;color:var(--txt)}
+.how-step-body{font-size:12px;color:var(--dim);line-height:1.7}
+
+/* ── ABOUT STRIP ── */
+.about-strip{background:linear-gradient(135deg,#0a0614,#0f0820);border-top:1px solid rgba(179,84,241,.15);border-bottom:1px solid rgba(179,84,241,.15)}
+.about-inner{max-width:1100px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.about-quote{font-family:var(--fun);font-size:clamp(18px,3vw,26px);line-height:1.5;color:var(--txt);position:relative;padding-left:24px}
+.about-quote::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--violet),var(--gold))}
+.about-attr{font-size:13px;font-weight:700;color:var(--violet);margin-top:16px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stat-card{background:var(--d2);border:1px solid var(--bdr);border-radius:14px;padding:20px}
+.stat-val{font-family:var(--display);font-size:48px;line-height:1;letter-spacing:.04em;color:var(--gold);margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;line-height:1.4}
+
+/* ── 3 PILLARS ── */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.pillar{background:var(--d2);border:1px solid var(--bdr);border-radius:16px;padding:26px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.pillar:hover{border-color:rgba(255,209,102,.3);transform:translateY(-3px)}
+.pillar-n{font-family:var(--display);font-size:60px;color:rgba(255,209,102,.08);line-height:1;position:absolute;top:12px;right:16px;letter-spacing:.04em}
+.pillar-icon{margin-bottom:14px;color:var(--gold)}
+.pillar-title{font-size:16px;font-weight:900;margin-bottom:8px;letter-spacing:-.01em}
+.pillar-body{font-size:13px;color:var(--dim);line-height:1.75}
+
+/* ── CONTACT ── */
+.contact-strip{background:linear-gradient(135deg,rgba(106,20,219,.08),rgba(179,84,241,.05));border-top:1px solid rgba(179,84,241,.2);padding:80px 24px;text-align:center}
+.contact-inner{max-width:680px;margin:0 auto}
+.contact-title{font-family:var(--display);font-size:clamp(48px,10vw,100px);line-height:.9;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+.contact-sub{font-size:16px;color:var(--dim);line-height:1.7;margin-bottom:32px}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--bdr);padding:40px 24px;background:var(--bg)}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px}
+.footer-brand{font-family:var(--display);font-size:20px;letter-spacing:.08em;color:#fff;margin-bottom:8px}
+.footer-brand span{color:var(--gold)}
+.footer-tagline{font-size:12px;color:var(--muted);line-height:1.6;max-width:240px}
+.footer-col-label{font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--violet);text-transform:uppercase;margin-bottom:12px}
+.footer-links-group{display:flex;flex-direction:column;gap:8px}
+.footer-link{font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;transition:color .15s}
+.footer-link:hover{color:var(--gold)}
+.footer-copy{border-top:1px solid var(--bdr);padding-top:24px;margin-top:32px;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;max-width:1100px;margin-left:auto;margin-right:auto}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.fade-up{opacity:0;animation:fadeUp .6s ease forwards}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}
+
+/* ── MOBILE ── */
+@media(max-width:899px){
+  .nav-links,.nav-cta{display:none}
+  .nav-hamburger{display:block;margin-left:auto}
+  .hero-content{grid-template-columns:1fr;gap:40px}
+  .hero-visual{display:none}
+  .hero-actions{justify-content:flex-start}
+  .events-grid{grid-template-columns:1fr}
+  .how-steps{grid-template-columns:1fr 1fr}
+  .pillars{grid-template-columns:1fr}
+  .about-inner{grid-template-columns:1fr;gap:40px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  footer .footer-inner{flex-direction:column}
+  .footer-copy{flex-direction:column}
+}
+@media(max-width:600px){
+  .hero{padding:90px 20px 60px}
+  .section{padding:56px 20px}
+  .how-steps{grid-template-columns:1fr}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .btn-gold,.btn-primary,.btn-ghost{justify-content:center}
+}
+@keyframes spinSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes dance1{0%{transform:rotate(-8deg) translateY(0)}100%{transform:rotate(6deg) translateY(-8px)}}
+@keyframes dance2{0%{transform:rotate(5deg) translateY(-4px)}100%{transform:rotate(-7deg) translateY(6px)}}
+@keyframes dance3{0%{transform:rotate(-5deg) translateY(0)}100%{transform:rotate(8deg) translateY(-10px)}}
+@keyframes floatPill{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+@keyframes wave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+@keyframes fadeNote{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:.9;transform:translateY(-8px)}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── hero word typing ── */
+#heroWord{
+  display:inline-block;
+  min-width:4px;
+  transition:color .3s;
+}
+@keyframes wordGlow{
+  0%,100%{text-shadow:0 0 0px rgba(255,209,102,0)}
+  50%{text-shadow:0 0 40px rgba(255,209,102,.9),0 0 80px rgba(255,209,102,.4),0 0 120px rgba(179,84,241,.3)}
+}
+.word-final{animation:wordGlow 1.8s ease-in-out infinite}
+
+.hero-left{position:relative;z-index:2}
+.hero-visual{position:relative;z-index:1;overflow:visible!important}
+
+@keyframes vanSlideIn{
+  0%{transform:translateX(calc(-100vw - 300px))}
+  66%{transform:translateX(4px)}
+  76%{transform:translateX(-10px)}
+  85%{transform:translateX(3px)}
+  93%{transform:translateX(-1px)}
+  100%{transform:translateX(0)}
+}
+@keyframes vanIdle{
+  0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}
+}
+/* Adult backflip entry */
+@keyframes smEntry{
+  0%  {opacity:0;transform:translateX(240px) translateY(-10px) rotate(0deg)}
+  22% {opacity:1;transform:translateX(120px) translateY(-78px) rotate(-135deg)}
+  50% {opacity:1;transform:translateX(16px)  translateY(-22px) rotate(-305deg)}
+  70% {opacity:1;transform:translateX(-8px)  translateY(0)     rotate(-360deg)}
+  82% {opacity:1;transform:translateX(5px)   translateY(-10px) rotate(-360deg)}
+  91% {opacity:1;transform:translateX(-2px)  translateY(0)     rotate(-360deg)}
+  100%{opacity:1;transform:translateX(0)     translateY(0)     rotate(-360deg)}
+}
+/* Adult slide entry */
+@keyframes smSlide{
+  0%  {opacity:0;transform:translateX(200px)}
+  30% {opacity:1}
+  80% {transform:translateX(-6px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+/* Kid bouncy slide entry */
+@keyframes smSlideKid{
+  0%  {opacity:0;transform:translateX(180px) translateY(0) scale(.6)}
+  25% {opacity:1;transform:translateX(80px)  translateY(-30px) scale(1.1)}
+  55% {opacity:1;transform:translateX(10px)  translateY(-10px) scale(.95)}
+  75% {opacity:1;transform:translateX(-5px)  translateY(0) scale(1.05)}
+  100%{opacity:1;transform:translateX(0)     translateY(0) scale(1)}
+}
+/* Idle dance poses */
+@keyframes smDance{
+  0%{transform:rotate(-8deg) translateY(0)}100%{transform:rotate(7deg) translateY(-11px)}
+}
+@keyframes smDance2{
+  0%{transform:rotate(6deg) translateY(-6px)}100%{transform:rotate(-9deg) translateY(4px)}
+}
+@keyframes smDance3{
+  0%{transform:rotate(-4deg) translateY(0)}100%{transform:rotate(10deg) translateY(-14px)}
+}
+/* Kid idle — faster, bouncier */
+@keyframes smKidDance{
+  0%{transform:rotate(-12deg) translateY(0) scale(1)}
+  100%{transform:rotate(12deg) translateY(-14px) scale(1.04)}
+}
+@keyframes pillIn{
+  from{opacity:0;transform:translateX(-50%) translateY(8px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}
+}
+@keyframes floatPill{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-5px)}
+}
+@keyframes noteFloat{
+  0%{opacity:0;transform:translateY(0) rotate(-5deg)}
+  18%{opacity:.85}100%{opacity:0;transform:translateY(-55px) rotate(14deg)}
+}
+
+
+
+.event-card{border:1px solid rgba(255,255,255,0.07)}
+.event-card-hot {border:1px solid rgba(255,27,154,.2)}
+.event-card-soon{border:1px solid rgba(255,255,255,0.08)}
+
+/* Featured: conic wrapper pattern — padding:2px + conic bg + dark inner */
+
+/* Inner mask div restores the dark card background */
+
+
+
+/* ══ DeStore conic spin border on featured event tile ══ */
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+
+/* Subtle hairline on non-featured tiles */
+.event-card      {border:1px solid rgba(255,255,255,0.08)}
+.event-card-hot  {border:1px solid rgba(255,27,154,.22)}
+.event-card-soon {border:1px solid rgba(255,255,255,0.09)}
+
+/* Featured card: IS the conic border wrapper (DeStore .conic-wrap pattern) */
+.ec-featured{
+  padding:3px !important;
+  border:none !important;
+  border-radius:21px !important;
+  background:conic-gradient(
+    from var(--angle,0deg),
+    #B354F1,#6a14db,#00c8ff,
+    #B354F1 40%,#321b68 60%,#B354F1
+  ) !important;
+  animation:spin-border 2.5s linear infinite;
+}
+/* Inner div restores the dark card bg — THIS is what the user sees as the card */
+.ec-featured .ec-conic-inner{
+  background:linear-gradient(135deg,#0f0820,#1a0d35);
+  border-radius:18px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── Moon + Stars ── */
+@keyframes moonIn{
+  0%  {opacity:0;transform:translateY(-8px) scale(.7)}
+  60% {opacity:1;transform:translateY(2px) scale(1.05)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes starPop{
+  0%  {opacity:0;transform:scale(0)}
+  70% {opacity:1;transform:scale(1.3)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes starTwinkle{
+  0%,100%{opacity:1}
+  50%{opacity:0.25}
+}
+
+
+/* ── Stars & Moon ── */
+.sky-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;opacity:0;animation:starTwinkle var(--dur,3s) ease-in-out var(--delay,0s) infinite}
+@keyframes starTwinkle{
+  0%,100%{opacity:0;transform:scale(.6)}
+  50%{opacity:var(--peak,.18);transform:scale(1)}
+}
+.moon{
+  position:absolute;
+  top:18px; right:80px;
+  width:38px; height:38px;
+  border-radius:50%;
+  background:transparent;
+  box-shadow: -6px 2px 0 2px rgba(255,240,200,.13);
+  opacity:0;
+  animation:moonFade 3s ease-out 1.2s forwards;
+}
+@keyframes moonFade{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* ── Stickman hover jump ── */
+.sm-dancer{transition:transform .15s cubic-bezier(0.34,1.56,0.64,1)}
+.sm-dancer.jumping{animation:smJump .45s cubic-bezier(0.34,1.56,0.64,1) forwards!important}
+@keyframes smJump{
+  0%{transform:translateY(0) rotate(0deg)}
+  35%{transform:translateY(-55px) rotate(-12deg)}
+  65%{transform:translateY(-45px) rotate(8deg)}
+  85%{transform:translateY(-8px) rotate(-3deg)}
+  100%{transform:translateY(0) rotate(0deg)}
+}
+
+
+.faq-item{background:var(--d2);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .16s}
+.faq-item:hover{border-color:rgba(179,84,241,.3)}
+.faq-item.open{border-color:rgba(179,84,241,.4)}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;font-size:14px;font-weight:700}
+.faq-arrow{color:var(--violet);transition:transform .2s;font-size:16px}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 22px 18px;font-size:13px;color:var(--dim);line-height:1.75}
+.faq-item.open .faq-a{display:block}
+
+</style>
+</head>
+<body>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-wordmark">ULTIMATE<span>·</span>XP</a>
+    <div class="nav-links">
+      <a href="#events" class="nav-link">Events</a>
+      <a href="#how" class="nav-link">How It Works</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    <a href="#contact"
+    <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<section style="padding:120px 24px 80px;background:var(--bg)">
+  <div style="max-width:1100px;margin:0 auto">
+
+    <!-- Hero -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-bottom:80px">
+      <div>
+        <div class="section-label" style="color:var(--violet)">Upcoming Event · Byron Bay</div>
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,7vw,80px);letter-spacing:.05em;line-height:.9;margin-bottom:20px">
+          ULTIMATE<br><span style="color:var(--violet)">FAMILY</span><br><span style="color:var(--gold)">DISCO</span>
+        </h1>
+        <p style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--dim);line-height:1.7;margin-bottom:28px">Where little legends and big kids share the same dancefloor. Three channels — kids' hits, 80s/90s anthems, and Aussie vibes. Everyone dances.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px">
+          <span style="background:rgba(179,84,241,.12);border:1px solid rgba(179,84,241,.3);color:var(--violet);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700">All Ages</span>
+          <span style="background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.3);color:var(--gold);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700">3 Channels</span>
+          <span style="background:rgba(40,183,157,.12);border:1px solid rgba(40,183,157,.3);color:var(--green);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700">RF Wireless</span>
+          <span style="background:rgba(255,27,154,.12);border:1px solid rgba(255,27,154,.3);color:var(--pink);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700">Byron Bay</span>
+        </div>
+        <div style="background:var(--d2);border:1px solid var(--bdr);border-radius:14px;padding:20px;margin-bottom:28px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span style="font-size:13px;font-weight:700;color:var(--gold)">Date TBC</span>
+          </div>
+          <div style="font-size:13px;color:var(--dim)">We're locking in the next date. Drop your email below and you'll be the first to know.</div>
+        </div>
+        <a href="#notify" class="btn-primary" style="font-size:14px;padding:14px 28px;margin-right:10px">Get Notified</a>
+        <a href="/contact" class="btn-ghost" style="font-size:14px;padding:14px 28px">Ask a Question</a>
+      </div>
+
+      <!-- Visual -->
+      <div style="background:linear-gradient(135deg,#0f0820,#1a0535);border:1px solid rgba(179,84,241,.2);border-radius:22px;aspect-ratio:4/5;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(179,84,241,.06) 20deg,transparent 40deg,rgba(255,209,102,.04) 80deg,transparent 100deg);animation:spinSlow 20s linear infinite"></div>
+        <!-- Disco ball -->
+        <svg width="100" height="120" viewBox="0 0 90 110" fill="none" style="margin-bottom:20px;position:relative;z-index:1">
+          <ellipse cx="45" cy="45" rx="40" ry="40" fill="#1a0d35" stroke="rgba(179,84,241,.3)" stroke-width="1"/>
+          <ellipse cx="45" cy="45" rx="40" ry="40" fill="url(#db2)"/>
+          <defs><radialGradient id="db2" cx="35%" cy="35%"><stop offset="0%" stop-color="#c8b8f8" stop-opacity=".9"/><stop offset="60%" stop-color="#6a14db" stop-opacity=".6"/><stop offset="100%" stop-color="#0f0820"/></radialGradient></defs>
+          <g fill="none" stroke="rgba(255,255,255,.15)" stroke-width=".5">
+            <rect x="15" y="20" width="10" height="7" rx="1"/><rect x="28" y="20" width="10" height="7" rx="1"/><rect x="41" y="20" width="10" height="7" rx="1"/>
+            <rect x="10" y="30" width="10" height="7" rx="1"/><rect x="23" y="30" width="10" height="7" rx="1"/><rect x="36" y="30" width="10" height="7" rx="1"/>
+          </g>
+          <line x1="45" y1="0" x2="45" y2="10" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+          <g opacity=".4">
+            <line x1="45" y1="85" x2="5" y2="110" stroke="#B354F1" stroke-width="1.5"/>
+            <line x1="45" y1="85" x2="45" y2="110" stroke="#FFD166" stroke-width="2"/>
+            <line x1="45" y1="85" x2="85" y2="110" stroke="#FF1B9A" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--dim);text-align:center;position:relative;z-index:1;padding:0 20px">The dancefloor where everyone gets their song.</div>
+      </div>
+    </div>
+
+    <!-- Channels -->
+    <div style="margin-bottom:80px">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,52px);letter-spacing:.05em;margin-bottom:32px">TONIGHT'S <span style="color:var(--gold)">CHANNELS</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div style="background:linear-gradient(135deg,#0f0820,#1a0d35);border:1px solid rgba(179,84,241,.25);border-radius:18px;padding:28px">
+          <div style="width:16px;height:16px;border-radius:50%;background:#B354F1;margin-bottom:14px;box-shadow:0 0 16px #B354F180"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#B354F1;letter-spacing:.04em;margin-bottom:8px">CHANNEL 1 — KIDS' HITS</div>
+          <div style="font-size:13px;color:var(--dim);line-height:1.7">Current pop hits the kids love. The channel they'll talk about at school on Monday.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0d0a00,#1a1400);border:1px solid rgba(255,209,102,.25);border-radius:18px;padding:28px">
+          <div style="width:16px;height:16px;border-radius:50%;background:var(--gold);margin-bottom:14px;box-shadow:0 0 16px rgba(255,209,102,.5)"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);letter-spacing:.04em;margin-bottom:8px">CHANNEL 2 — 80S/90S</div>
+          <div style="font-size:13px;color:var(--dim);line-height:1.7">The anthems Mum and Dad grew up on. Their turn to know every word.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0d0d08,#1a1a10);border:1px solid rgba(255,209,102,.15);border-radius:18px;padding:28px">
+          <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,209,102,.6);margin-bottom:14px;box-shadow:0 0 16px rgba(255,209,102,.3)"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,209,102,.7);letter-spacing:.04em;margin-bottom:8px">CHANNEL 3 — AUSSIE VIBES</div>
+          <div style="font-size:13px;color:var(--dim);line-height:1.7">Laid back Aussie classics. The one that surprises everyone into staying on it all night.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notify form -->
+    <div id="notify" style="background:linear-gradient(135deg,#0f0820,#1a0d35);border:1px solid rgba(179,84,241,.25);border-radius:22px;padding:48px;text-align:center;margin-bottom:80px">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.05em;margin-bottom:12px">BE FIRST TO <span style="color:var(--gold)">KNOW.</span></h2>
+      <p style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--dim);margin-bottom:32px">Drop your email and we'll tell you the moment tickets go live.</p>
+      <div style="display:flex;gap:12px;max-width:440px;margin:0 auto" id="notifyForm">
+        <input type="email" class="form-input" placeholder="your@email.com" id="notifyEmail" style="flex:1">
+        <button onclick="submitNotify()" class="btn-primary" style="white-space:nowrap;padding:0 24px">Notify Me</button>
+      </div>
+      <div id="notifySuccess" style="display:none;font-family:'Fredoka One',cursive;font-size:18px;color:var(--green)">You're on the list! 🎧</div>
+    </div>
+
+    <!-- FAQ -->
+    <div style="margin-bottom:48px">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,52px);letter-spacing:.05em;margin-bottom:32px">COMMON <span style="color:var(--gold)">QUESTIONS</span></h2>
+      <div style="display:flex;flex-direction:column;gap:8px" id="faqList">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How old do kids need to be? <span class="faq-arrow">↓</span></div>
+          <div class="faq-a">All ages are welcome. We've had babies in arms and grandparents on the dancefloor at the same event. The three channels mean there's something for every age group.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is it too loud for kids? <span class="faq-arrow">↓</span></div>
+          <div class="faq-a">Each headset has individual volume control, so parents can set a comfortable level for their kids. The space itself is essentially silent — so it's actually quieter than a regular event for anyone not wearing headphones.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Do I need to download an app? <span class="faq-arrow">↓</span></div>
+          <div class="faq-a">No app, no pairing, no setup. You put the headset on and it works. One button to switch channels.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">What should we wear? <span class="faq-arrow">↓</span></div>
+          <div class="faq-a">Whatever you'd dance in. We're an outdoor event — wear layers if it's an evening, and comfortable shoes you can move in.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is there food and drink? <span class="faq-arrow">↓</span></div>
+          <div class="faq-a">Varies by event — check the specific event listing. Most of our public events include food trucks or are held near food options.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function submitNotify(){
+  var email=document.getElementById('notifyEmail').value;
+  if(!email){return;}
+  fetch('https://n8n.flowberry.org/webhook/destore-espr-lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({source:'family-disco-notify',email:email,submitted_at:new Date().toISOString()})
+  }).catch(function(){});
+  document.getElementById('notifyForm').style.display='none';
+  document.getElementById('notifySuccess').style.display='block';
+}
+function toggleFaq(el){
+  var isOpen=el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(f){f.classList.remove('open');});
+  if(!isOpen) el.classList.add('open');
+}
+</script>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">ULTIMATE<span>·</span>XP</div>
+      <div class="footer-tagline">We don't do events. We do experiences. Born in Byron Bay. Built for all of Australia.</div>
+    </div>
+    <div>
+      <div class="footer-col-label">Events</div>
+      <div class="footer-links-group">
+        <a href="/family-disco" class="footer-link">Ultimate Family Disco</a>
+        <a href="#contact" class="footer-link">Private &amp; Corporate</a>
+        <a href="#contact" class="footer-link">Wellness Disco</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-label">Company</div>
+      <div class="footer-links-group">
+        <a href="#about" class="footer-link">About UE</a>
+        <a href="https://www.byronbaysilentdisco.com" class="footer-link" target="_blank">Byron Bay Silent Disco</a>
+        <a href="https://destore.network" class="footer-link" target="_blank">DeStore Network</a>
+        <a href="#contact" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>© 2026 Ultimate Experiences Pty Ltd · Byron Bay, NSW, Australia</span>
+    <span>A sister brand of Byron Bay Silent Disco · Part of the Kotzur family of companies</span>
+  </div>
+</footer>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function toggleMenu(){document.getElementById('navDrawer').classList.toggle('open')}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('nav')&&!e.target.closest('.nav-drawer'))
+    document.getElementById('navDrawer').classList.remove('open')
+});
+setTimeout(function(){
+  var v=document.getElementById('vanActor');
+  if(v){v.style.animation='vanIdle 2.6s ease-in-out infinite';v.style.transform='translateX(0)';}
+},3100);
+if(window.IntersectionObserver){
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='none';obs.unobserve(e.target)}
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('.pillar,.how-step,.stat-card,.event-card').forEach(function(el){
+    el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity .5s ease,transform .5s ease';
+    obs.observe(el);
+  });
+}
+</script>
+<script>
+setTimeout(function(){
+  var v=document.getElementById("vanActor");
+  if(v){v.style.animation="vanIdle 2.6s ease-in-out infinite";v.style.transform="translateX(0)";}
+},3100);
+</script>
+<script>
+/* ── Hero word typer ── */
+(function(){
+  var el,tmr;
+  var words=[
+    {text:'FUN.',       typeSpeed:130,deleteSpeed:50,pauseAfter:1400,final:false},
+    {text:'LAUGHTER.',  typeSpeed:85, deleteSpeed:45,pauseAfter:1700,final:false},
+    {text:'EXPERIENCES.',typeSpeed:68,deleteSpeed:0, pauseAfter:0,   final:true}
+  ];
+  var idx=0;
+  function init(){el=document.getElementById('heroWord');if(!el)return;setTimeout(startWord,900);}
+  function startWord(){el.classList.remove('word-final');typeChars(0);}
+  function typeChars(i){
+    var w=words[idx];
+    if(i<=w.text.length){
+      el.textContent=w.text.slice(0,i)+(i<w.text.length?'|':'');
+      tmr=setTimeout(function(){typeChars(i+1);},i===0?260:w.typeSpeed+(Math.random()*22|0));
+    } else {
+      el.textContent=w.text;
+      if(w.final){el.classList.add('word-final');return;}
+      tmr=setTimeout(deleteChars,w.pauseAfter);
+    }
+  }
+  function deleteChars(){
+    var str=words[idx].text,i=str.length;
+    function del(){
+      if(i>=0){el.textContent=str.slice(0,i)+(i>0?'|':'');i--;tmr=setTimeout(del,words[idx].deleteSpeed);}
+      else{el.textContent=' ';idx=(idx+1)%words.length;tmr=setTimeout(startWord,280);}
+    }
+    del();
+  }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+})();
+</script>
+
+<script>
+/* ── Star generator ── */
+(function(){
+  var layer = document.getElementById('skyLayer');
+  if(!layer) return;
+  var count = 55;
+  for(var i=0;i<count;i++){
+    var s = document.createElement('div');
+    s.className = 'star';
+    var size = (Math.random()*2+1).toFixed(1);
+    var peak = (Math.random()*.12+.05).toFixed(2);
+    var dur  = (Math.random()*4+2).toFixed(1);
+    var delay= (Math.random()*8).toFixed(1);
+    s.style.cssText = [
+      'left:'+(Math.random()*100).toFixed(1)+'%',
+      'top:'+(Math.random()*70).toFixed(1)+'%',
+      'width:'+size+'px',
+      'height:'+size+'px',
+      '--peak:'+peak,
+      '--dur:'+dur+'s',
+      '--delay:'+delay+'s'
+    ].join(';');
+    layer.appendChild(s);
+  }
+})();
+
+/* ── Stickman proximity jump ── */
+(function(){
+  var ids = ['sm1','sm2','sm3','sm4','kid1','kid2','kid3'];
+  var jumping = {};
+  var lastJump = {};
+
+  function getCenter(el){
+    var r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+
+  document.addEventListener('mousemove', function(e){
+    var now = Date.now();
+    var closest = null;
+    var closestDist = 9999;
+
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      var c = getCenter(el);
+      var dx = e.clientX - c.x;
+      var dy = e.clientY - c.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < closestDist){
+        closestDist = dist;
+        closest = id;
+      }
+    });
+
+    if(closest && closestDist < 90){
+      var el = document.getElementById(closest);
+      if(!jumping[closest] && (!lastJump[closest] || now - lastJump[closest] > 700)){
+        jumping[closest] = true;
+        lastJump[closest] = now;
+        el.classList.add('jumping');
+        setTimeout(function(){
+          el.classList.remove('jumping');
+          jumping[closest] = false;
+        }, 500);
+      }
+    }
+  });
+})();
+</script>
+
+
+</body>
+</html>

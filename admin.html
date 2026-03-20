@@ -1,0 +1,2758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ULTIMATE·XP Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#FFD166;--gdim:#c9952a;--violet:#B354F1;--orchid:#6A14DB;
+  --pink:#FF1B9A;--green:#28B79D;--orange:#FF9F46;--red:#e53e3e;
+  --bg:#07070a;--d1:#0d0d10;--d2:#141418;--d3:#1c1c22;--d4:#26262e;
+  --bdr:#2e2e38;--muted:#6b6b80;--dim:#9999b0;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--d1)}
+::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+/* ── keyframes ── */
+@keyframes spin{to{--ang:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes scanLine{0%,100%{top:0}50%{top:calc(100% - 2px)}}
+@keyframes slideIn{from{transform:translateX(110%)}to{transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(110%)}}
+
+/* ══ TOPBAR ══ */
+.topbar{height:54px;background:var(--d1);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:10}
+.topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em}
+.topbar-logo span{color:var(--gold)}
+.tb-sep{width:1px;height:18px;background:var(--bdr)}
+.tb-label{font-size:11px;font-weight:700;color:var(--muted)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-user{font-size:12px;font-weight:700;color:var(--dim)}
+.tb-logout{background:none;border:1px solid var(--bdr);border-radius:7px;
+  padding:4px 11px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.tb-logout:hover{border-color:rgba(255,27,154,.3);color:var(--pink)}
+
+/* ══ APP SHELL ══ */
+.app-wrap{display:flex;flex:1;overflow:hidden}
+.shell{display:none;flex-direction:column;height:100vh}
+.shell.active{display:flex}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:210px;flex-shrink:0;background:var(--d1);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;overflow-y:auto;padding:12px 0}
+.nav-sec{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:12px 18px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+  border-left:2px solid transparent;transition:all .13s;user-select:none}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.025)}
+.nav-item.on{color:var(--gold);border-left-color:var(--gold);background:rgba(255,209,102,.06)}
+.nav-item svg{width:15px;height:15px;opacity:.65;flex-shrink:0}
+.nav-item.on svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--violet);color:#fff;font-size:9px;
+  font-weight:800;border-radius:100px;padding:2px 6px;min-width:17px;text-align:center}
+
+/* ══ MAIN ══ */
+.main{flex:1;overflow-y:auto}
+.panel{display:none;padding:32px 36px 80px;animation:fadeUp .25s ease}
+.panel.on{display:block}
+.pg-hd{margin-bottom:28px}
+.pg-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.04em;line-height:1;margin-bottom:4px}
+.pg-sub{font-size:12px;color:var(--dim)}
+.pg-hd-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
+
+/* ══ STATS ══ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat{background:var(--d1);border:1px solid var(--bdr);border-radius:13px;padding:18px 20px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;margin-bottom:3px}
+.stat-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+
+/* ══ CARD ══ */
+.card{background:var(--d1);border:1px solid var(--bdr);border-radius:15px;overflow:hidden}
+.card-hd{padding:16px 20px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:12px;font-weight:800;letter-spacing:.02em}
+
+/* ══ TABLE ══ */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);padding:10px 20px;border-bottom:1px solid var(--bdr)}
+.tbl td{padding:12px 20px;font-size:12px;color:var(--dim);
+  border-bottom:1px solid rgba(46,46,56,.4);vertical-align:middle}
+.tbl td:first-child{color:#fff;font-weight:700}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+
+/* ══ BADGE ══ */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:100px;
+  padding:2px 9px;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.bg{background:rgba(40,183,157,.12);color:var(--green);border:1px solid rgba(40,183,157,.25)}
+.bv{background:rgba(179,84,241,.12);color:var(--violet);border:1px solid rgba(179,84,241,.25)}
+.by{background:rgba(255,209,102,.12);color:var(--gold);border:1px solid rgba(255,209,102,.25)}
+.bp{background:rgba(255,27,154,.12);color:var(--pink);border:1px solid rgba(255,27,154,.25)}
+.bm{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--bdr)}
+.br{background:rgba(229,62,62,.12);color:#fc8181;border:1px solid rgba(229,62,62,.25)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.5s ease-in-out infinite}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;
+  font-size:12px;font-weight:800;cursor:pointer;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .14s;letter-spacing:.02em}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(135deg,var(--gdim),var(--gold));color:#07070a;
+  box-shadow:0 3px 14px rgba(255,209,102,.3)}
+.btn-gold:hover{filter:brightness(1.08)}
+.btn-violet{background:linear-gradient(135deg,var(--orchid),var(--violet));color:#fff;
+  box-shadow:0 3px 14px rgba(179,84,241,.3)}
+.btn-green{background:linear-gradient(135deg,#1a9a84,var(--green));color:#fff}
+.btn-ghost{background:transparent;color:var(--dim);border:1px solid var(--bdr)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2);color:#fff}
+.btn-danger{background:linear-gradient(135deg,#7a0a0a,var(--red));color:#fff}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:8px}
+
+/* ══ FORMS ══ */
+.form-group{display:flex;flex-direction:column;gap:5px}
+.lbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.inp,.sel,.ta{background:var(--d4);border:1px solid var(--bdr);border-radius:10px;
+  padding:10px 13px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;font-weight:600;outline:none;transition:border-color .18s,box-shadow .18s;width:100%}
+.inp:focus,.sel:focus,.ta:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,209,102,.1)}
+.ta{resize:vertical;min-height:80px}
+.sel option{background:var(--d3)}
+.inp-wrap{position:relative;display:flex;align-items:center}
+.inp-wrap .inp{padding-right:40px}
+.inp-eye{position:absolute;right:0;top:0;bottom:0;width:38px;
+  display:flex;align-items:center;justify-content:center;background:none;
+  border:none;color:var(--muted);cursor:pointer;transition:color .15s}
+.inp-eye:hover{color:var(--gold)}
+.inp-dollar{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-weight:800;color:var(--muted);font-size:13px;pointer-events:none}
+.inp-pct{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-weight:800;color:var(--muted);pointer-events:none}
+
+/* ══ NODE FLOW ══ */
+.flow-wrap{background:var(--d1);border:1px solid var(--bdr);border-radius:16px;
+  overflow:hidden;margin-bottom:20px}
+.flow-bar{padding:14px 20px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;gap:10px}
+.flow-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 9px rgba(255,209,102,.5)}
+.flow-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.flow-step-lbl{margin-left:auto;font-size:11px;font-weight:700;color:var(--gold)}
+.step-dots{display:flex;gap:5px;align-items:center;padding:12px 20px 4px}
+.sd{width:7px;height:7px;border-radius:50%;background:var(--d4);
+  transition:all .2s;cursor:pointer}
+.sd.on{background:var(--gold);width:22px;border-radius:3px}
+.sd.done{background:var(--green)}
+.step-prog{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700}
+.flow-row{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:12px 20px 14px;
+  scrollbar-width:thin}
+.fn-card{display:flex;flex-direction:column;align-items:flex-start;gap:7px;
+  padding:13px 15px;min-width:145px;max-width:165px;
+  background:var(--d2);border:1.5px solid var(--bdr);border-radius:13px;
+  cursor:pointer;transition:all .18s;position:relative;overflow:hidden;flex-shrink:0}
+.fn-card:hover{border-color:rgba(255,209,102,.4);background:var(--d3);transform:translateY(-2px)}
+.fn-card.on{border-color:var(--gold);background:rgba(255,209,102,.07);
+  box-shadow:0 0 0 1px rgba(255,209,102,.3),0 0 20px rgba(255,209,102,.15)}
+.fn-card.done{border-color:rgba(40,183,157,.45);background:rgba(40,183,157,.06)}
+.fn-icon{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fn-title{font-size:11px;font-weight:800;color:#fff;line-height:1.3}
+.fn-sub{font-size:10px;color:var(--muted);font-weight:600;line-height:1.4}
+.fn-conn{display:flex;align-items:center;flex-shrink:0;margin-top:26px;padding:0 3px}
+.fn-line{width:32px;height:2px;background:var(--bdr);transition:all .2s}
+.fn-line.on{background:var(--gold);box-shadow:0 0 6px rgba(255,209,102,.4)}
+.fn-arrow{width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;
+  border-left:7px solid var(--bdr);transition:all .2s}
+.fn-arrow.on{border-left-color:var(--gold)}
+
+/* ══ EVENT BOARD ══ */
+.ev-board{padding:14px 0}
+.ev-card{background:var(--d2);border:1.5px solid var(--bdr);border-radius:13px;
+  margin:0 20px 10px;cursor:pointer;transition:all .18s;overflow:visible}
+.ev-card:hover{border-color:rgba(255,209,102,.3);transform:translateY(-1px)}
+.ev-card.feat{padding:2px;border:none;
+  background:conic-gradient(from var(--ang,0deg),var(--violet),var(--orchid),#00c8ff,var(--violet) 40%,#321b68 60%,var(--violet));
+  animation:spin 2.5s linear infinite;border-radius:15px}
+.ev-inner{background:var(--d2);border-radius:12px;display:flex;overflow:hidden}
+.ev-stripe{width:5px;flex-shrink:0}
+.ev-body{flex:1;padding:13px 16px;display:flex;align-items:center;gap:14px}
+.ev-date{background:var(--d3);border-radius:9px;padding:8px 11px;text-align:center;flex-shrink:0;min-width:50px}
+.ev-day{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--gold)}
+.ev-mon{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ev-info{flex:1}
+.ev-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:3px}
+.ev-meta{font-size:11px;color:var(--dim);margin-bottom:5px}
+.ev-chs{display:flex;gap:4px;flex-wrap:wrap}
+.ch-pip{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;
+  letter-spacing:.04em;border-radius:100px;padding:2px 8px}
+.ch-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.ev-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;padding-right:2px}
+.ev-actions{display:flex;gap:6px;margin-top:4px}
+
+/* ══ MODAL ══ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+  z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--d1);border:1px solid var(--bdr);border-radius:18px;
+  width:100%;max-width:620px;max-height:90vh;overflow-y:auto;animation:fadeUp .22s ease}
+.modal-hd{padding:22px 26px 18px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;gap:12px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em}
+.modal-close{margin-left:auto;background:none;border:none;color:var(--muted);
+  font-size:20px;cursor:pointer;padding:2px 5px;transition:color .15s;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-body{padding:22px 26px}
+.modal-ft{padding:14px 26px 22px;display:flex;justify-content:flex-end;gap:9px}
+
+/* ══ NODE POPUP MODAL ══ */
+.node-modal-hd{padding:20px 26px 16px;border-bottom:1px solid var(--bdr)}
+.node-modal-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.nm-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nm-title{font-size:15px;font-weight:900;color:#fff}
+.nm-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.nm-dots{display:flex;gap:5px;align-items:center}
+.nm-step{font-size:10px;color:var(--muted);font-weight:700;white-space:nowrap;margin-left:8px}
+
+/* ══ CAPACITY STEPPER ══ */
+.cap-display{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--green);line-height:1}
+.step-row{display:flex;gap:6px;margin-bottom:10px}
+.cap-btn{flex:1;padding:6px 4px;border-radius:8px;background:var(--d4);
+  border:1px solid var(--bdr);color:var(--dim);font-size:12px;font-weight:700;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .14s;text-align:center}
+.cap-btn.pos{color:var(--green);border-color:rgba(40,183,157,.3)}
+.cap-btn:hover{background:var(--d3);border-color:var(--gold);color:var(--gold)}
+.gauge{height:5px;background:var(--d4);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.gauge-fill{height:100%;background:linear-gradient(90deg,#1a9a84,var(--green));border-radius:3px;transition:width .3s}
+.preset-btn{background:var(--d4);border:1px solid var(--bdr);border-radius:8px;
+  padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;color:var(--dim);
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .14s}
+.preset-btn:hover{border-color:rgba(40,183,157,.4);color:var(--green)}
+.preset-btn.on{background:rgba(40,183,157,.12);border-color:rgba(40,183,157,.4);color:var(--green)}
+
+/* ══ PRICING TIERS ══ */
+.tier{padding:15px 18px;border-bottom:1px solid var(--bdr)}
+.tier:last-child{border-bottom:none}
+.tier-hd{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.tier-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tier-name{font-size:12px;font-weight:900}
+.tier-date{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700}
+.tier-badge{margin-left:auto}
+.tier-grid{display:grid;gap:10px}
+.eb-auto{background:rgba(40,183,157,.08);border:1px solid rgba(40,183,157,.25);
+  border-radius:10px;padding:10px 13px;font-size:17px;font-weight:900;color:var(--green)}
+
+/* ══ PRICING SUMMARY ══ */
+.price-summary{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--bdr)}
+.ps-col{flex:1;padding:11px 13px}
+.ps-col:not(:last-child){border-right:1px solid var(--bdr)}
+.ps-col:nth-child(even){background:var(--d3)}
+.ps-dot{width:7px;height:7px;border-radius:50%;margin-bottom:5px}
+.ps-lbl{font-size:10px;font-weight:800;color:var(--muted);margin-bottom:3px}
+.ps-price{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;line-height:1}
+.ps-period{font-size:9px;color:var(--muted);margin-top:3px}
+
+/* ══ QR SCANNER ══ */
+.scanner-vp{position:relative;width:100%;aspect-ratio:4/3;background:#000;overflow:hidden}
+#scanVideo{width:100%;height:100%;object-fit:cover;display:block}
+.scan-overlay{position:absolute;inset:0;
+  background:linear-gradient(rgba(0,0,0,.35) 0%,transparent 20%,transparent 80%,rgba(0,0,0,.35) 100%);
+  pointer-events:none}
+.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:210px;height:210px}
+.sc{position:absolute;width:26px;height:26px;border-color:var(--gold);border-style:solid;border-width:0}
+.sc.tl{top:0;left:0;border-top-width:3px;border-left-width:3px}
+.sc.tr{top:0;right:0;border-top-width:3px;border-right-width:3px}
+.sc.bl{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px}
+.sc.br{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px}
+.scan-line{position:absolute;left:5%;width:90%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:scanLine 2.4s ease-in-out infinite;box-shadow:0 0 8px var(--gold);opacity:.75}
+.scan-status{position:absolute;bottom:0;left:0;right:0;padding:13px 18px;
+  background:linear-gradient(transparent,rgba(0,0,0,.85));
+  font-size:12px;font-weight:700;color:var(--gold);text-align:center}
+.scan-entry{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 13px;background:var(--d3);border-radius:9px;margin-bottom:5px}
+.scan-entry-name{font-size:12px;font-weight:700}
+.scan-entry-ev{font-size:10px;color:var(--muted)}
+.scan-entry-time{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+/* ══ API CARDS ══ */
+.api-card{background:var(--d1);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:14px;transition:border-color .2s}
+.api-card.connected{border-color:rgba(40,183,157,.3)}
+.api-hd{padding:14px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px}
+.api-logo{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.api-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:2px}
+.api-desc{font-size:11px;color:var(--muted)}
+.api-status{margin-left:auto;flex-shrink:0}
+.api-body{padding:18px 20px}
+.api-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.api-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+
+/* ══ QR GENERATOR ══ */
+.qr-style{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;
+  padding:7px 9px;border-radius:9px;border:1.5px solid var(--bdr);background:var(--d2);
+  transition:all .15s;font-size:10px;font-weight:700;color:var(--muted)}
+.qr-style:hover,.qr-style.on{border-color:var(--violet);color:var(--violet);background:rgba(179,84,241,.08)}
+.qr-swatch{width:38px;height:38px;border-radius:5px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr)}
+.gs1-url{background:var(--bg);border:1.5px solid rgba(179,84,241,.25);border-radius:10px;
+  padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--violet);
+  word-break:break-all;line-height:1.7;min-height:48px}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;top:68px;right:18px;z-index:9999;
+  background:var(--d2);border:1px solid var(--bdr);border-radius:11px;
+  padding:12px 16px;display:flex;align-items:center;gap:10px;
+  max-width:300px;box-shadow:0 8px 28px rgba(0,0,0,.4);animation:slideIn .22s ease}
+.toast.out{animation:toastOut .28s ease forwards}
+.toast-msg{font-size:12px;font-weight:700}
+
+/* ══ VISIBILITY RADIO ══ */
+.vis-opt{display:flex;align-items:center;gap:12px;background:var(--d2);
+  border:1.5px solid var(--bdr);border-radius:11px;padding:12px 15px;cursor:pointer;transition:all .15s}
+.vis-opt.on{background:var(--d3)}
+.vis-radio{width:17px;height:17px;border-radius:50%;border:2px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.vis-radio-fill{width:8px;height:8px;border-radius:50%}
+
+/* ══ PROGRESS ══ */
+.prog-bar{height:3px;background:var(--d4);border-radius:2px;overflow:hidden;margin-top:5px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gdim),var(--gold));border-radius:2px}
+
+/* ══ FEAT TOGGLE ══ */
+.feat-toggle{display:flex;align-items:center;gap:11px;background:var(--d2);
+  border:1.5px solid var(--bdr);border-radius:11px;padding:14px 15px;cursor:pointer;transition:all .15s}
+.feat-toggle.on{background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.4)}
+
+/* ══ REVIEW CARD ══ */
+.review-card{background:var(--d2);border:1px solid var(--bdr);border-radius:13px;padding:18px;margin-bottom:14px}
+.review-date-block{background:var(--d3);border-radius:9px;padding:9px 12px;text-align:center;flex-shrink:0;min-width:50px}
+
+/* ══ COUNTDOWN ══ */
+.cd-tile{background:rgba(0,0,0,.3);border:1px solid rgba(179,84,241,.15);border-radius:9px;padding:11px 7px;text-align:center}
+.cd-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--violet);line-height:1}
+.cd-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:860px){.stats{grid-template-columns:1fr 1fr}.sidebar{width:180px}.api-grid{grid-template-columns:1fr}.api-grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:580px){.sidebar{display:none}.panel{padding:20px 14px 60px}}
+</style>
+</head>
+<body>
+
+<!-- ══ APP SHELL (shown immediately — demo mode) ══ -->
+<div class="shell active" id="appShell">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">ULTIMATE<span>&#183;</span>XP</div>
+    <div class="tb-sep"></div>
+    <div class="tb-label">Admin</div>
+    <div style="margin-left:10px"><span class="badge bg"><span class="live-dot" style="margin-right:4px"></span>Live</span></div>
+    <div class="tb-right">
+      <div class="tb-user" id="tbUser"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="513b3e2238303911243d25383c302534342921342338343f3234227f323e3c7f3024">[email&#160;protected]</a></div>
+      <button class="tb-logout" id="tbLogout">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="app-wrap">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-sec">Main</div>
+      <div class="nav-item on" data-panel="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-panel="events">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        Events
+        <span class="nav-badge" id="evBadge">0</span>
+      </div>
+      <div class="nav-item" data-panel="scanner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="7" y1="12" y2="12.01"/><line x1="12" x2="12" y1="12" y2="12.01"/><line x1="17" x2="17" y1="12" y2="12.01"/></svg>
+        QR Scanner
+      </div>
+      <div class="nav-item" data-panel="attendees">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Attendees
+      </div>
+      <div class="nav-sec" style="margin-top:6px">Config</div>
+      <div class="nav-item" data-panel="integrations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="19" cy="19" r="3"/><circle cx="5" cy="19" r="3"/><line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="14" x2="19" y2="16"/><line x1="12" y1="14" x2="5" y2="16"/></svg>
+        Integrations
+        <span class="nav-badge" style="background:var(--green)">API</span>
+      </div>
+      <div class="nav-item" data-panel="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="panel on" id="panel-dashboard">
+        <div class="pg-hd">
+          <div class="pg-title">DASHBOARD</div>
+          <div class="pg-sub">Welcome back. Here's what's happening.</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-val" style="color:var(--gold)" id="statEv">0</div><div class="stat-lbl">Active Events</div></div>
+          <div class="stat"><div class="stat-val" style="color:var(--violet)" id="statTix">0</div><div class="stat-lbl">Registrations</div></div>
+          <div class="stat"><div class="stat-val" style="color:var(--green)" id="statScans">0</div><div class="stat-lbl">QR Scans Today</div></div>
+          <div class="stat"><div class="stat-val" style="color:var(--pink)" id="statEnq">0</div><div class="stat-lbl">Enquiries</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">UPCOMING EVENTS</div>
+            <button class="btn btn-gold btn-sm" id="dashNewEvt">+ New Event</button>
+          </div>
+          <div id="dashEvList" style="padding:14px 0"></div>
+        </div>
+      </div>
+
+      <!-- ── EVENTS ── -->
+      <div class="panel" id="panel-events">
+        <div class="pg-hd-row">
+          <div>
+            <div class="pg-title">EVENTS</div>
+            <div class="pg-sub">Build templates &middot; assign dates &middot; publish to ultimateexperiences.com.au</div>
+          </div>
+          <div style="display:flex;gap:9px">
+            <button class="btn btn-ghost" id="btnSchedule">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              Schedule Event
+            </button>
+            <button class="btn btn-gold" id="btnNewTpl">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Template
+            </button>
+          </div>
+        </div>
+
+        <!-- Creation pipeline -->
+        <div class="flow-wrap" id="creationFlow">
+          <div class="flow-bar">
+            <div class="flow-dot"></div>
+            <div class="flow-label">Template Builder Pipeline</div>
+            <div class="flow-step-lbl" id="flowLbl">Click a node to begin</div>
+          </div>
+          <div class="step-dots">
+            <div class="sd on" id="sd0"></div>
+            <div class="sd" id="sd1"></div>
+            <div class="sd" id="sd2"></div>
+            <div class="sd" id="sd3"></div>
+            <div class="sd" id="sd4"></div>
+            <div class="step-prog" id="flowProg">Step 1 of 5</div>
+          </div>
+          <div class="flow-row">
+            <div class="fn-card on" id="fn0">
+              <div class="fn-icon" style="background:linear-gradient(135deg,var(--gdim),var(--gold))">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#07070a" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="fn-title">Template Info</div>
+              <div class="fn-sub">Name &middot; type &middot; venue</div>
+              <span class="badge by" style="font-size:8px">Required</span>
+            </div>
+            <div class="fn-conn"><div class="fn-line" id="fl0"></div><div class="fn-arrow" id="fa0"></div></div>
+            <div class="fn-card" id="fn1">
+              <div class="fn-icon" style="background:linear-gradient(135deg,var(--orchid),var(--violet))">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              </div>
+              <div class="fn-title">3 Channels</div>
+              <div class="fn-sub">CH1 &middot; CH2 &middot; CH3</div>
+              <span class="badge bv" style="font-size:8px">Configure</span>
+            </div>
+            <div class="fn-conn"><div class="fn-line" id="fl1"></div><div class="fn-arrow" id="fa1"></div></div>
+            <div class="fn-card" id="fn2">
+              <div class="fn-icon" style="background:linear-gradient(135deg,#1a9a84,var(--green))">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="fn-title">Capacity &amp; Pricing</div>
+              <div class="fn-sub">Headsets &middot; tiered pricing</div>
+              <span class="badge bg" style="font-size:8px">Set Limits</span>
+            </div>
+            <div class="fn-conn"><div class="fn-line" id="fl2"></div><div class="fn-arrow" id="fa2"></div></div>
+            <div class="fn-card" id="fn3">
+              <div class="fn-icon" style="background:linear-gradient(135deg,#c0126f,var(--pink))">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+              <div class="fn-title">Visibility</div>
+              <div class="fn-sub">Status &middot; featured</div>
+              <span class="badge bp" style="font-size:8px">Publish</span>
+            </div>
+            <div class="fn-conn"><div class="fn-line" id="fl3"></div><div class="fn-arrow" id="fa3"></div></div>
+            <div class="fn-card" id="fn4">
+              <div class="fn-icon" style="background:linear-gradient(135deg,#321b68,var(--violet))">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="fn-title">Save Template</div>
+              <div class="fn-sub">Review &middot; save</div>
+              <span class="badge bv" style="font-size:8px">Final Step</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates board -->
+        <div class="card">
+          <div class="card-hd">
+            <div style="display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="card-title">TEMPLATES</div>
+              <span class="badge bm" id="tplCount" style="font-size:9px">0 templates</span>
+            </div>
+            <input type="text" class="inp" id="tplSearch" placeholder="Filter templates..." style="width:180px;padding:6px 11px;font-size:11px">
+          </div>
+          <div id="tplBoard" style="padding:10px 0 6px"></div>
+        </div>
+
+      </div>
+
+<!-- ── SCANNER ── -->
+      <div class="panel" id="panel-scanner">
+        <div class="pg-hd"><div class="pg-title">QR SCANNER</div>
+          <div class="pg-sub">Scan guest QR codes at the door.</div></div>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+          <div class="card">
+            <div class="card-hd">
+              <div class="card-title">DOOR SCANNER</div>
+              <select class="sel" id="scanEvSel" style="width:180px;padding:5px 10px;font-size:11px">
+                <option value="">All Events</option>
+              </select>
+            </div>
+            <div class="scanner-vp">
+              <video id="scanVideo" playsinline autoplay muted></video>
+              <canvas id="scanCanvas" style="display:none"></canvas>
+              <div class="scan-overlay"></div>
+              <div class="scan-frame">
+                <div class="sc tl"></div><div class="sc tr"></div>
+                <div class="sc bl"></div><div class="sc br"></div>
+                <div class="scan-line" id="scanLineEl" style="display:none"></div>
+              </div>
+              <div class="scan-status" id="scanSt">Tap Start to begin</div>
+            </div>
+            <div style="padding:14px 18px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--bdr)">
+              <button class="btn btn-gold" id="btnStartScan">&#9654; Start Scanning</button>
+              <button class="btn btn-ghost" id="btnStopScan" style="display:none">Stop</button>
+            </div>
+            <div id="scanResult" style="padding:0 18px 16px"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <div class="card-title">SCAN LOG</div>
+              <button class="btn btn-ghost btn-sm" id="btnClearLog">Clear</button>
+            </div>
+            <div id="scanLog" style="padding:10px;max-height:440px;overflow-y:auto">
+              <div style="text-align:center;padding:28px;color:var(--muted);font-size:12px">No scans yet</div>
+            </div>
+            <div style="padding:12px 16px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:11px;color:var(--muted)">Check-ins today</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)" id="scanCount">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ATTENDEES ── -->
+      <div class="panel" id="panel-attendees">
+        <div class="pg-hd-row">
+          <div><div class="pg-title">ATTENDEES</div><div class="pg-sub">All registrations.</div></div>
+          <input type="text" class="inp" id="attSearch" placeholder="Search name or email..." style="width:220px;padding:7px 12px;font-size:12px">
+        </div>
+        <div class="card">
+          <table class="tbl" id="attTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Event</th><th>Status</th><th>Registered</th></tr></thead>
+            <tbody id="attBody"><tr><td colspan="5" style="text-align:center;padding:36px;color:var(--muted)">No attendees yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── INTEGRATIONS ── -->
+      <div class="panel" id="panel-integrations">
+        <div class="pg-hd"><div class="pg-title">INTEGRATIONS</div>
+          <div class="pg-sub">API keys &middot; GS1 Digital Link &middot; QR generator &middot; DeStore pipeline</div></div>
+
+        <!-- DeStore -->
+        <div class="api-card" id="ac-destore">
+          <div class="api-hd">
+            <div class="api-logo" style="background:linear-gradient(135deg,var(--orchid),var(--violet))">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
+            <div><div class="api-name">DeStore Network API</div><div class="api-desc">DPP issuance &middot; GS1 resolver &middot; brand wallet</div></div>
+            <div class="api-status" id="as-destore"><span class="badge bm">Not configured</span></div>
+          </div>
+          <div class="api-body">
+            <div class="api-grid">
+              <div class="form-group"><label class="lbl">API Key</label>
+                <div class="inp-wrap"><input class="inp" type="password" id="k_ds_key" placeholder="ds_live_&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-svc="destore" data-fld="key">
+                  <button class="inp-eye" data-target="k_ds_key">&#128065;</button></div></div>
+              <div class="form-group"><label class="lbl">Brand Domain</label>
+                <input class="inp" type="text" id="k_ds_domain" placeholder="ultimateexperiences.com.au" data-svc="destore" data-fld="domain"></div>
+              <div class="form-group"><label class="lbl">Thirdweb Client ID</label>
+                <div class="inp-wrap"><input class="inp" type="password" id="k_ds_tw" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-svc="destore" data-fld="thirdweb">
+                  <button class="inp-eye" data-target="k_ds_tw">&#128065;</button></div></div>
+              <div class="form-group"><label class="lbl">Brand Wallet</label>
+                <input class="inp" type="text" id="k_ds_wallet" placeholder="0x0000...0000" style="font-family:'JetBrains Mono',monospace;font-size:11px" data-svc="destore" data-fld="wallet"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-violet btn-sm api-test" data-svc="destore">&#9889; Test</button>
+              <button class="btn btn-ghost btn-sm api-save">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- GS1 -->
+        <div class="api-card" id="ac-gs1">
+          <div class="api-hd">
+            <div class="api-logo" style="background:linear-gradient(135deg,#003087,#0057b8)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <div><div class="api-name">GS1 Digital Link</div><div class="api-desc">GTIN prefix &middot; QR generation &middot; GS1 Australia</div></div>
+            <div class="api-status" id="as-gs1"><span class="badge bm">Not configured</span></div>
+          </div>
+          <div class="api-body">
+            <div class="api-grid-3">
+              <div class="form-group"><label class="lbl">GS1 Company Prefix</label>
+                <input class="inp" type="text" id="k_gs1_pfx" placeholder="9312345" style="font-family:'JetBrains Mono',monospace" data-svc="gs1" data-fld="prefix"></div>
+              <div class="form-group"><label class="lbl">GS1 API Key</label>
+                <div class="inp-wrap"><input class="inp" type="password" id="k_gs1_key" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" data-svc="gs1" data-fld="apikey">
+                  <button class="inp-eye" data-target="k_gs1_key">&#128065;</button></div></div>
+              <div class="form-group"><label class="lbl">Resolver Base URL</label>
+                <input class="inp" type="text" id="k_gs1_res" placeholder="id.gs1.org" data-svc="gs1" data-fld="resolver"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm api-test" data-svc="gs1">&#9889; Test GS1</button>
+              <button class="btn btn-ghost btn-sm api-save">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anthropic -->
+        <div class="api-card" id="ac-anthropic">
+          <div class="api-hd">
+            <div class="api-logo" style="background:linear-gradient(135deg,#c96c39,#e8843a)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/></svg>
+            </div>
+            <div><div class="api-name">Anthropic / Claude API</div><div class="api-desc">AI agent &middot; ESPR compliance &middot; DPP content</div></div>
+            <div class="api-status" id="as-anthropic"><span class="badge bm">Not configured</span></div>
+          </div>
+          <div class="api-body">
+            <div class="api-grid">
+              <div class="form-group"><label class="lbl">API Key</label>
+                <div class="inp-wrap"><input class="inp" type="password" id="k_ant_key" placeholder="sk-ant-api03-&bull;&bull;&bull;&bull;" data-svc="anthropic" data-fld="key">
+                  <button class="inp-eye" data-target="k_ant_key">&#128065;</button></div></div>
+              <div class="form-group"><label class="lbl">Model</label>
+                <select class="sel" id="k_ant_model" data-svc="anthropic" data-fld="model">
+                  <option>claude-sonnet-4-20250514</option>
+                  <option>claude-opus-4-20250514</option>
+                  <option>claude-haiku-4-5-20251001</option>
+                </select></div>
+            </div>
+            <button class="btn btn-ghost btn-sm api-save">Save</button>
+          </div>
+        </div>
+
+        <!-- n8n -->
+        <div class="api-card" id="ac-n8n">
+          <div class="api-hd">
+            <div class="api-logo" style="background:linear-gradient(135deg,#c4342d,#ea4b35)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </div>
+            <div><div class="api-name">n8n Automation</div><div class="api-desc">Webhooks &middot; form submissions &middot; Telegram</div></div>
+            <div class="api-status" id="as-n8n"><span class="badge bm">Not configured</span></div>
+          </div>
+          <div class="api-body">
+            <div class="api-grid" style="margin-bottom:10px">
+              <div class="form-group"><label class="lbl">n8n Instance URL</label>
+                <input class="inp" type="text" id="k_n8n_url" placeholder="https://n8n.flowberry.org" data-svc="n8n" data-fld="url"></div>
+              <div class="form-group"><label class="lbl">Webhook Path</label>
+                <input class="inp" type="text" id="k_n8n_wh" placeholder="/webhook/ue-events" data-svc="n8n" data-fld="webhook"></div>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="lbl">Full Webhook URL</label>
+              <div style="background:var(--bg);border:1px solid var(--bdr);border-radius:9px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)" id="webhookPreview">https://n8n.flowberry.org/webhook/ue-events</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" id="btnTestWebhook">&#10145; Send Test</button>
+              <button class="btn btn-ghost btn-sm api-save">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Generator -->
+        <div class="card" style="margin-top:24px">
+          <div class="card-hd">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 9px rgba(179,84,241,.5);display:inline-block"></span>
+              <div class="card-title">GS1 DIGITAL LINK QR GENERATOR</div>
+            </div>
+            <span class="badge bv">Per Event</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:0">
+            <div style="padding:20px;border-right:1px solid var(--bdr)">
+              <div class="form-group" style="margin-bottom:12px">
+                <label class="lbl">Select Event</label>
+                <select class="sel" id="qrEvSel"></select>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                <div class="form-group"><label class="lbl">GTIN-14</label>
+                  <input class="inp" type="text" id="qrGtin" placeholder="09312345000001" maxlength="14" style="font-family:'JetBrains Mono',monospace;font-size:11px"></div>
+                <div class="form-group"><label class="lbl">Serial / Token ID</label>
+                  <input class="inp" type="text" id="qrSerial" placeholder="auto" style="font-family:'JetBrains Mono',monospace;font-size:11px"></div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="lbl">GS1 Digital Link URL</label>
+                <div class="gs1-url" id="gs1Preview">Fill in event + GTIN to generate link</div>
+              </div>
+              <div style="margin-bottom:14px">
+                <label class="lbl" style="display:block;margin-bottom:8px">QR Style</label>
+                <div style="display:flex;gap:8px">
+                  <div class="qr-style on" data-style="standard"><div class="qr-swatch" style="background:#fff"><svg viewBox="0 0 20 20" width="22" height="22" fill="#000"><rect x="2" y="2" width="7" height="7"/><rect x="11" y="2" width="7" height="7"/><rect x="2" y="11" width="7" height="7"/><rect x="4" y="4" width="3" height="3" fill="#fff"/><rect x="13" y="4" width="3" height="3" fill="#fff"/><rect x="4" y="13" width="3" height="3" fill="#fff"/></svg></div>Standard</div>
+                  <div class="qr-style" data-style="dark"><div class="qr-swatch" style="background:#0d0d10"><svg viewBox="0 0 20 20" width="22" height="22" fill="#B354F1"><rect x="2" y="2" width="7" height="7"/><rect x="11" y="2" width="7" height="7"/><rect x="2" y="11" width="7" height="7"/><rect x="4" y="4" width="3" height="3" fill="#0d0d10"/><rect x="13" y="4" width="3" height="3" fill="#0d0d10"/><rect x="4" y="13" width="3" height="3" fill="#0d0d10"/></svg></div>Dark</div>
+                  <div class="qr-style" data-style="gold"><div class="qr-swatch" style="background:#07070a"><svg viewBox="0 0 20 20" width="22" height="22" fill="#FFD166"><rect x="2" y="2" width="7" height="7"/><rect x="11" y="2" width="7" height="7"/><rect x="2" y="11" width="7" height="7"/><rect x="4" y="4" width="3" height="3" fill="#07070a"/><rect x="13" y="4" width="3" height="3" fill="#07070a"/><rect x="4" y="13" width="3" height="3" fill="#07070a"/></svg></div>Gold</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-violet btn-sm" id="btnGenQR">Generate QR</button>
+                <button class="btn btn-ghost btn-sm" id="btnDlQR">Download SVG</button>
+                <button class="btn btn-ghost btn-sm" id="btnCopyLink">Copy Link</button>
+              </div>
+            </div>
+            <div style="padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+              <div id="qrPreview" style="width:180px;height:180px;background:var(--d3);border:1px solid var(--bdr);border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" opacity=".4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;font-weight:700;color:var(--muted)" id="qrEvLbl">No event selected</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim);margin-top:3px;max-width:180px;word-break:break-all" id="qrShortUrl"></div>
+              </div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--bdr);padding:14px 20px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Generated QR Codes</div>
+            <div id="qrHistory" style="display:flex;gap:8px;flex-wrap:wrap"><div style="font-size:12px;color:var(--muted)">None yet</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="panel" id="panel-settings">
+        <div class="pg-hd"><div class="pg-title">SETTINGS</div><div class="pg-sub">Account and platform config.</div></div>
+        <div style="max-width:560px;display:grid;gap:18px">
+          <div class="card">
+            <div class="card-hd"><div class="card-title">ACCOUNT</div></div>
+            <div style="padding:20px;display:grid;gap:14px">
+              <div class="form-group"><label class="lbl">Admin Email</label><input class="inp" type="email" value="josiah@ultimateexperiences.com.au"></div>
+              <div class="form-group"><label class="lbl">Company Name</label><input class="inp" type="text" value="Ultimate Experiences Pty Ltd"></div>
+              <div class="form-group"><label class="lbl">Website</label><input class="inp" type="text" value="https://ultimateexperiences.com.au"></div>
+              <button class="btn btn-gold" style="width:fit-content">Save Changes</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">CHANGE PASSWORD</div></div>
+            <div style="padding:20px;display:grid;gap:14px">
+              <div class="form-group"><label class="lbl">Current Password</label><input class="inp" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+              <div class="form-group"><label class="lbl">New Password</label><input class="inp" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+              <button class="btn btn-ghost" style="width:fit-content">Update Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /app-wrap -->
+</div><!-- /appShell -->
+
+<!-- ══ NODE POPUP MODAL ══ -->
+<div class="modal-bg" id="nodeModal">
+  <div class="modal" style="max-width:640px">
+    <div class="node-modal-hd">
+      <div class="node-modal-top">
+        <div class="nm-icon" id="nmIcon" style="background:linear-gradient(135deg,var(--gdim),var(--gold))">&#9733;</div>
+        <div><div class="nm-title" id="nmTitle">Event Basics</div><div class="nm-sub" id="nmSub">Fill in the core details</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="nm-dots">
+          <div class="sd on" id="nsd0"></div><div class="sd" id="nsd1"></div>
+          <div class="sd" id="nsd2"></div><div class="sd" id="nsd3"></div><div class="sd" id="nsd4"></div>
+        </div>
+        <div class="nm-step" id="nmStep">1 / 5</div>
+        <button class="modal-close" id="nmClose">&#10005;</button>
+      </div>
+    </div>
+    <div style="padding:22px 26px;max-height:68vh;overflow-y:auto" id="nmBody"></div>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM MODAL ══ -->
+<div class="modal-bg" id="deleteModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hd"><div class="modal-title" style="color:var(--pink)">DELETE EVENT</div><button class="modal-close" id="delClose">&#10005;</button></div>
+    <div class="modal-body"><p style="font-size:13px;color:var(--dim);line-height:1.75">Delete <strong style="color:#fff" id="delName">this event</strong>? This cannot be undone.</p></div>
+    <div class="modal-ft"><button class="btn btn-ghost" id="delCancel">Cancel</button><button class="btn btn-danger" id="delConfirm">Delete</button></div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ════════════════════════════════════════════
+   STATE — var so inline handlers can reach globals
+════════════════════════════════════════════ */
+var ST = {
+  templates: JSON.parse(localStorage.getItem('ue_tpl') || '[]'),
+  events:    JSON.parse(localStorage.getItem('ue_ev')  || '[]'),
+  attendees: JSON.parse(localStorage.getItem('ue_att') || '[]'),
+  scanLog:   [],
+  editId:    null,
+  deleteId:  null,
+  scanActive:false,
+  scanStream:null,
+  scanTick:  null,
+  apiKeys:   JSON.parse(localStorage.getItem('ue_api') || '{}')
+};
+
+/* node flow state */
+var D = {
+  name:'', date:'', time:'18:00', venue:'', type:'Public', desc:'',
+  ch1:'', ch2:'', ch3:'', capacity:100, price:0, status:'Active', featured:false,
+  eb_discount:20, eb_days:30, std_price:0, std_days:7, door_price:0
+};
+var CUR_NODE = 0;
+var DONE = {};
+var QR_STYLE = 'standard';
+var QR_EV = null;
+var CD_TIMER = null;
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+
+  /* ── sidebar nav ── */
+  document.querySelectorAll('.nav-item[data-panel]').forEach(function(el) {
+    el.addEventListener('click', function() { showPanel(el.dataset.panel); });
+  });
+
+  /* ── topbar ── */
+  document.getElementById('tbLogout').addEventListener('click', function() {
+    if(confirm('Sign out?')) { window.location.reload(); }
+  });
+
+  /* ── dashboard new event button ── */
+  document.getElementById('dashNewEvt').addEventListener('click', function() {
+    showPanel('events');
+    populateSchedModal();
+    document.getElementById('scheduleModal').classList.add('open');
+  });
+
+  /* ── events new event button ── */
+  var nev = document.getElementById('btnNewEvt');
+  if(nev) nev.addEventListener('click', startCreateFlow);
+
+  /* ── flow node cards ── */
+  for(var i = 0; i < 5; i++) {
+    (function(idx) {
+      var el = document.getElementById('fn' + idx);
+      if(el) el.addEventListener('click', function() { openNode(idx); });
+      var sd = document.getElementById('sd' + idx);
+      if(sd) sd.addEventListener('click', function() { openNode(idx); });
+    })(i);
+  }
+
+  /* ── node modal close ── */
+  document.getElementById('nmClose').addEventListener('click', closeNode);
+  document.getElementById('nodeModal').addEventListener('click', function(e) {
+    if(e.target === this) closeNode();
+  });
+
+  /* ── board search (now template search) ── */
+  var bs = document.getElementById('tplSearch') || document.getElementById('boardSearch');
+  if(bs) bs.addEventListener('input', function() { filterTplBoard(this.value); });
+
+  /* ── new template button ── */
+  var nb = document.getElementById('btnNewTpl');
+  if(nb) nb.addEventListener('click', startCreateFlow);
+
+  /* ── schedule button ── */
+  var sb = document.getElementById('btnSchedule');
+  if(sb) sb.addEventListener('click', function() {
+    populateSchedModal();
+    document.getElementById('scheduleModal').classList.add('open');
+  });
+
+  /* ── schedule modal close/cancel ── */
+  var smc = document.getElementById('schedModalClose');
+  if(smc) smc.addEventListener('click', function() { document.getElementById('scheduleModal').classList.remove('open'); });
+  var sc2 = document.getElementById('schedCancel');
+  if(sc2) sc2.addEventListener('click', function() { document.getElementById('scheduleModal').classList.remove('open'); });
+
+  /* ── schedule modal backdrop ── */
+  var sm = document.getElementById('scheduleModal');
+  if(sm) sm.addEventListener('click', function(e) { if(e.target === this) this.classList.remove('open'); });
+
+  /* ── schedule publish ── */
+  var sp = document.getElementById('schedPublish');
+  if(sp) sp.addEventListener('click', publishFromSchedule);
+
+  /* ── schedule template select → preview ── */
+  var sts = document.getElementById('schedTplSel');
+  if(sts) sts.addEventListener('change', updateSchedPreview);
+  var sdt = document.getElementById('schedDate');
+  if(sdt) sdt.addEventListener('change', updateSchedPreview);
+
+  /* ── delete modal ── */
+  document.getElementById('delClose').addEventListener('click', function() {
+    document.getElementById('deleteModal').classList.remove('open');
+  });
+  document.getElementById('delCancel').addEventListener('click', function() {
+    document.getElementById('deleteModal').classList.remove('open');
+  });
+  document.getElementById('delConfirm').addEventListener('click', confirmDelete);
+
+  /* ── scanner ── */
+  document.getElementById('btnStartScan').addEventListener('click', startScanner);
+  document.getElementById('btnStopScan').addEventListener('click', stopScanner);
+  document.getElementById('btnClearLog').addEventListener('click', clearScanLog);
+
+  /* ── api key eye toggles ── */
+  document.querySelectorAll('.inp-eye').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var inp = document.getElementById(btn.dataset.target);
+      if(!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.style.color = inp.type === 'text' ? 'var(--gold)' : '';
+    });
+  });
+
+  /* ── api save buttons ── */
+  document.querySelectorAll('.api-save').forEach(function(btn) {
+    btn.addEventListener('click', saveAllApiKeys);
+  });
+
+  /* ── api test buttons ── */
+  document.querySelectorAll('.api-test').forEach(function(btn) {
+    btn.addEventListener('click', function() { testApi(btn.dataset.svc); });
+  });
+
+  /* ── n8n webhook preview ── */
+  document.getElementById('k_n8n_url').addEventListener('input', updateWebhookPreview);
+  document.getElementById('k_n8n_wh').addEventListener('input', updateWebhookPreview);
+
+  /* ── test webhook ── */
+  document.getElementById('btnTestWebhook').addEventListener('click', function() {
+    var url = document.getElementById('webhookPreview').textContent;
+    fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({source:'ue-admin-test',ts:new Date().toISOString()})
+    }).then(function() { toast('Webhook fired!', 'green'); })
+      .catch(function() { toast('Sent (CORS may block response)', 'gold'); });
+  });
+
+  /* ── api key input changes ── */
+  document.querySelectorAll('.inp[data-svc],.sel[data-svc]').forEach(function(inp) {
+    inp.addEventListener('change', function() {
+      var svc = inp.dataset.svc, fld = inp.dataset.fld;
+      if(!ST.apiKeys[svc]) ST.apiKeys[svc] = {};
+      ST.apiKeys[svc][fld] = inp.value;
+      localStorage.setItem('ue_api', JSON.stringify(ST.apiKeys));
+      updateApiStatuses();
+    });
+  });
+
+  /* ── QR generator ── */
+  document.getElementById('qrGtin').addEventListener('input', updateQRLink);
+  document.getElementById('qrSerial').addEventListener('input', updateQRLink);
+  document.getElementById('qrEvSel').addEventListener('change', function() {
+    updateQRLink();
+    var ev = ST.events.find(function(e) { return e.id === this.value; }, this);
+    document.getElementById('qrEvLbl').textContent = ev ? ev.name : 'No event selected';
+  });
+  document.querySelectorAll('.qr-style').forEach(function(el) {
+    el.addEventListener('click', function() {
+      document.querySelectorAll('.qr-style').forEach(function(x) { x.classList.remove('on'); });
+      el.classList.add('on');
+      QR_STYLE = el.dataset.style;
+    });
+  });
+  document.getElementById('btnGenQR').addEventListener('click', generateQR);
+  document.getElementById('btnDlQR').addEventListener('click', downloadQR);
+  document.getElementById('btnCopyLink').addEventListener('click', function() {
+    if(!QR_EV) { toast('Generate a link first', 'gold'); return; }
+    if(navigator.clipboard) navigator.clipboard.writeText(QR_EV.url);
+    toast('Link copied!', 'green');
+  });
+
+  /* ── attendees search ── */
+  document.getElementById('attSearch').addEventListener('input', function() {
+    renderAttendees(this.value);
+  });
+
+  /* ── restore api keys ── */
+  restoreApiKeys();
+
+  /* ── initial render ── */
+  renderDashboard();
+  renderTplBoard();
+  renderBoard();
+  renderAttendees('');
+  updateBadges();
+  populateScanSelects();
+  updateApiStatuses();
+});
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('on'); });
+  var panel = document.getElementById('panel-' + id);
+  if(panel) panel.classList.add('on');
+  var nav = document.querySelector('.nav-item[data-panel="' + id + '"]');
+  if(nav) nav.classList.add('on');
+  if(id !== 'scanner') stopScanner();
+  if(id === 'events') { renderBoard(); populateScanSelects(); }
+}
+
+/* ════════════════════════════════════════════
+   RENDER HELPERS
+════════════════════════════════════════════ */
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function statusBadge(s) {
+  var cls = {Active:'bg','Coming Soon':'bv','Sold Out':'br',Cancelled:'bm','Date TBC':'by'};
+  return '<span class="badge ' + (cls[s] || 'bm') + '">' + esc(s) + '</span>';
+}
+
+function fmtDate(d) {
+  if(!d) return 'TBC';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function dateBlock(d) {
+  if(!d) return '<div class="ev-date"><div class="ev-day">?</div><div class="ev-mon">TBC</div></div>';
+  var dt = new Date(d + 'T12:00:00');
+  return '<div class="ev-date"><div class="ev-day">' + dt.getDate() +
+    '</div><div class="ev-mon">' + dt.toLocaleDateString('en-AU',{month:'short'}) + '</div></div>';
+}
+
+/* ════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════ */
+function renderDashboard() {
+  var se = document.getElementById('statEv');
+  var st = document.getElementById('statTix');
+  var ss = document.getElementById('statScans');
+  var sq = document.getElementById('statEnq');
+  if(se) se.textContent = ST.events.filter(function(e) { return e.status === 'Active'; }).length;
+  if(st) st.textContent = ST.attendees.length;
+  if(ss) ss.textContent = ST.scanLog.length;
+  if(sq) sq.textContent = 0;
+
+  var list = document.getElementById('dashEvList');
+  if(!list) return;
+  if(!ST.events.length) {
+    list.innerHTML = '<div style="text-align:center;padding:36px;color:var(--muted);font-size:13px">No events yet.</div>';
+    return;
+  }
+  var html = '';
+  ST.events.slice(0, 5).forEach(function(ev) {
+    html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(46,46,56,.4)">'
+      + dateBlock(ev.date)
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#fff">' + esc(ev.name) + '</div>'
+      + '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + esc(ev.venue || 'No venue') + '</div></div>'
+      + '<div style="display:flex;gap:6px">' + statusBadge(ev.status)
+      + '<button class="btn btn-ghost btn-sm" onclick="editEv(\'' + ev.id + '\')">Edit</button>'
+      + '</div></div>';
+  });
+  list.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════
+   EVENTS BOARD
+════════════════════════════════════════════ */
+function renderBoard() {
+  var board = document.getElementById('eventBoard');
+  var count = document.getElementById('boardCount');
+  if(!board) return;
+  if(count) count.textContent = ST.events.length + ' event' + (ST.events.length !== 1 ? 's' : '');
+
+  if(!ST.events.length) {
+    board.innerHTML = '<div style="text-align:center;padding:44px;color:var(--muted);font-size:13px">'
+      + '<div style="font-size:36px;margin-bottom:10px;opacity:.35">&#127911;</div>'
+      + 'No events yet. Hit New Event to get started.</div>';
+    return;
+  }
+
+  var stripColor = function(type) {
+    if(type === 'Family' || type === 'Public') return 'linear-gradient(180deg,var(--violet),var(--orchid))';
+    if(type === 'Wellness') return 'linear-gradient(180deg,var(--green),#1a9a84)';
+    if(type === 'Club Night') return 'linear-gradient(180deg,var(--pink),#c0126f)';
+    return 'linear-gradient(180deg,var(--gold),var(--gdim))';
+  };
+
+  var html = '';
+  ST.events.forEach(function(ev) {
+    var innerStyle = ev.featured
+      ? ' style="margin:0 20px 10px" class="ev-card feat"'
+      : ' style="margin:0 20px 10px" class="ev-card"';
+    html += '<div' + innerStyle + ' onclick="editEv(\'' + ev.id + '\')">';
+    if(ev.featured) html += '<div class="ev-inner">';
+    else html += '<div class="ev-inner">';
+
+    html += '<div class="ev-stripe" style="background:' + stripColor(ev.type) + '"></div>'
+      + '<div class="ev-body">'
+      + dateBlock(ev.date)
+      + '<div class="ev-info">'
+      + '<div class="ev-name">' + esc(ev.name) + (ev.featured ? ' <span style="color:var(--gold)">&#9733;</span>' : '') + '</div>'
+      + '<div class="ev-meta">' + esc(ev.venue || 'No venue') + ' &middot; ' + esc(ev.time || 'TBC') + '</div>'
+      + '<div class="ev-chs">';
+
+    if(ev.ch1) html += '<span class="ch-pip" style="background:rgba(179,84,241,.12);color:#B354F1;border:1px solid rgba(179,84,241,.2)"><span class="ch-dot" style="background:#B354F1"></span>' + esc(ev.ch1.slice(0,16)) + '</span>';
+    if(ev.ch2) html += '<span class="ch-pip" style="background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2)"><span class="ch-dot" style="background:var(--gold)"></span>' + esc(ev.ch2.slice(0,16)) + '</span>';
+    if(ev.ch3) html += '<span class="ch-pip" style="background:rgba(255,27,154,.1);color:#FF1B9A;border:1px solid rgba(255,27,154,.2)"><span class="ch-dot" style="background:#FF1B9A"></span>' + esc(ev.ch3.slice(0,16)) + '</span>';
+
+    if(ev.std_price) {
+      var ebP = ev.std_price ? Math.round(ev.std_price * (1 - ((ev.eb_discount || 20) / 100))) : 0;
+      html += '<span style="font-size:10px;color:var(--green);font-weight:700;margin-left:4px">EB $' + ebP + ' / Std $' + ev.std_price + '</span>';
+    }
+
+    html += '</div></div>'
+      + '<div class="ev-right">'
+      + statusBadge(ev.status)
+      + '<span class="badge bm">' + (ev.capacity || 100) + ' &#127911;</span>'
+      + '<div class="ev-actions">'
+      + (ev.eventUrl ? '<button class="btn btn-green btn-sm" onclick="event.stopPropagation();viewEventPage(\'' + ev.id + '\')">&#9654; View Page</button>' : '')
+      + '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editEv(\'' + ev.id + '\')">Edit</button>'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--pink)" onclick="event.stopPropagation();deleteEv(\'' + ev.id + '\')">&#10005;</button>'
+      + '<div style="font-size:9px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:3px;text-align:right">' + (ev.slug ? '/events/' + esc(ev.slug) : '') + '</div>'
+      + '</div></div></div></div></div>';
+  });
+  board.innerHTML = html;
+}
+
+function filterBoard(q) {
+  document.querySelectorAll('#eventBoard .ev-card').forEach(function(c) {
+    c.style.display = c.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function updateBadges() {
+  var b = document.getElementById('evBadge');
+  if(b) b.textContent = ST.events.length;
+}
+
+function populateScanSelects() {
+  var opts = '<option value="">All Events</option>';
+  ST.events.forEach(function(e) { opts += '<option value="' + e.id + '">' + esc(e.name) + '</option>'; });
+  ['scanEvSel','qrEvSel'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if(sel) sel.innerHTML = opts;
+  });
+}
+
+/* ════════════════════════════════════════════
+   NODE FLOW
+════════════════════════════════════════════ */
+function startCreateFlow() {
+  D = {name:'',date:'',time:'18:00',venue:'',type:'Public',desc:'',
+       ch1:'',ch2:'',ch3:'',capacity:100,price:0,status:'Active',featured:false,
+       eb_discount:20,eb_days:30,std_price:0,std_days:7,door_price:0};
+  DONE = {};
+  CUR_NODE = 0;
+  ST.editId = null;
+  refreshNodeStates();
+  openNode(0);
+  var cf = document.getElementById('creationFlow');
+  if(cf) cf.scrollIntoView({behavior:'smooth'});
+}
+
+function editEv(id) {
+  var ev = ST.events.find(function(e) { return e.id === id; });
+  if(!ev) return;
+  ST.editId = id;
+  D = {
+    name:     ev.name     || '',
+    date:     ev.date     || '',
+    time:     ev.time     || '18:00',
+    venue:    ev.venue    || '',
+    type:     ev.type     || 'Public',
+    desc:     ev.desc     || '',
+    ch1:      ev.ch1      || '',
+    ch2:      ev.ch2      || '',
+    ch3:      ev.ch3      || '',
+    capacity: ev.capacity || 100,
+    price:    ev.price    || 0,
+    status:   ev.status   || 'Active',
+    featured: ev.featured || false,
+    eb_discount: ev.eb_discount || 20,
+    eb_days:     ev.eb_days     || 30,
+    std_price:   ev.std_price   || 0,
+    std_days:    ev.std_days    || 7,
+    door_price:  ev.door_price  || 0
+  };
+  DONE = {0:true, 1:true, 2:true, 3:true};
+  CUR_NODE = 0;
+  refreshNodeStates();
+  showPanel('events');
+  openNode(0);
+}
+
+function openNode(idx) {
+  CUR_NODE = idx;
+  refreshNodeStates();
+  buildNodeBody(idx);
+  refreshModalDots(idx);
+  document.getElementById('nodeModal').classList.add('open');
+}
+
+function closeNode() {
+  if(CD_TIMER) { clearInterval(CD_TIMER); CD_TIMER = null; }
+  document.getElementById('nodeModal').classList.remove('open');
+  document.getElementById('flowLbl').textContent = 'Click a node to begin';
+}
+
+function refreshNodeStates() {
+  for(var i = 0; i < 5; i++) {
+    var el = document.getElementById('fn' + i);
+    var line = document.getElementById('fl' + i);
+    var arr = document.getElementById('fa' + i);
+    if(!el) continue;
+    el.classList.remove('on','done');
+    if(i === CUR_NODE) el.classList.add('on');
+    else if(DONE[i])   el.classList.add('done');
+    if(line) line.classList.toggle('on', !!DONE[i]);
+    if(arr)  arr.classList.toggle('on', !!DONE[i]);
+  }
+  for(var j = 0; j < 5; j++) {
+    var sd = document.getElementById('sd' + j);
+    if(!sd) continue;
+    sd.classList.remove('on','done');
+    if(j === CUR_NODE) sd.classList.add('on');
+    else if(DONE[j])   sd.classList.add('done');
+  }
+  document.getElementById('flowProg').textContent = 'Step ' + (CUR_NODE+1) + ' of 5';
+  var lbl = document.getElementById('flowLbl');
+  var names = ['Event Basics','3 Channels','Capacity & Pricing','Visibility','Review & Publish'];
+  if(lbl) lbl.textContent = names[CUR_NODE];
+}
+
+function refreshModalDots(idx) {
+  for(var i = 0; i < 5; i++) {
+    var d = document.getElementById('nsd' + i);
+    if(!d) continue;
+    d.classList.remove('on','done');
+    if(i === idx) d.classList.add('on');
+    else if(DONE[i]) d.classList.add('done');
+  }
+  document.getElementById('nmStep').textContent = (idx+1) + ' / 5';
+}
+
+function doneNode(idx) {
+  DONE[idx] = true;
+  refreshNodeStates();
+  refreshModalDots(idx);
+  var next = idx + 1;
+  if(next < 5) openNode(next);
+  else closeNode();
+}
+
+/* ════════════════════════════════════════════
+   NODE BODY BUILDERS — no template literals
+════════════════════════════════════════════ */
+function buildNodeBody(idx) {
+  if(CD_TIMER) { clearInterval(CD_TIMER); CD_TIMER = null; }
+  var icons = [
+    ['linear-gradient(135deg,var(--gdim),var(--gold))', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#07070a" stroke-width="2.5"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>'],
+    ['linear-gradient(135deg,var(--orchid),var(--violet))', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>'],
+    ['linear-gradient(135deg,#1a9a84,var(--green))', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'],
+    ['linear-gradient(135deg,#c0126f,var(--pink))', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'],
+    ['linear-gradient(135deg,#321b68,var(--violet))', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>']
+  ];
+  var titles = ['Event Basics','Channel Programming','Capacity & Pricing','Visibility & Status','Review & Publish'];
+  var subs   = ['Name · date · venue · type','What plays on each channel','Headsets · countdown · tiered pricing','Status · featured flag','Confirm and go live'];
+
+  var icon = document.getElementById('nmIcon');
+  if(icon) { icon.style.background = icons[idx][0]; icon.innerHTML = icons[idx][1]; }
+  document.getElementById('nmTitle').textContent = titles[idx];
+  document.getElementById('nmSub').textContent   = subs[idx];
+
+  var body = document.getElementById('nmBody');
+  if(!body) return;
+
+  if(idx === 0) body.innerHTML = buildNode0();
+  else if(idx === 1) body.innerHTML = buildNode1();
+  else if(idx === 2) { body.innerHTML = buildNode2(); startCdTimer(); }
+  else if(idx === 3) body.innerHTML = buildNode3();
+  else if(idx === 4) body.innerHTML = buildNode4();
+
+  wireNodeHandlers(idx);
+}
+
+/* ── Node 0: Event Basics ── */
+function buildNode0() {
+  var typeOpts = ['Public','Family','Wellness','Club Night','Private','Corporate'];
+  var tSel = typeOpts.map(function(t) {
+    return '<option' + (D.type === t ? ' selected' : '') + '>' + t + '</option>';
+  }).join('');
+
+  return '<div style="display:grid;gap:14px">'
+    + '<div class="form-group"><label class="lbl">Event Name</label>'
+      + '<input class="inp" id="n0_name" value="' + esc(D.name) + '" placeholder="Ultimate Family Disco"></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px">'
+      + '<div class="form-group"><label class="lbl">Date</label><input class="inp" type="date" id="n0_date" value="' + esc(D.date) + '"></div>'
+      + '<div class="form-group"><label class="lbl">Time</label><input class="inp" type="time" id="n0_time" value="' + esc(D.time) + '"></div>'
+      + '<div class="form-group"><label class="lbl">Type</label><select class="sel" id="n0_type">' + tSel + '</select></div>'
+    + '</div>'
+    + '<div class="form-group"><label class="lbl">Venue / Location</label>'
+      + '<input class="inp" id="n0_venue" value="' + esc(D.venue) + '" placeholder="Byron Bay Beach, NSW"></div>'
+    + '<div class="form-group"><label class="lbl">Description</label>'
+      + '<textarea class="ta" id="n0_desc" rows="3" style="min-height:72px">' + esc(D.desc) + '</textarea></div>'
+    + '<div style="display:flex;justify-content:flex-end;margin-top:4px">'
+      + '<button class="btn btn-gold" id="n0_next">Next: Channels &#8594;</button>'
+    + '</div></div>';
+}
+
+/* ── Node 1: Channels ── */
+function buildNode1() {
+  var chans = [
+    {id:'ch1', color:'#B354F1', bg:'rgba(179,84,241,.07)', bdr:'rgba(179,84,241,.3)', label:'Channel 1 — Violet', glow:'#B354F180', ph:"Kids' Hits / House / Electronic", val:D.ch1},
+    {id:'ch2', color:'var(--gold)', bg:'rgba(255,209,102,.07)', bdr:'rgba(255,209,102,.3)', label:'Channel 2 — Gold', glow:'rgba(255,209,102,.5)', ph:'80s/90s Anthems / Lo-fi', val:D.ch2},
+    {id:'ch3', color:'var(--pink)', bg:'rgba(255,27,154,.07)', bdr:'rgba(255,27,154,.3)', label:'Channel 3 — Pink', glow:'rgba(255,27,154,.5)', ph:'Aussie Vibes / Wild Card', val:D.ch3}
+  ];
+  var rows = chans.map(function(c) {
+    return '<div style="background:' + c.bg + ';border:1.5px solid ' + c.bdr + ';border-radius:11px;padding:14px 16px">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">'
+        + '<div style="width:11px;height:11px;border-radius:50%;background:' + c.color + ';box-shadow:0 0 9px ' + c.glow + '"></div>'
+        + '<span style="font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:' + c.color + '">' + c.label + '</span>'
+      + '</div>'
+      + '<input class="inp" id="n1_' + c.id + '" value="' + esc(c.val) + '" placeholder="' + c.ph + '" style="border-color:' + c.bdr + '">'
+    + '</div>';
+  }).join('');
+
+  return '<div style="font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:14px">Three channels play simultaneously. Guests switch with one button. LED glows their channel colour.</div>'
+    + '<div style="display:grid;gap:10px">' + rows + '</div>'
+    + '<div style="display:flex;justify-content:space-between;margin-top:18px">'
+      + '<button class="btn btn-ghost" id="n1_back">&#8592; Back</button>'
+      + '<button class="btn btn-gold" id="n1_next">Next: Capacity &#8594;</button>'
+    + '</div>';
+}
+
+/* ── Node 2: Capacity & Pricing ── */
+function buildNode2() {
+  var cap = D.capacity || 100;
+  var gaugeW = Math.min(100, Math.round((cap / 500) * 100));
+
+  /* countdown */
+  var cdHtml = '';
+  if(!D.date) {
+    cdHtml = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">Set event date in Step 1 to see countdown.</div>';
+  } else {
+    var evDt = new Date(D.date + 'T' + (D.time || '18:00') + ':00');
+    var ms = evDt - new Date();
+    if(ms <= 0) {
+      cdHtml = '<div style="font-size:12px;color:var(--pink);font-weight:800;text-align:center">This event date has passed.</div>';
+    } else {
+      var tiles = [
+        {v:Math.floor(ms/86400000), l:'Days'},
+        {v:Math.floor((ms%86400000)/3600000), l:'Hours'},
+        {v:Math.floor((ms%3600000)/60000), l:'Mins'},
+        {v:Math.floor((ms%60000)/1000), l:'Secs'}
+      ];
+      cdHtml = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:9px">';
+      tiles.forEach(function(t) {
+        cdHtml += '<div class="cd-tile"><div class="cd-val" data-unit="' + t.l.toLowerCase() + '">'
+          + String(t.v).padStart(2,'0') + '</div><div class="cd-lbl">' + t.l + '</div></div>';
+      });
+      cdHtml += '</div>'
+        + '<div style="font-size:11px;color:var(--dim);text-align:center">'
+        + evDt.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+        + ' at ' + (D.time || '18:00') + '</div>';
+    }
+  }
+
+  /* preset buttons */
+  var presets = '';
+  [30,50,75,100,150,200,300,500].forEach(function(n) {
+    presets += '<button class="preset-btn' + (cap === n ? ' on' : '') + '" data-cap="' + n + '">' + n + '</button>';
+  });
+
+  /* tier date calc */
+  var evDt2 = D.date ? new Date(D.date + 'T' + (D.time || '18:00') + ':00') : null;
+  function fmtTierDate(d) { return d ? d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '&#8211;'; }
+  var ebEndStr='', stdStartStr='', stdEndStr='', doorStr='';
+  if(evDt2) {
+    var stdEnd2 = new Date(evDt2); stdEnd2.setDate(stdEnd2.getDate() - 1);
+    var stdStart2 = new Date(evDt2); stdStart2.setDate(stdStart2.getDate() - (D.std_days || 7));
+    var ebEnd2 = new Date(stdStart2); ebEnd2.setDate(ebEnd2.getDate() - 1);
+    ebEndStr   = fmtTierDate(ebEnd2);
+    stdStartStr= fmtTierDate(stdStart2);
+    stdEndStr  = fmtTierDate(stdEnd2);
+    doorStr    = fmtTierDate(evDt2);
+  }
+
+  var ebPrice = D.std_price ? Math.round(D.std_price * (1 - ((D.eb_discount || 20) / 100))) : '&#8211;';
+  var maxRev  = D.door_price && cap ? '$' + (D.door_price * cap).toLocaleString() : '&#8211;';
+
+  return ''
+    /* countdown */
+    + '<div style="background:linear-gradient(135deg,#0f0820,#1a0d35);border:1px solid rgba(179,84,241,.2);border-radius:12px;padding:15px 18px;margin-bottom:14px">'
+      + '<div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin-bottom:11px">&#9201; Event Countdown</div>'
+      + cdHtml
+    + '</div>'
+
+    /* capacity */
+    + '<div style="background:var(--d2);border:1px solid var(--bdr);border-radius:12px;padding:15px 17px;margin-bottom:14px">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+        + '<div style="font-size:12px;font-weight:800;color:#fff">RF Headset Capacity</div>'
+        + '<div class="cap-display" id="capNum">' + cap + '</div>'
+      + '</div>'
+      + '<div class="step-row">'
+        + '<button class="cap-btn" data-adj="-50">&#8722;50</button>'
+        + '<button class="cap-btn" data-adj="-10">&#8722;10</button>'
+        + '<button class="cap-btn" data-adj="-1">&#8722;1</button>'
+        + '<button class="cap-btn pos" data-adj="1">+1</button>'
+        + '<button class="cap-btn pos" data-adj="10">+10</button>'
+        + '<button class="cap-btn pos" data-adj="50">+50</button>'
+      + '</div>'
+      + '<div class="gauge"><div class="gauge-fill" id="gaugeFill" style="width:' + gaugeW + '%"></div></div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap">' + presets + '</div>'
+    + '</div>'
+
+    /* tiered pricing */
+    + '<div style="background:var(--d2);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:14px">'
+      + '<div style="padding:12px 17px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between">'
+        + '<div style="font-size:12px;font-weight:800;color:#fff">Tiered Pricing</div>'
+        + '<div style="font-size:11px;color:var(--muted)">3 phases &middot; auto-scheduled</div>'
+      + '</div>'
+
+      /* early bird */
+      + '<div class="tier">'
+        + '<div class="tier-hd">'
+          + '<div class="tier-dot" style="background:#28B79D;box-shadow:0 0 7px #28B79D80"></div>'
+          + '<div class="tier-name" style="color:var(--green)">&#128038; Early Bird</div>'
+          + '<div class="tier-date">' + (ebEndStr ? 'Ends: ' + ebEndStr : 'Set event date') + '</div>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
+          + '<div class="form-group"><label class="lbl">Standard Price ($)</label>'
+            + '<div class="inp-wrap"><div class="inp-dollar">$</div>'
+            + '<input class="inp" type="number" id="t_std_price" min="0" step="5" value="' + (D.std_price || '') + '" placeholder="35" style="padding-left:24px;font-weight:800"></div></div>'
+          + '<div class="form-group"><label class="lbl">EB Discount (%)</label>'
+            + '<div class="inp-wrap"><input class="inp" type="number" id="t_eb_disc" min="0" max="80" step="5" value="' + (D.eb_discount || 20) + '" style="padding-right:26px;font-weight:800">'
+            + '<div class="inp-pct">%</div></div></div>'
+          + '<div class="form-group"><label class="lbl">EB Price (auto)</label>'
+            + '<div class="eb-auto" id="ebAutoPrice">$' + ebPrice + '</div></div>'
+        + '</div>'
+        + '<div class="form-group" style="margin-top:10px"><label class="lbl">Early Bird period (days before event)</label>'
+          + '<div style="display:flex;align-items:center;gap:10px">'
+            + '<input class="inp" type="number" id="t_eb_days" min="1" max="365" value="' + (D.eb_days || 30) + '" style="width:90px;font-weight:800;text-align:center">'
+            + '<span style="font-size:12px;color:var(--dim)">days out &nbsp;<span style="color:var(--green);font-weight:700">' + (ebEndStr ? 'Ends ' + ebEndStr : '') + '</span></span>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+
+      /* standard */
+      + '<div class="tier">'
+        + '<div class="tier-hd">'
+          + '<div class="tier-dot" style="background:var(--gold);box-shadow:0 0 7px rgba(255,209,102,.5)"></div>'
+          + '<div class="tier-name" style="color:var(--gold)">&#127903; Standard Pricing</div>'
+          + '<div class="tier-date">' + (stdStartStr ? stdStartStr + ' &#8211; ' + stdEndStr : 'Set event date') + '</div>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+          + '<div class="form-group"><label class="lbl">Standard Price ($)</label>'
+            + '<div class="inp-wrap"><div class="inp-dollar">$</div>'
+            + '<input class="inp" type="number" id="t_std_price2" min="0" step="5" value="' + (D.std_price || '') + '" placeholder="35" style="padding-left:24px;font-size:17px;font-weight:900"></div></div>'
+          + '<div class="form-group"><label class="lbl">Standard phase (days before event)</label>'
+            + '<div style="display:flex;align-items:center;gap:8px">'
+              + '<input class="inp" type="number" id="t_std_days" min="0" max="60" value="' + (D.std_days || 7) + '" style="width:80px;font-weight:800;text-align:center">'
+              + '<span style="font-size:11px;color:var(--dim)">days &nbsp;<span style="color:var(--gold);font-weight:700">' + (stdEndStr ? 'Until ' + stdEndStr : '') + '</span></span>'
+            + '</div></div>'
+        + '</div>'
+      + '</div>'
+
+      /* door */
+      + '<div class="tier" style="border-bottom:none">'
+        + '<div class="tier-hd">'
+          + '<div class="tier-dot" style="background:var(--pink);box-shadow:0 0 7px rgba(255,27,154,.5)"></div>'
+          + '<div class="tier-name" style="color:var(--pink)">&#128682; At the Door</div>'
+          + '<div class="tier-date">Event day &middot; ' + (doorStr || 'Set event date') + '</div>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+          + '<div class="form-group"><label class="lbl">Door Price ($)</label>'
+            + '<div class="inp-wrap"><div class="inp-dollar">$</div>'
+            + '<input class="inp" type="number" id="t_door" min="0" step="5" value="' + (D.door_price || '') + '" placeholder="45" style="padding-left:24px;font-size:17px;font-weight:900"></div></div>'
+          + '<div style="background:var(--d3);border-radius:10px;padding:11px 13px;font-size:11px;color:var(--dim);line-height:1.7">'
+            + '<div style="font-weight:800;color:var(--pink);margin-bottom:3px">Auto-scheduled</div>'
+            + 'Activates on event day (' + (doorStr || 'set date') + ') only.'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+
+    /* summary */
+    + '<div style="background:var(--d2);border:1px solid rgba(255,209,102,.15);border-radius:11px;padding:13px 16px;margin-bottom:18px">'
+      + '<div style="font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:9px">Pricing Summary</div>'
+      + '<div class="price-summary">'
+        + '<div class="ps-col"><div class="ps-dot" style="background:#28B79D"></div><div class="ps-lbl">Early Bird</div><div class="ps-price" id="psSumEB">$' + ebPrice + '</div><div class="ps-period">' + (D.eb_days || 30) + '+ days out</div></div>'
+        + '<div class="ps-col"><div class="ps-dot" style="background:var(--gold)"></div><div class="ps-lbl">Standard</div><div class="ps-price">$' + (D.std_price || '&#8211;') + '</div><div class="ps-period">' + (D.std_days || 7) + ' days out</div></div>'
+        + '<div class="ps-col"><div class="ps-dot" style="background:var(--pink)"></div><div class="ps-lbl">At Door</div><div class="ps-price">$' + (D.door_price || '&#8211;') + '</div><div class="ps-period">Event day</div></div>'
+      + '</div>'
+      + '<div style="margin-top:9px;font-size:11px;color:var(--dim)">Max revenue (door sellout): <span style="font-weight:800;color:var(--green)">' + maxRev + '</span></div>'
+    + '</div>'
+
+    + '<div style="display:flex;justify-content:space-between">'
+      + '<button class="btn btn-ghost" id="n2_back">&#8592; Back</button>'
+      + '<button class="btn btn-gold" id="n2_next">Next: Visibility &#8594;</button>'
+    + '</div>';
+}
+
+/* ── Node 3: Visibility ── */
+function buildNode3() {
+  var statuses = [
+    {val:'Active',      color:'var(--green)',  desc:'Visible &middot; registrations open'},
+    {val:'Coming Soon', color:'var(--violet)', desc:'Visible but not bookable yet'},
+    {val:'Date TBC',    color:'var(--gold)',   desc:'Shows TBC &middot; notify form visible'},
+    {val:'Sold Out',    color:'var(--pink)',   desc:'Sold out badge &middot; no new bookings'},
+    {val:'Cancelled',   color:'var(--muted)',  desc:'Hidden from site'}
+  ];
+  var rows = statuses.map(function(s) {
+    var on = D.status === s.val;
+    return '<div class="vis-opt' + (on ? ' on' : '') + '" style="border-color:' + (on ? s.color + '60' : 'var(--bdr)') + '" data-status="' + s.val + '">'
+      + '<div class="vis-radio" style="border-color:' + s.color + '">'
+        + (on ? '<div class="vis-radio-fill" style="background:' + s.color + '"></div>' : '')
+      + '</div>'
+      + '<div><div style="font-size:13px;font-weight:800;color:#fff">' + s.val + '</div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + s.desc + '</div>'
+      + '</div></div>';
+  }).join('');
+
+  return '<div style="display:grid;gap:9px;margin-bottom:13px">' + rows + '</div>'
+    + '<div class="feat-toggle' + (D.featured ? ' on' : '') + '" id="featToggle">'
+      + '<input type="checkbox" ' + (D.featured ? 'checked' : '') + ' style="width:15px;height:15px;accent-color:var(--gold)" id="featCb">'
+      + '<div><div style="font-size:13px;font-weight:800;color:var(--gold)">&#9733; Featured Event</div>'
+        + '<div style="font-size:11px;color:var(--muted)">Spinning conic border &mdash; one per page only</div>'
+      + '</div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;margin-top:18px">'
+      + '<button class="btn btn-ghost" id="n3_back">&#8592; Back</button>'
+      + '<button class="btn btn-gold" id="n3_next">Next: Review &#8594;</button>'
+    + '</div>';
+}
+
+/* ── Node 4: Review & Publish ── */
+function buildNode4() {
+  var dt = D.date ? new Date(D.date + 'T12:00:00') : null;
+  var day = dt ? dt.getDate() : '?';
+  var mon = dt ? dt.toLocaleDateString('en-AU',{month:'short'}) : 'TBC';
+  var ebP = D.std_price ? Math.round(D.std_price * (1 - ((D.eb_discount || 20) / 100))) : '&#8211;';
+  var statusCls = D.status === 'Active' ? 'bg' : D.status === 'Coming Soon' ? 'bv' : 'by';
+
+  return '<div class="review-card">'
+      + '<div style="font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Event Preview</div>'
+      + '<div style="display:flex;gap:14px;align-items:flex-start">'
+        + '<div class="review-date-block">'
+          + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;line-height:1;color:var(--gold)">' + day + '</div>'
+          + '<div style="font-size:9px;font-weight:800;text-transform:uppercase;color:var(--muted)">' + mon + '</div>'
+        + '</div>'
+        + '<div style="flex:1">'
+          + '<div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:3px">' + esc(D.name || 'Untitled Event') + '</div>'
+          + '<div style="font-size:12px;color:var(--dim);margin-bottom:7px">' + esc(D.venue || 'No venue') + ' &middot; ' + esc(D.time) + '</div>'
+          + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">'
+            + '<span class="badge bm">' + esc(D.type) + '</span>'
+            + '<span class="badge ' + statusCls + '">' + esc(D.status) + '</span>'
+            + (D.featured ? '<span class="badge by">&#9733; Featured</span>' : '')
+          + '</div>'
+          + '<div style="display:flex;gap:4px;flex-wrap:wrap">'
+            + (D.ch1 ? '<span class="ch-pip" style="background:rgba(179,84,241,.12);color:#B354F1;border:1px solid rgba(179,84,241,.2)"><span class="ch-dot" style="background:#B354F1"></span>' + esc(D.ch1.slice(0,16)) + '</span>' : '')
+            + (D.ch2 ? '<span class="ch-pip" style="background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2)"><span class="ch-dot" style="background:var(--gold)"></span>' + esc(D.ch2.slice(0,16)) + '</span>' : '')
+            + (D.ch3 ? '<span class="ch-pip" style="background:rgba(255,27,154,.1);color:#FF1B9A;border:1px solid rgba(255,27,154,.2)"><span class="ch-dot" style="background:#FF1B9A"></span>' + esc(D.ch3.slice(0,16)) + '</span>' : '')
+          + '</div>'
+        + '</div>'
+        + '<div style="text-align:right;flex-shrink:0">'
+          + '<div style="font-size:22px;font-weight:900;color:var(--gold)">' + (D.capacity || 100) + '</div>'
+          + '<div style="font-size:10px;color:var(--muted)">headsets</div>'
+          + '<div style="font-size:11px;color:var(--dim);margin-top:5px">EB: $' + ebP + '</div>'
+          + '<div style="font-size:14px;font-weight:800;color:#fff">Std: $' + (D.std_price || '&#8211;') + '</div>'
+          + '<div style="font-size:11px;color:var(--dim)">Door: $' + (D.door_price || '&#8211;') + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+    + (!D.name ? '<div style="background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.3);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:12px">&#9888; Event name is required.</div>' : '')
+    + '<div style="display:flex;justify-content:space-between;align-items:center">'
+      + '<button class="btn btn-ghost" id="n4_back">&#8592; Back</button>'
+      + '<div style="display:flex;gap:9px">'
+        + '<button class="btn btn-ghost" id="n4_draft">Save Draft</button>'
+        + '<button class="btn btn-violet" id="n4_publish"' + (!D.name ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>'
+          + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Publish Event'
+        + '</button>'
+      + '</div>'
+    + '</div>';
+}
+
+/* ════════════════════════════════════════════
+   WIRE NODE EVENT HANDLERS
+════════════════════════════════════════════ */
+function wireNodeHandlers(idx) {
+  function get(id) { return document.getElementById(id); }
+
+  if(idx === 0) {
+    get('n0_next').addEventListener('click', function() {
+      D.name  = get('n0_name').value;
+      D.date  = get('n0_date').value;
+      D.time  = get('n0_time').value;
+      D.venue = get('n0_venue').value;
+      D.type  = get('n0_type').value;
+      D.desc  = get('n0_desc').value;
+      doneNode(0);
+    });
+  }
+
+  if(idx === 1) {
+    get('n1_back').addEventListener('click', function() { openNode(0); });
+    get('n1_next').addEventListener('click', function() {
+      D.ch1 = get('n1_ch1').value;
+      D.ch2 = get('n1_ch2').value;
+      D.ch3 = get('n1_ch3').value;
+      doneNode(1);
+    });
+  }
+
+  if(idx === 2) {
+    get('n2_back').addEventListener('click', function() { openNode(1); });
+    get('n2_next').addEventListener('click', function() {
+      D.std_price  = parseFloat(get('t_std_price2').value)  || 0;
+      D.eb_discount= parseFloat(get('t_eb_disc').value)     || 20;
+      D.eb_days    = parseInt(get('t_eb_days').value)        || 30;
+      D.std_days   = parseInt(get('t_std_days').value)       || 7;
+      D.door_price = parseFloat(get('t_door').value)         || 0;
+      D.price      = D.std_price;
+      doneNode(2);
+    });
+
+    /* capacity adjusters */
+    document.querySelectorAll('.cap-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        D.capacity = Math.max(1, (D.capacity || 100) + parseInt(btn.dataset.adj));
+        var cn = get('capNum'); if(cn) cn.textContent = D.capacity;
+        var gf = get('gaugeFill'); if(gf) gf.style.width = Math.min(100, Math.round((D.capacity/500)*100)) + '%';
+        document.querySelectorAll('.preset-btn').forEach(function(b) {
+          b.classList.toggle('on', parseInt(b.dataset.cap) === D.capacity);
+        });
+      });
+    });
+
+    document.querySelectorAll('.preset-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        D.capacity = parseInt(btn.dataset.cap);
+        var cn = get('capNum'); if(cn) cn.textContent = D.capacity;
+        var gf = get('gaugeFill'); if(gf) gf.style.width = Math.min(100, Math.round((D.capacity/500)*100)) + '%';
+        document.querySelectorAll('.preset-btn').forEach(function(b) {
+          b.classList.toggle('on', parseInt(b.dataset.cap) === D.capacity);
+        });
+      });
+    });
+
+    /* live EB price calc */
+    function recalcEB() {
+      var stdEl = get('t_std_price') || get('t_std_price2');
+      var discEl= get('t_eb_disc');
+      if(!stdEl || !discEl) return;
+      var std  = parseFloat(stdEl.value) || 0;
+      var disc = parseFloat(discEl.value) || 0;
+      var eb   = std ? Math.round(std * (1 - disc/100)) : 0;
+      var ap = get('ebAutoPrice'); if(ap) ap.textContent = eb ? '$' + eb : '&#8211;';
+      var sp = get('psSumEB');    if(sp) sp.textContent  = eb ? '$' + eb : '&#8211;';
+    }
+    ['t_std_price','t_std_price2','t_eb_disc'].forEach(function(id) {
+      var el = get(id); if(el) el.addEventListener('input', recalcEB);
+    });
+  }
+
+  if(idx === 3) {
+    get('n3_back').addEventListener('click', function() { openNode(2); });
+    get('n3_next').addEventListener('click', function() {
+      D.featured = !!(get('featCb') && get('featCb').checked);
+      doneNode(3);
+    });
+
+    /* status radio */
+    document.querySelectorAll('.vis-opt').forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        D.status = opt.dataset.status;
+        openNode(3); /* re-render to update UI */
+      });
+    });
+
+    /* featured toggle */
+    var ft = get('featToggle');
+    if(ft) ft.addEventListener('click', function() {
+      var cb = get('featCb');
+      if(!cb) return;
+      cb.checked = !cb.checked;
+      D.featured = cb.checked;
+      ft.classList.toggle('on', cb.checked);
+    });
+  }
+
+  if(idx === 4) {
+    get('n4_back').addEventListener('click', function() { openNode(3); });
+    get('n4_draft').addEventListener('click', function() {
+      D.status = 'Coming Soon';
+      publishEvent();
+    });
+    var pub = get('n4_publish');
+    if(pub && D.name) pub.addEventListener('click', publishEvent);
+  }
+}
+
+/* ════════════════════════════════════════════
+   COUNTDOWN TIMER (node 2)
+════════════════════════════════════════════ */
+function startCdTimer() {
+  if(!D.date) return;
+  CD_TIMER = setInterval(function() {
+    var evDt = new Date(D.date + 'T' + (D.time || '18:00') + ':00');
+    var left = evDt - new Date();
+    if(left <= 0) { clearInterval(CD_TIMER); return; }
+    var units = {days:Math.floor(left/86400000), hours:Math.floor((left%86400000)/3600000), mins:Math.floor((left%3600000)/60000), secs:Math.floor((left%60000)/1000)};
+    Object.keys(units).forEach(function(u) {
+      document.querySelectorAll('.cd-val[data-unit="' + u + '"]').forEach(function(el) {
+        el.textContent = String(units[u]).padStart(2,'0');
+      });
+    });
+  }, 1000);
+}
+
+/* ════════════════════════════════════════════
+   PUBLISH / SAVE
+════════════════════════════════════════════ */
+function publishEvent() {
+  if(!D.name) { toast('Template name required', 'gold'); return; }
+  var ev = {
+    id:          ST.editId || 'tpl_' + Date.now(),
+    name:        D.name,
+    date:        D.date,
+    time:        D.time,
+    venue:       D.venue,
+    type:        D.type,
+    desc:        D.desc,
+    ch1:         D.ch1,
+    ch2:         D.ch2,
+    ch3:         D.ch3,
+    capacity:    D.capacity,
+    price:       D.std_price,
+    status:      D.status,
+    featured:    D.featured,
+    eb_discount: D.eb_discount,
+    eb_days:     D.eb_days,
+    std_price:   D.std_price,
+    std_days:    D.std_days,
+    door_price:  D.door_price,
+    createdAt:   new Date().toISOString()
+  };
+  if(ST.editId) {
+    ST.templates = ST.templates.map(function(t) { return t.id === ST.editId ? ev : t; });
+    toast('Template updated!', 'green');
+  } else {
+    ST.templates.unshift(ev);
+    toast('Template saved!', 'gold');
+  }
+  localStorage.setItem('ue_tpl', JSON.stringify(ST.templates));
+  closeNode();
+  DONE = {0:true,1:true,2:true,3:true,4:true};
+  ST.editId = null;
+  refreshNodeStates();
+  renderTplBoard();
+  renderDashboard();
+  updateBadges();
+  populateScanSelects();
+  setTimeout(function() {
+    D = {name:'',date:'',time:'18:00',venue:'',type:'Public',desc:'',ch1:'',ch2:'',ch3:'',
+      capacity:100,price:0,status:'Active',featured:false,eb_discount:20,eb_days:30,std_price:0,std_days:7,door_price:0};
+    DONE = {}; CUR_NODE = 0;
+    refreshNodeStates();
+  }, 300);
+}
+
+function deleteEv(id) {
+  var ev = ST.events.find(function(e) { return e.id === id; });
+  if(!ev) return;
+  ST.deleteId = id;
+  document.getElementById('delName').textContent = ev.name;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+function confirmDelete() {
+  var id = ST.deleteId;
+  if(id && id.indexOf('tpl_') === 0) {
+    ST.templates = ST.templates.filter(function(t) { return t.id !== id; });
+    localStorage.setItem('ue_tpl', JSON.stringify(ST.templates));
+    toast('Template deleted', 'pink');
+  } else {
+    ST.events = ST.events.filter(function(e) { return e.id !== id; });
+    localStorage.setItem('ue_ev', JSON.stringify(ST.events));
+    toast('Event deleted', 'pink');
+  }
+  document.getElementById('deleteModal').classList.remove('open');
+  renderTplBoard();
+  renderBoard();
+  renderDashboard();
+  updateBadges();
+  populateScanSelects();
+}
+
+/* ════════════════════════════════════════════
+   ATTENDEES
+════════════════════════════════════════════ */
+function renderAttendees(q) {
+  var body = document.getElementById('attBody');
+  if(!body) return;
+  var list = ST.attendees;
+  if(q) list = list.filter(function(a) {
+    return a.name.toLowerCase().includes(q.toLowerCase()) || a.email.toLowerCase().includes(q.toLowerCase());
+  });
+  if(!list.length) {
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--muted)">No attendees found</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(a) {
+    var ev = ST.events.find(function(e) { return e.id === a.eventId; });
+    return '<tr><td>' + esc(a.name) + '</td><td style="font-family:\'JetBrains Mono\',monospace;font-size:11px">' + esc(a.email) + '</td>'
+      + '<td>' + esc(ev ? ev.name : '&#8211;') + '</td>'
+      + '<td><span class="badge ' + (a.checkedIn ? 'bg' : 'bv') + '">' + (a.checkedIn ? 'Checked In' : 'Registered') + '</span></td>'
+      + '<td style="font-size:11px;color:var(--muted)">' + new Date(a.registeredAt).toLocaleDateString('en-AU') + '</td></tr>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════════
+   QR SCANNER
+════════════════════════════════════════════ */
+function startScanner() {
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}})
+    .then(function(stream) {
+      ST.scanStream = stream;
+      ST.scanActive = true;
+      var vid = document.getElementById('scanVideo');
+      vid.srcObject = stream;
+      vid.play();
+      document.getElementById('btnStartScan').style.display = 'none';
+      document.getElementById('btnStopScan').style.display  = 'inline-flex';
+      document.getElementById('scanSt').textContent = 'Scanning — point at QR code';
+      document.getElementById('scanLineEl').style.display = 'block';
+      var canvas = document.getElementById('scanCanvas');
+      var ctx = canvas.getContext('2d');
+      ST.scanTick = setInterval(function() {
+        if(!ST.scanActive || vid.readyState !== vid.HAVE_ENOUGH_DATA) return;
+        canvas.width = vid.videoWidth; canvas.height = vid.videoHeight;
+        ctx.drawImage(vid, 0, 0);
+        var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var code = typeof jsQR !== 'undefined' ? jsQR(img.data, img.width, img.height) : null;
+        if(code) handleScan(code.data);
+      }, 200);
+    })
+    .catch(function() {
+      document.getElementById('scanSt').textContent = 'Camera access denied.';
+      toast('Allow camera access', 'gold');
+    });
+}
+
+function stopScanner() {
+  ST.scanActive = false;
+  if(ST.scanTick) { clearInterval(ST.scanTick); ST.scanTick = null; }
+  if(ST.scanStream) { ST.scanStream.getTracks().forEach(function(t) { t.stop(); }); ST.scanStream = null; }
+  var vid = document.getElementById('scanVideo');
+  if(vid) vid.srcObject = null;
+  var s = document.getElementById('btnStartScan'); if(s) s.style.display = 'inline-flex';
+  var x = document.getElementById('btnStopScan');  if(x) x.style.display = 'none';
+  var st= document.getElementById('scanSt');       if(st) st.textContent = 'Tap Start to begin';
+  var sl= document.getElementById('scanLineEl');   if(sl) sl.style.display = 'none';
+}
+
+var lastScan = '', lastScanMs = 0;
+function handleScan(data) {
+  var now = Date.now();
+  if(data === lastScan && now - lastScanMs < 3000) return;
+  lastScan = data; lastScanMs = now;
+  var ticket;
+  try { ticket = JSON.parse(data); } catch(e) { ticket = {name:data,email:'&#8211;',eventId:null}; }
+  var name  = ticket.name  || data;
+  var email = ticket.email || '&#8211;';
+  var evId  = ticket.eventId || document.getElementById('scanEvSel').value;
+  var ev    = ST.events.find(function(e) { return e.id === evId; });
+  var evName= ev ? ev.name : 'Unknown Event';
+  var time  = new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+
+  document.getElementById('scanSt').textContent = '&#10003; Checked in: ' + name;
+  document.getElementById('scanResult').innerHTML =
+    '<div style="background:rgba(40,183,157,.08);border:1px solid rgba(40,183,157,.25);border-radius:11px;padding:14px 16px;display:flex;align-items:center;gap:12px">'
+      + '<div style="width:38px;height:38px;border-radius:50%;background:rgba(40,183,157,.15);border:1.5px solid rgba(40,183,157,.3);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--green)">&#10003;</div>'
+      + '<div><div style="font-size:15px;font-weight:900;color:#fff">' + esc(name) + '</div>'
+        + '<div style="font-size:11px;color:var(--dim)">' + esc(email) + ' &middot; ' + esc(evName) + '</div>'
+        + '<div style="margin-top:6px;display:flex;gap:6px"><span class="badge bg">Checked In</span>'
+          + '<span class="badge bm" style="font-family:\'JetBrains Mono\',monospace">' + time + '</span></div>'
+      + '</div></div>';
+
+  ST.scanLog.unshift({name:name,email:email,evName:evName,time:time});
+  var sc = document.getElementById('scanCount');
+  if(sc) sc.textContent = ST.scanLog.length;
+  renderScanLog();
+  var se = document.getElementById('statScans');
+  if(se) se.textContent = ST.scanLog.length;
+  toast('&#10003; ' + name + ' checked in', 'green');
+}
+
+function renderScanLog() {
+  var log = document.getElementById('scanLog');
+  if(!log) return;
+  if(!ST.scanLog.length) {
+    log.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:12px">No scans yet</div>';
+    return;
+  }
+  log.innerHTML = ST.scanLog.map(function(s) {
+    return '<div class="scan-entry"><div><div class="scan-entry-name">' + esc(s.name) + '</div>'
+      + '<div class="scan-entry-ev">' + esc(s.evName) + '</div></div>'
+      + '<div class="scan-entry-time">' + s.time + '</div></div>';
+  }).join('');
+}
+
+function clearScanLog() {
+  ST.scanLog = [];
+  var sc = document.getElementById('scanCount');
+  if(sc) sc.textContent = '0';
+  renderScanLog();
+}
+
+/* ════════════════════════════════════════════
+   API KEYS
+════════════════════════════════════════════ */
+function restoreApiKeys() {
+  var map = {
+    k_ds_key:   ['destore','key'],
+    k_ds_domain:['destore','domain'],
+    k_ds_tw:    ['destore','thirdweb'],
+    k_ds_wallet:['destore','wallet'],
+    k_gs1_pfx:  ['gs1','prefix'],
+    k_gs1_key:  ['gs1','apikey'],
+    k_gs1_res:  ['gs1','resolver'],
+    k_ant_key:  ['anthropic','key'],
+    k_ant_model:['anthropic','model'],
+    k_n8n_url:  ['n8n','url'],
+    k_n8n_wh:   ['n8n','webhook']
+  };
+  Object.keys(map).forEach(function(id) {
+    var svc = map[id][0], fld = map[id][1];
+    var el = document.getElementById(id);
+    if(el && ST.apiKeys[svc] && ST.apiKeys[svc][fld]) el.value = ST.apiKeys[svc][fld];
+  });
+}
+
+function saveAllApiKeys() {
+  var map = {
+    k_ds_key:   ['destore','key'],
+    k_ds_domain:['destore','domain'],
+    k_ds_tw:    ['destore','thirdweb'],
+    k_ds_wallet:['destore','wallet'],
+    k_gs1_pfx:  ['gs1','prefix'],
+    k_gs1_key:  ['gs1','apikey'],
+    k_gs1_res:  ['gs1','resolver'],
+    k_ant_key:  ['anthropic','key'],
+    k_ant_model:['anthropic','model'],
+    k_n8n_url:  ['n8n','url'],
+    k_n8n_wh:   ['n8n','webhook']
+  };
+  Object.keys(map).forEach(function(id) {
+    var svc = map[id][0], fld = map[id][1];
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(!ST.apiKeys[svc]) ST.apiKeys[svc] = {};
+    ST.apiKeys[svc][fld] = el.value;
+  });
+  localStorage.setItem('ue_api', JSON.stringify(ST.apiKeys));
+  updateApiStatuses();
+  updateWebhookPreview();
+  toast('API keys saved', 'green');
+}
+
+function updateApiStatuses() {
+  var checks = {
+    destore:   !!(ST.apiKeys.destore   && ST.apiKeys.destore.key),
+    gs1:       !!(ST.apiKeys.gs1       && ST.apiKeys.gs1.prefix),
+    anthropic: !!(ST.apiKeys.anthropic && ST.apiKeys.anthropic.key),
+    n8n:       !!(ST.apiKeys.n8n       && ST.apiKeys.n8n.url)
+  };
+  Object.keys(checks).forEach(function(svc) {
+    var el = document.getElementById('as-' + svc);
+    var card = document.getElementById('ac-' + svc);
+    if(el) el.innerHTML = checks[svc]
+      ? '<span class="badge bg"><span class="live-dot" style="margin-right:4px"></span>Connected</span>'
+      : '<span class="badge bm">Not configured</span>';
+    if(card) card.classList.toggle('connected', checks[svc]);
+  });
+}
+
+function updateWebhookPreview() {
+  var url = (document.getElementById('k_n8n_url').value || 'https://n8n.flowberry.org')
+          + (document.getElementById('k_n8n_wh').value  || '/webhook/ue-events');
+  var el = document.getElementById('webhookPreview');
+  if(el) el.textContent = url;
+}
+
+function testApi(svc) {
+  toast('Testing ' + svc.toUpperCase() + '...', 'gold');
+  setTimeout(function() {
+    var k = ST.apiKeys[svc];
+    toast(k ? svc.toUpperCase() + ': looks good!' : svc.toUpperCase() + ': no credentials', k ? 'green' : 'gold');
+  }, 1100);
+}
+
+/* ════════════════════════════════════════════
+   QR GENERATOR
+════════════════════════════════════════════ */
+function updateQRLink() {
+  var evId   = document.getElementById('qrEvSel').value;
+  var gtin   = document.getElementById('qrGtin').value;
+  var serial = document.getElementById('qrSerial').value;
+  var domain = (ST.apiKeys.destore && ST.apiKeys.destore.domain) || 'ultimateexperiences.com.au';
+  var prev   = document.getElementById('gs1Preview');
+  var short  = document.getElementById('qrShortUrl');
+  var evLbl  = document.getElementById('qrEvLbl');
+  var ev     = ST.events.find(function(e) { return e.id === evId; });
+  if(evLbl) evLbl.textContent = ev ? ev.name : 'No event selected';
+
+  if(!gtin || !evId) {
+    if(prev)  prev.textContent = 'Fill in event + GTIN to generate link';
+    if(short) short.textContent = '';
+    QR_EV = null;
+    return;
+  }
+  var g = gtin.padStart(14,'0');
+  var s = serial || (evId.slice(-8));
+  var url = 'https://' + domain + '/01/' + g + '/21/' + s;
+  if(prev)  prev.innerHTML = '<span style="color:var(--dim)">https://' + esc(domain) + '/</span>'
+    + '<span style="color:var(--violet)">01/</span><span style="color:var(--gold)">' + g + '</span>'
+    + '<span style="color:var(--violet)">/21/</span><span style="color:var(--green)">' + s + '</span>';
+  if(short) short.textContent = url.replace('https://','');
+  QR_EV = {ev:ev, gtin:g, serial:s, url:url};
+}
+
+function generateQR() {
+  if(!QR_EV) { toast('Select event + enter GTIN first', 'gold'); return; }
+  var colors = {
+    standard:{fg:'000000',bg:'ffffff'},
+    dark:    {fg:'B354F1',bg:'0d0d10'},
+    gold:    {fg:'FFD166',bg:'07070a'}
+  };
+  var c = colors[QR_STYLE] || colors.standard;
+  var apiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='
+    + encodeURIComponent(QR_EV.url) + '&color=' + c.fg + '&bgcolor=' + c.bg + '&qzone=2&format=svg';
+  var wrap = document.getElementById('qrPreview');
+  wrap.innerHTML = '<img src="' + apiUrl + '" style="width:180px;height:180px;border-radius:10px;display:block">';
+  addQRHistory(QR_EV, apiUrl);
+  toast('QR generated for ' + QR_EV.ev.name, 'violet');
+}
+
+function addQRHistory(qe, imgUrl) {
+  var hist = document.getElementById('qrHistory');
+  if(!hist) return;
+  if(hist.querySelector('div') && hist.querySelector('div').textContent === 'None yet') hist.innerHTML = '';
+  var item = document.createElement('div');
+  item.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer';
+  item.innerHTML = '<div style="width:52px;height:52px;background:var(--d3);border:1px solid var(--bdr);border-radius:7px;overflow:hidden">'
+    + '<img src="' + imgUrl + '" style="width:100%;height:100%"></div>'
+    + '<div style="font-size:9px;font-weight:700;color:var(--muted);text-align:center;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(qe.ev.name) + '</div>';
+  item.addEventListener('click', function() {
+    document.getElementById('qrPreview').innerHTML = '<img src="' + imgUrl + '" style="width:180px;height:180px;border-radius:10px">';
+  });
+  hist.prepend(item);
+}
+
+function downloadQR() {
+  if(!QR_EV) { toast('Generate a QR first', 'gold'); return; }
+  var colors = {standard:{fg:'000000',bg:'ffffff'},dark:{fg:'B354F1',bg:'0d0d10'},gold:{fg:'FFD166',bg:'07070a'}};
+  var c = colors[QR_STYLE] || colors.standard;
+  var a = document.createElement('a');
+  a.href = 'https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=' + encodeURIComponent(QR_EV.url) + '&color=' + c.fg + '&bgcolor=' + c.bg + '&format=svg&qzone=2';
+  a.download = 'ue-qr-' + QR_EV.ev.name.replace(/\s+/g,'-').toLowerCase() + '.svg';
+  a.target = '_blank'; a.click();
+  toast('Downloading SVG...', 'gold');
+}
+
+/* ════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════ */
+function toast(msg, color) {
+  var colors = {green:'var(--green)',gold:'var(--gold)',pink:'var(--pink)',violet:'var(--violet)',red:'var(--red)'};
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = '<div class= "<div class=\"toast-msg\" style=\"color:" + (colors[color]||"#fff") + "\">" + msg + "</div>";
+  document.body.appendChild(t);
+  setTimeout(function() { t.classList.add("out"); setTimeout(function() { t.remove(); }, 320); }, 3000);
+}
+
+
+/* ════════════════════════════════════════════
+   TEMPLATE SYSTEM
+════════════════════════════════════════════ */
+
+function renderTplBoard() {
+  var board = document.getElementById('tplBoard');
+  var count = document.getElementById('tplCount');
+  if(!board) return;
+  if(count) count.textContent = ST.templates.length + ' template' + (ST.templates.length !== 1 ? 's' : '');
+
+  if(!ST.templates.length) {
+    board.innerHTML = '<div style="text-align:center;padding:44px;color:var(--muted);font-size:13px">'
+      + '<div style="font-size:36px;margin-bottom:10px;opacity:.35">&#127919;</div>'
+      + 'No templates yet. Hit <strong style="color:var(--gold)">New Template</strong> to build your first reusable event.'
+      + '</div>';
+    return;
+  }
+
+  var stripColor = function(type) {
+    if(type === 'Family' || type === 'Public') return 'linear-gradient(180deg,var(--violet),var(--orchid))';
+    if(type === 'Wellness') return 'linear-gradient(180deg,var(--green),#1a9a84)';
+    if(type === 'Club Night') return 'linear-gradient(180deg,var(--pink),#c0126f)';
+    return 'linear-gradient(180deg,var(--gold),var(--gdim))';
+  };
+
+  var html = '';
+  ST.templates.forEach(function(tpl) {
+    /* count how many times this template has been scheduled */
+    var schedCount = ST.events.filter(function(e) { return e.tplId === tpl.id; }).length;
+    var ebP = tpl.std_price ? Math.round(tpl.std_price * (1 - ((tpl.eb_discount || 20) / 100))) : 0;
+
+    html += '<div class="ev-card' + (tpl.featured ? ' feat' : '') + '" style="margin:0 20px 10px" onclick="editTpl('' + tpl.id + '')">'
+      + '<div class="ev-inner">'
+        + '<div class="ev-stripe" style="background:' + stripColor(tpl.type) + '"></div>'
+        + '<div class="ev-body">'
+          + '<div style="background:var(--d3);border-radius:9px;padding:8px 11px;text-align:center;flex-shrink:0;min-width:50px">'
+            + '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="display:block;margin:0 auto 3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+            + '<div style="font-size:8px;font-weight:800;text-transform:uppercase;color:var(--muted)">TPL</div>'
+          + '</div>'
+          + '<div class="ev-info">'
+            + '<div class="ev-name">' + esc(tpl.name) + (tpl.featured ? ' <span style="color:var(--gold)">&#9733;</span>' : '') + '</div>'
+            + '<div class="ev-meta">' + esc(tpl.venue || 'No default venue') + ' &middot; ' + esc(tpl.type) + '</div>'
+            + '<div class="ev-chs">'
+              + (tpl.ch1 ? '<span class="ch-pip" style="background:rgba(179,84,241,.12);color:#B354F1;border:1px solid rgba(179,84,241,.2)"><span class="ch-dot" style="background:#B354F1"></span>' + esc(tpl.ch1.slice(0,14)) + '</span>' : '')
+              + (tpl.ch2 ? '<span class="ch-pip" style="background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2)"><span class="ch-dot" style="background:var(--gold)"></span>' + esc(tpl.ch2.slice(0,14)) + '</span>' : '')
+              + (tpl.ch3 ? '<span class="ch-pip" style="background:rgba(255,27,154,.1);color:#FF1B9A;border:1px solid rgba(255,27,154,.2)"><span class="ch-dot" style="background:#FF1B9A"></span>' + esc(tpl.ch3.slice(0,14)) + '</span>' : '')
+              + (ebP ? '<span style="font-size:10px;color:var(--green);font-weight:700;margin-left:4px">EB $' + ebP + ' / Std $' + tpl.std_price + ' / Door $' + (tpl.door_price || '?') + '</span>' : '')
+            + '</div>'
+          + '</div>'
+          + '<div class="ev-right">'
+            + '<span class="badge bm">' + (tpl.capacity || 100) + ' &#127911;</span>'
+            + '<span class="badge ' + (schedCount ? 'bg' : 'bm') + '">'
+              + (schedCount ? schedCount + ' scheduled' : 'Not scheduled') + '</span>'
+            + '<div class="ev-actions">'
+              + '<button class="btn btn-violet btn-sm" onclick="event.stopPropagation();openScheduleFromTpl('' + tpl.id + '')">Schedule</button>'
+              + '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editTpl('' + tpl.id + '')">Edit</button>'
+              + '<button class="btn btn-ghost btn-sm" style="color:var(--pink)" onclick="event.stopPropagation();deleteTpl('' + tpl.id + '')">&#10005;</button>'
+            + '</div>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+  });
+  board.innerHTML = html;
+}
+
+function filterTplBoard(q) {
+  document.querySelectorAll('#tplBoard .ev-card').forEach(function(c) {
+    c.style.display = c.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function editTpl(id) {
+  var tpl = ST.templates.find(function(t) { return t.id === id; });
+  if(!tpl) return;
+  ST.editId = id;
+  D = {
+    name:        tpl.name        || '',
+    date:        '',
+    time:        tpl.time        || '18:00',
+    venue:       tpl.venue       || '',
+    type:        tpl.type        || 'Public',
+    desc:        tpl.desc        || '',
+    ch1:         tpl.ch1         || '',
+    ch2:         tpl.ch2         || '',
+    ch3:         tpl.ch3         || '',
+    capacity:    tpl.capacity    || 100,
+    price:       tpl.std_price   || 0,
+    status:      tpl.status      || 'Active',
+    featured:    tpl.featured    || false,
+    eb_discount: tpl.eb_discount || 20,
+    eb_days:     tpl.eb_days     || 30,
+    std_price:   tpl.std_price   || 0,
+    std_days:    tpl.std_days    || 7,
+    door_price:  tpl.door_price  || 0
+  };
+  DONE = {0:true,1:true,2:true,3:true};
+  CUR_NODE = 0;
+  refreshNodeStates();
+  showPanel('events');
+  openNode(0);
+}
+
+function deleteTpl(id) {
+  var tpl = ST.templates.find(function(t) { return t.id === id; });
+  if(!tpl) return;
+  ST.deleteId = 'tpl_' + id;
+  document.getElementById('delName').textContent = tpl.name + ' (template)';
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+/* ── Schedule from template ── */
+function openScheduleFromTpl(tplId) {
+  populateSchedModal();
+  var sel = document.getElementById('schedTplSel');
+  if(sel && tplId) sel.value = tplId;
+  updateSchedPreview();
+  document.getElementById('scheduleModal').classList.add('open');
+}
+
+function populateSchedModal() {
+  var sel = document.getElementById('schedTplSel');
+  if(!sel) return;
+  var opts = '<option value="">Choose a template...</option>';
+  ST.templates.forEach(function(t) {
+    opts += '<option value="' + t.id + '">' + esc(t.name) + '</option>';
+  });
+  sel.innerHTML = opts;
+}
+
+function updateSchedPreview() {
+  /* Auto-generate slug from template name + date */
+  var slugEl = document.getElementById('schedSlug');
+  var dateEl = document.getElementById('schedDate');
+  var sel = document.getElementById('schedTplSel');
+  if(slugEl && sel && sel.value) {
+    var tpl = ST.templates.find(function(t){ return t.id === sel.value; });
+    if(tpl) {
+      var base = tpl.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+      var date = dateEl && dateEl.value ? '-' + dateEl.value.replace(/-/g,'') : '';
+      slugEl.placeholder = base + date;
+    }
+  }
+  var sel = document.getElementById('schedTplSel');
+  var prev = document.getElementById('schedTplPreview');
+  var inner = document.getElementById('schedTplPreviewInner');
+  if(!sel || !prev || !inner) return;
+  var tpl = ST.templates.find(function(t) { return t.id === sel.value; });
+  if(!tpl) { prev.style.display = 'none'; return; }
+  prev.style.display = 'block';
+  var ebP = tpl.std_price ? Math.round(tpl.std_price * (1 - ((tpl.eb_discount||20)/100))) : '–';
+  inner.innerHTML =
+    '<div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:5px">' + esc(tpl.name) + '</div>'
+    + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px">' + esc(tpl.venue||'No default venue') + ' &middot; ' + esc(tpl.type) + ' &middot; ' + (tpl.capacity||100) + ' headsets</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      + (tpl.ch1 ? '<span class="ch-pip" style="background:rgba(179,84,241,.12);color:#B354F1;border:1px solid rgba(179,84,241,.2)"><span class="ch-dot" style="background:#B354F1"></span>' + esc(tpl.ch1.slice(0,16)) + '</span>' : '')
+      + (tpl.ch2 ? '<span class="ch-pip" style="background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2)"><span class="ch-dot" style="background:var(--gold)"></span>' + esc(tpl.ch2.slice(0,16)) + '</span>' : '')
+      + (tpl.ch3 ? '<span class="ch-pip" style="background:rgba(255,27,154,.1);color:#FF1B9A;border:1px solid rgba(255,27,154,.2)"><span class="ch-dot" style="background:#FF1B9A"></span>' + esc(tpl.ch3.slice(0,16)) + '</span>' : '')
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--dim)">EB: <span style="color:var(--green);font-weight:700">$' + ebP + '</span>'
+      + ' &nbsp; Std: <span style="color:var(--gold);font-weight:700">$' + (tpl.std_price||'–') + '</span>'
+      + ' &nbsp; Door: <span style="color:var(--pink);font-weight:700">$' + (tpl.door_price||'–') + '</span></div>';
+}
+
+function publishFromSchedule() {
+  var sel = document.getElementById('schedTplSel');
+  var dateEl = document.getElementById('schedDate');
+  var timeEl = document.getElementById('schedTime');
+  var venueEl = document.getElementById('schedVenue');
+  var statusEl = document.getElementById('schedStatus');
+  if(!sel || !sel.value) { toast('Select a template', 'gold'); return; }
+  if(!dateEl || !dateEl.value) { toast('Set an event date', 'gold'); return; }
+  var tpl = ST.templates.find(function(t) { return t.id === sel.value; });
+  if(!tpl) return;
+
+  var slugEl = document.getElementById('schedSlug');
+  var payEl  = document.getElementById('schedPayLink');
+  var autoSlug = tpl.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')
+    + '-' + dateEl.value.replace(/-/g,'');
+  var slug = (slugEl && slugEl.value) ? slugEl.value : autoSlug;
+  var ev = {
+    id:          'ev_' + Date.now(),
+    tplId:       tpl.id,
+    name:        tpl.name,
+    date:        dateEl.value,
+    time:        timeEl ? timeEl.value : '18:00',
+    venue:       (venueEl && venueEl.value) ? venueEl.value : tpl.venue,
+    type:        tpl.type,
+    desc:        tpl.desc,
+    ch1:         tpl.ch1,
+    ch2:         tpl.ch2,
+    ch3:         tpl.ch3,
+    capacity:    tpl.capacity,
+    price:       tpl.std_price,
+    status:      statusEl ? statusEl.value : 'Active',
+    featured:    tpl.featured,
+    eb_discount: tpl.eb_discount,
+    eb_days:     tpl.eb_days,
+    std_price:   tpl.std_price,
+    std_days:    tpl.std_days,
+    door_price:  tpl.door_price,
+    slug:        slug,
+    payLink:     (payEl && payEl.value) ? payEl.value : '',
+    eventUrl:    'https://ultimateexperiences.com.au/events/' + slug,
+    createdAt:   new Date().toISOString()
+  };
+  ST.events.unshift(ev);
+  localStorage.setItem('ue_ev', JSON.stringify(ST.events));
+  document.getElementById('scheduleModal').classList.remove('open');
+  renderTplBoard();
+  renderDashboard();
+  updateBadges();
+  populateScanSelects();
+  toast('Event scheduled from template!', 'gold');
+}
+
+
+/* ════════════════════════════════════════════
+   EVENT ONE-PAGER GENERATOR
+════════════════════════════════════════════ */
+
+
+function viewEventPage(id) {
+  var ev = ST.events.find(function(e) { return e.id === id; });
+  if(!ev) return;
+  var page = buildEventPage(ev);
+  var w = window.open('', '_blank');
+  if(w) { w.document.write(page); w.document.close(); }
+  else toast('Allow popups to view event page', 'gold');
+}
+
+function buildEventPage(ev) {
+  var ebP   = ev.std_price ? Math.round(ev.std_price * (1 - ((ev.eb_discount||20)/100))) : 0;
+  var stdP  = ev.std_price  || 0;
+  var doorP = ev.door_price || 0;
+  var isFree = !stdP && !doorP;
+
+  /* determine active tier */
+  var activePrice = stdP;
+  var activeTier  = 'Standard';
+  var activeBadge = '';
+  if(ev.date) {
+    var evDt = new Date(ev.date+'T'+(ev.time||'18:00')+':00');
+    var days = (evDt - new Date()) / 86400000;
+    if(days <= 0 && doorP)           { activePrice = doorP; activeTier = 'At the Door'; activeBadge = 'Tonight'; }
+    else if(days <= (ev.std_days||7)) { activePrice = stdP;  activeTier = 'Standard';    activeBadge = ''; }
+    else if(ebP)                      { activePrice = ebP;   activeTier = 'Early Bird';  activeBadge = 'Save '+ev.eb_discount+'%'; }
+  }
+
+  var fmtEvDate = ev.date
+    ? new Date(ev.date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+    : 'Date TBC';
+
+  /* ── INLINE STYLES (no external CSS needed) ── */
+  var css = [
+    '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}',
+    'html{scroll-behavior:smooth}',
+    '::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#07070a}::-webkit-scrollbar-thumb{background:#2e2e38;border-radius:2px}',
+    '@property --ang{syntax:"<angle>";initial-value:0deg;inherits:false}',
+    '@keyframes spin{to{--ang:360deg}}',
+    '@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}',
+    '@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}',
+    '@keyframes overlayIn{from{opacity:0}to{opacity:1}}',
+    '@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}',
+    'body{background:#07070a;color:#fff;font-family:"Plus Jakarta Sans",sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}',
+    /* NAV */
+    '.nav{position:sticky;top:0;z-index:50;background:rgba(7,7,10,.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 24px;height:52px;display:flex;align-items:center;gap:16px}',
+    '.nav-logo{font-family:"Bebas Neue",Impact,sans-serif;font-size:20px;letter-spacing:.06em;color:#fff;text-decoration:none}',
+    '.nav-gold{color:#FFD166}',
+    /* LAYOUT */
+    '.page{max-width:1080px;margin:0 auto;padding:40px 24px 120px;display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:start}',
+    '@media(max-width:800px){.page{grid-template-columns:1fr;padding:24px 16px 100px}}',
+    /* LEFT COLUMN */
+    '.ev-hero{border-radius:18px;overflow:hidden;aspect-ratio:16/9;position:relative;margin-bottom:28px;background:linear-gradient(135deg,#0f0820,#1a0d35)}',
+    '.ev-type{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#B354F1;margin-bottom:10px}',
+    '.ev-title{font-family:"Bebas Neue",Impact,sans-serif;font-size:clamp(44px,8vw,80px);letter-spacing:.04em;line-height:.92;margin-bottom:18px}',
+    '.ev-meta{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}',
+    '.ev-meta-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#9999b0}',
+    '.ev-meta-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0}',
+    '.ev-meta-main{color:#fff;font-weight:700}',
+    '.ev-meta-sub{font-size:11px;color:#6b6b80;margin-top:1px}',
+    /* COUNTDOWN */
+    '.cd-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}',
+    '.cd-tile{background:rgba(179,84,241,.08);border:1px solid rgba(179,84,241,.15);border-radius:12px;padding:14px 8px;text-align:center}',
+    '.cd-val{font-family:"Bebas Neue",Impact,sans-serif;font-size:34px;color:#B354F1;line-height:1}',
+    '.cd-lbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#6b6b80;margin-top:3px}',
+    /* CHANNELS */
+    '.ch-row{display:grid;gap:8px;margin-bottom:28px}',
+    '.ch-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;transition:border-color .15s}',
+    '.ch-card:hover{border-color:rgba(255,255,255,.14)}',
+    '.ch-led{width:12px;height:12px;border-radius:50%;flex-shrink:0}',
+    '.ch-info{}',
+    '.ch-label{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px}',
+    '.ch-name{font-size:13px;font-weight:700;color:#fff}',
+    /* ABOUT */
+    '.about-body{font-size:14px;color:#9999b0;line-height:1.8;margin-bottom:28px}',
+    /* ATTENDEES */
+    '.att-row{display:flex;align-items:center;gap:10px;margin-bottom:28px}',
+    '.att-faces{display:flex}',
+    '.att-face{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6A14DB,#B354F1);border:2px solid #07070a;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}',
+    '.att-face:first-child{margin-left:0}',
+    '.att-text{font-size:13px;color:#9999b0;font-weight:600}',
+    '.att-text strong{color:#fff}',
+    /* RIGHT STICKY CARD */
+    '.ticket-card{position:sticky;top:68px;background:#0d0d10;border:1px solid #2e2e38;border-radius:20px;overflow:hidden}',
+    '@media(max-width:800px){.ticket-card{position:static}}',
+    '.tc-header{padding:22px 24px 18px;border-bottom:1px solid #2e2e38}',
+    '.tc-price{font-family:"Bebas Neue",Impact,sans-serif;font-size:42px;line-height:1;margin-bottom:4px}',
+    '.tc-tier{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:100px;padding:3px 10px;margin-bottom:12px}',
+    '.tc-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#2e2e38;border-radius:12px;overflow:hidden;margin-bottom:16px}',
+    '.tier-col{padding:12px 10px;text-align:center;background:#141418;transition:background .15s}',
+    '.tier-col.active{background:#0f0820}',
+    '.tier-dot{width:8px;height:8px;border-radius:50%;margin:0 auto 6px}',
+    '.tier-lbl{font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}',
+    '.tier-price{font-family:"Bebas Neue",Impact,sans-serif;font-size:22px;line-height:1;color:#fff}',
+    '.tier-when{font-size:9px;color:#6b6b80;margin-top:3px}',
+    /* FORM */
+    '.tc-body{padding:20px 24px}',
+    '.qty-row{display:flex;align-items:center;justify-content:space-between;background:#1c1c22;border:1px solid #2e2e38;border-radius:12px;padding:12px 16px;margin-bottom:14px}',
+    '.qty-label{font-size:12px;font-weight:700;color:#fff}',
+    '.qty-sub{font-size:11px;color:#6b6b80;margin-top:2px}',
+    '.qty-ctrl{display:flex;align-items:center;gap:10px}',
+    '.qty-btn{width:30px;height:30px;border-radius:8px;background:#26262e;border:1px solid #2e2e38;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s;font-weight:300}',
+    '.qty-btn:hover{background:#2e2e38;border-color:#FFD166;color:#FFD166}',
+    '.qty-num{font-family:"Bebas Neue",Impact,sans-serif;font-size:22px;color:#fff;min-width:28px;text-align:center}',
+    '.field{margin-bottom:12px}',
+    '.field label{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b6b80;margin-bottom:6px}',
+    '.field input{width:100%;background:#1c1c22;border:1px solid #2e2e38;border-radius:11px;padding:12px 14px;color:#fff;font-family:"Plus Jakarta Sans",sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color .18s,box-shadow .18s}',
+    '.field input:focus{border-color:#FFD166;box-shadow:0 0 0 3px rgba(255,209,102,.1)}',
+    '.field input.err{border-color:#FF1B9A}',
+    '.cta-btn{width:100%;padding:15px;border:none;border-radius:13px;font-family:"Plus Jakarta Sans",sans-serif;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.03em;transition:all .2s;position:relative;overflow:hidden}',
+    '.cta-btn.gold{background:linear-gradient(135deg,#c9952a,#FFD166);color:#07070a;box-shadow:0 4px 20px rgba(255,209,102,.35)}',
+    '.cta-btn.gold:hover{filter:brightness(1.06);box-shadow:0 6px 28px rgba(255,209,102,.45);transform:translateY(-1px)}',
+    '.cta-btn.green{background:linear-gradient(135deg,#1a9a84,#28B79D);color:#fff;box-shadow:0 4px 20px rgba(40,183,157,.3)}',
+    '.cta-btn.gold:disabled,.cta-btn.green:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none}',
+    '.tc-fine{font-size:11px;color:#6b6b80;text-align:center;margin-top:12px;line-height:1.6}',
+    '.tc-fine a{color:#9999b0;text-decoration:none}',
+    /* CALENDAR BTNS */
+    '.cal-row{display:flex;gap:8px;margin-top:14px}',
+    '.cal-btn{flex:1;padding:9px;background:#1c1c22;border:1px solid #2e2e38;border-radius:10px;color:#9999b0;font-size:11px;font-weight:700;cursor:pointer;font-family:"Plus Jakarta Sans",sans-serif;transition:all .15s;text-align:center;text-decoration:none;display:block}',
+    '.cal-btn:hover{border-color:rgba(255,255,255,.2);color:#fff}',
+    /* SUCCESS OVERLAY */
+    '.success-overlay{position:fixed;inset:0;background:rgba(7,7,10,.95);z-index:1000;display:flex;align-items:center;justify-content:center;animation:overlayIn .3s ease;display:none}',
+    '.success-card{text-align:center;padding:48px 32px;animation:fadeUp .4s ease}',
+    /* DIVIDER */
+    '.sec-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80;margin-bottom:14px}',
+    '.divider{height:1px;background:#2e2e38;margin:24px 0}',
+  ].join('\n');
+
+  /* build channel cards */
+  var chHtml = '';
+  [
+    {v:ev.ch1, color:'#B354F1', n:'Channel 1 · Violet'},
+    {v:ev.ch2, color:'#FFD166', n:'Channel 2 · Gold'},
+    {v:ev.ch3, color:'#FF1B9A', n:'Channel 3 · Pink'}
+  ].forEach(function(c) {
+    if(!c.v) return;
+    chHtml += '<div class="ch-card">'
+      + '<div class="ch-led" style="background:'+c.color+';box-shadow:0 0 12px '+c.color+'80"></div>'
+      + '<div class="ch-info"><div class="ch-label" style="color:'+c.color+'">'+c.n+'</div>'
+        + '<div class="ch-name">'+esc(c.v)+'</div></div>'
+    + '</div>';
+  });
+
+  /* tier columns */
+  var tierCols = '';
+  [
+    {l:'Early Bird', color:'#28B79D', p:ebP,   when:(ev.eb_days||30)+'+ days out', active:activeTier==='Early Bird'},
+    {l:'Standard',  color:'#FFD166', p:stdP,   when:(ev.std_days||7)+'+ days out', active:activeTier==='Standard'},
+    {l:'At Door',   color:'#FF1B9A', p:doorP,  when:'Event day',                   active:activeTier==='At the Door'}
+  ].forEach(function(t) {
+    if(!t.p && !isFree) return;
+    tierCols += '<div class="tier-col'+(t.active?' active':'')+'">'
+      + '<div class="tier-dot" style="background:'+t.color+(t.active?';box-shadow:0 0 8px '+t.color:'')+'"></div>'
+      + '<div class="tier-lbl" style="color:'+t.color+'">'+t.l+'</div>'
+      + '<div class="tier-price">'+(isFree?'FREE':'$'+t.p)+'</div>'
+      + '<div class="tier-when">'+t.when+'</div>'
+    + '</div>';
+  });
+
+  /* price display */
+  var priceDisplay = isFree
+    ? '<div class="tc-price" style="color:#28B79D">FREE</div><div style="font-size:12px;color:#6b6b80;margin-bottom:14px">Free entry &bull; headsets at the door</div>'
+    : '<div class="tc-price" style="color:'+(activeTier==='Early Bird'?'#28B79D':activeTier==='At the Door'?'#FF1B9A':'#FFD166')+'">$'+activePrice+'</div>'
+      + '<div class="tc-tier" style="background:'+(activeTier==='Early Bird'?'rgba(40,183,157,.12)':activeTier==='At the Door'?'rgba(255,27,154,.12)':'rgba(255,209,102,.12)')+';color:'+(activeTier==='Early Bird'?'#28B79D':activeTier==='At the Door'?'#FF1B9A':'#FFD166')+';border:1px solid '+(activeTier==='Early Bird'?'rgba(40,183,157,.3)':activeTier==='At the Door'?'rgba(255,27,154,.3)':'rgba(255,209,102,.3)')+'">'+activeTier+(activeBadge?' &bull; '+activeBadge:'')+'</div>';
+
+  /* calendar links */
+  var calStart = ev.date ? ev.date.replace(/-/g,'')+'T'+(ev.time||'18:00').replace(':','')+'00' : '';
+  var gcal = ev.date
+    ? 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(ev.name)+'&dates='+calStart+'/'+calStart+'&details='+encodeURIComponent(ev.desc||'')+'&location='+encodeURIComponent(ev.venue||'')
+    : '#';
+
+  var payLink = ev.payLink || '';
+
+  /* attendee count (mock — replace with real DB later) */
+  var attCount = Math.floor(Math.random()*40)+8;
+  var faces = '';
+  var initials = ['JK','AB','SM','TL','RC','PW','ND'];
+  var faceColors = ['linear-gradient(135deg,#6A14DB,#B354F1)','linear-gradient(135deg,#c9952a,#FFD166)','linear-gradient(135deg,#c0126f,#FF1B9A)','linear-gradient(135deg,#1a9a84,#28B79D)'];
+  for(var fi=0; fi<5; fi++) {
+    faces += '<div class="att-face" style="background:'+faceColors[fi%4]+'">'+initials[fi]+'</div>';
+  }
+
+  return '<!DOCTYPE html><html lang="en"><head>'
+    + '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>'+esc(ev.name)+' &mdash; Ultimate Experiences</title>'
+    + '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    + '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap">'
+    + '<style>'+css+'</style>'
+    + '</head><body>'
+
+    /* ── NAV ── */
+    + '<nav class="nav">'
+      + '<a href="https://ultimateexperiences.com.au" class="nav-logo">ULTIMATE<span class="nav-gold">&#183;</span>XP</a>'
+      + '<span style="font-size:11px;color:#6b6b80;font-weight:700;margin-left:4px">/ Events</span>'
+      + '<div style="margin-left:auto;display:flex;align-items:center;gap:10px">'
+        + '<span class="badge" style="background:rgba(40,183,157,.12);color:#28B79D;border:1px solid rgba(40,183,157,.25);border-radius:100px;padding:3px 10px;font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase">'
+          + '<span style="width:6px;height:6px;border-radius:50%;background:#28B79D;display:inline-block;margin-right:5px;animation:pulse 1.5s ease-in-out infinite"></span>Live</span>'
+      + '</div>'
+    + '</nav>'
+
+    + '<div class="page">'
+
+    /* ── LEFT: event info ── */
+    + '<div>'
+
+      /* hero image / disco visual */
+      + '<div class="ev-hero">'
+        + '<div style="position:absolute;inset:0;background:conic-gradient(from var(--ang,0deg) at 50% 50%,transparent 0deg,rgba(179,84,241,.08) 20deg,transparent 40deg,rgba(255,209,102,.05) 80deg,transparent 100deg);animation:spin 20s linear infinite"></div>'
+        /* disco ball SVG */
+        + '<svg width="120" height="140" viewBox="0 0 90 110" fill="none" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%)">'
+          + '<ellipse cx="45" cy="45" rx="40" ry="40" fill="#1a0d35" stroke="rgba(179,84,241,.3)" stroke-width="1"/>'
+          + '<ellipse cx="45" cy="45" rx="40" ry="40" fill="url(#db_hero)"/>'
+          + '<defs><radialGradient id="db_hero" cx="35%" cy="35%"><stop offset="0%" stop-color="#c8b8f8" stop-opacity=".9"/><stop offset="60%" stop-color="#6a14db" stop-opacity=".6"/><stop offset="100%" stop-color="#0f0820"/></radialGradient></defs>'
+          + '<g fill="none" stroke="rgba(255,255,255,.15)" stroke-width=".6">'
+            + '<rect x="15" y="20" width="10" height="7" rx="1"/><rect x="28" y="20" width="10" height="7" rx="1"/><rect x="41" y="20" width="10" height="7" rx="1"/>'
+            + '<rect x="10" y="30" width="10" height="7" rx="1"/><rect x="23" y="30" width="10" height="7" rx="1"/><rect x="36" y="30" width="10" height="7" rx="1"/><rect x="49" y="30" width="10" height="7" rx="1"/>'
+            + '<rect x="15" y="40" width="10" height="7" rx="1"/><rect x="28" y="40" width="10" height="7" rx="1"/><rect x="41" y="40" width="10" height="7" rx="1"/>'
+          + '</g>'
+          + '<line x1="45" y1="0" x2="45" y2="7" stroke="rgba(255,255,255,.2)" stroke-width="2"/>'
+          + '<g opacity=".5">'
+            + '<line x1="45" y1="85" x2="5"  y2="110" stroke="#B354F1" stroke-width="1.5"/>'
+            + '<line x1="45" y1="85" x2="45" y2="110" stroke="#FFD166" stroke-width="2"/>'
+            + '<line x1="45" y1="85" x2="85" y2="110" stroke="#FF1B9A" stroke-width="1.5"/>'
+          + '</g>'
+        + '</svg>'
+        + '<div style="position:absolute;bottom:16px;left:20px;font-family:\'Bebas Neue\',sans-serif;font-size:clamp(22px,5vw,38px);letter-spacing:.05em;color:rgba(255,255,255,.15);line-height:1">'+esc(ev.name)+'</div>'
+      + '</div>'
+
+      /* event type */
+      + '<div class="ev-type">'+esc(ev.type||'Public')+' Event &mdash; Ultimate Experiences</div>'
+
+      /* title */
+      + '<h1 class="ev-title">'+esc(ev.name)+'</h1>'
+
+      /* meta rows */
+      + '<div class="ev-meta">'
+        + '<div class="ev-meta-row">'
+          + '<div class="ev-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B354F1" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></div>'
+          + '<div><div class="ev-meta-main">'+fmtEvDate+'</div>'
+            + (ev.time ? '<div class="ev-meta-sub">Doors open '+esc(ev.time)+'</div>' : '')
+          + '</div>'
+        + '</div>'
+        + (ev.venue ? '<div class="ev-meta-row">'
+          + '<div class="ev-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD166" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>'
+          + '<div><div class="ev-meta-main">'+esc(ev.venue)+'</div>'
+            + '<div class="ev-meta-sub">Byron Bay, NSW, Australia</div>'
+          + '</div>'
+        + '</div>' : '')
+        + '<div class="ev-meta-row">'
+          + '<div class="ev-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28B79D" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>'
+          + '<div><div class="ev-meta-main">3 Channels &mdash; RF Wireless</div>'
+            + '<div class="ev-meta-sub">No app, no pairing &mdash; on in 60 seconds</div>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+
+      /* countdown */
+      + (ev.date ? '<div class="sec-label">Event Countdown</div><div class="cd-row" id="cd"></div>' : '')
+
+      /* attendees */
+      + '<div class="att-row">'
+        + '<div class="att-faces">'+faces+'</div>'
+        + '<div class="att-text"><strong>'+attCount+'+ people</strong> are going</div>'
+      + '</div>'
+
+      + '<div class="divider"></div>'
+
+      /* description */
+      + (ev.desc ? '<div class="sec-label">About This Event</div><div class="about-body">'+esc(ev.desc)+'</div><div class="divider"></div>' : '')
+
+      /* channels */
+      + (chHtml ? '<div class="sec-label">What\'s Playing</div><div class="ch-row">'+chHtml+'</div><div class="divider"></div>' : '')
+
+      /* hosted by */
+      + '<div class="sec-label">Hosted By</div>'
+      + '<div style="display:flex;align-items:center;gap:12px">'
+        + '<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#c9952a,#FFD166);display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',sans-serif;font-size:16px;color:#07070a;flex-shrink:0">UE</div>'
+        + '<div><div style="font-size:14px;font-weight:800;color:#fff">Ultimate Experiences</div>'
+          + '<div style="font-size:12px;color:#6b6b80">Byron Bay &bull; Silent Disco Pioneers</div>'
+        + '</div>'
+      + '</div>'
+
+    + '</div>'
+
+    /* ── RIGHT: ticket card ── */
+    + '<div>'
+      + '<div class="ticket-card">'
+
+        /* header */
+        + '<div class="tc-header">'
+          + priceDisplay
+          /* tier grid */
+          + ((!isFree && (ebP||stdP||doorP)) ? '<div class="tc-tiers">'+tierCols+'</div>' : '')
+          /* cal btns */
+          + (ev.date ? '<div class="cal-row">'
+            + '<a href="'+gcal+'" target="_blank" class="cal-btn">+ Google Calendar</a>'
+            + '<a href="#" class="cal-btn" onclick="addAppleCal();return false">+ Apple Calendar</a>'
+          + '</div>' : '')
+        + '</div>'
+
+        /* form body */
+        + '<div class="tc-body">'
+          /* qty */
+          + '<div class="qty-row">'
+            + '<div><div class="qty-label">Tickets</div>'
+              + '<div class="qty-sub">'+esc(ev.name)+'</div>'
+            + '</div>'
+            + '<div class="qty-ctrl">'
+              + '<button class="qty-btn" onclick="adjQty(-1)">&#8722;</button>'
+              + '<div class="qty-num" id="qtyNum">1</div>'
+              + '<button class="qty-btn" onclick="adjQty(1)">+</button>'
+            + '</div>'
+          + '</div>'
+          /* name */
+          + '<div class="field"><label>Your Name</label>'
+            + '<input type="text" id="buyName" placeholder="Sarah Johnson" oninput="checkReady()">'
+          + '</div>'
+          /* email */
+          + '<div class="field"><label>Email Address</label>'
+            + '<input type="email" id="buyEmail" placeholder="sarah@example.com" oninput="checkReady()">'
+          + '</div>'
+
+          /* CTA */
+          + (isFree
+            ? '<button class="cta-btn green" id="ctaBtn" onclick="submitFree()" disabled>Register for Free</button>'
+            : '<button class="cta-btn gold" id="ctaBtn" onclick="submitPaid(\''+esc(payLink)+'\')" disabled>'
+              + (activePrice ? '&#9733; Get '+(activePrice?'$'+activePrice+' ':'')+'Ticket' : 'Get Ticket')
+            + '</button>'
+          )
+
+          + '<div class="tc-fine">Secure checkout &bull; Ticket emailed instantly<br>No account needed &bull; <a href="#">Refund policy</a></div>'
+        + '</div>'
+
+      + '</div>'
+    + '</div>'
+
+    + '</div>'/* /page */
+
+    /* SUCCESS */
+    + '<div class="success-overlay" id="successOv">'
+      + '<div class="success-card">'
+        + '<div style="font-size:56px;margin-bottom:16px">&#127911;</div>'
+        + '<div style="font-family:\'Bebas Neue\',Impact,sans-serif;font-size:56px;letter-spacing:.04em;line-height:.95;margin-bottom:12px">YOU\'RE<br><span style="color:#FFD166">IN!</span></div>'
+        + '<div style="font-size:14px;color:#9999b0;line-height:1.7;margin-bottom:28px">Your ticket is on its way to your inbox.<br>See you on the dancefloor.</div>'
+        + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+          + (ev.date ? '<a href="'+gcal+'" target="_blank" style="padding:11px 20px;background:#1c1c22;border:1px solid #2e2e38;border-radius:11px;color:#9999b0;font-size:12px;font-weight:700;text-decoration:none;transition:all .15s">+ Add to Calendar</a>' : '')
+          + '<a href="https://ultimateexperiences.com.au" style="padding:11px 20px;background:#1c1c22;border:1px solid #2e2e38;border-radius:11px;color:#9999b0;font-size:12px;font-weight:700;text-decoration:none">Back to site</a>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+
+    + '<script>'
+    /* state */
+    + 'var qty = 1;'
+    + 'var evDate = '+JSON.stringify(ev.date||'')+';'
+    + 'var evTime = '+JSON.stringify(ev.time||'18:00')+';'
+
+    /* countdown */
+    + 'if(evDate){'
+      + '(function(){'
+        + 'var units=[["days",86400000],["hours",3600000],["mins",60000],["secs",1000]];'
+        + 'var labels=["Days","Hours","Mins","Secs"];'
+        + 'function tick(){'
+          + 'var left=new Date(evDate+"T"+evTime+":00")-new Date();'
+          + 'if(left<0){clearInterval(tid);document.getElementById("cd").innerHTML=\'<div style="font-size:12px;color:#FF1B9A;font-weight:800;grid-column:1/-1;text-align:center">This event has started!</div>\';return;}'
+          + 'var html="";'
+          + 'units.forEach(function(u,i){'
+            + 'var v=Math.floor(left/u[1])%( i===0?99999:60 );if(i===0)v=Math.floor(left/86400000);'
+            + 'html+=\'<div class="cd-tile"><div class="cd-val">\'+String(v).padStart(2,"0")+\'</div><div class="cd-lbl">\'+labels[i]+\'</div></div>\';'
+          + '});'
+          + 'var cd=document.getElementById("cd");if(cd)cd.innerHTML=html;'
+        + '}'
+        + 'tick();var tid=setInterval(tick,1000);'
+      + '})();'
+    + '}'
+
+    /* qty */
+    + 'function adjQty(d){'
+      + 'qty=Math.max(1,Math.min(10,qty+d));'
+      + 'document.getElementById("qtyNum").textContent=qty;'
+      + 'var price='+activePrice+';'
+      + 'var btn=document.getElementById("ctaBtn");'
+      + 'if(btn&&price){btn.textContent="\\u2605 Get "+qty+" Ticket"+(qty>1?"s":"")+" \u2014 $"+(price*qty);}'
+    + '}'
+
+    /* validation */
+    + 'function checkReady(){'
+      + 'var n=document.getElementById("buyName"),e=document.getElementById("buyEmail");'
+      + 'var ok=n&&n.value.trim().length>1&&e&&e.value.includes("@")&&e.value.includes(".");'
+      + 'var btn=document.getElementById("ctaBtn");if(btn)btn.disabled=!ok;'
+      + 'if(n)n.classList.toggle("err",n.value.length>0&&n.value.trim().length<2);'
+      + 'if(e)e.classList.toggle("err",e.value.length>0&&!e.value.includes("@"));'
+    + '}'
+
+    /* submit free */
+    + 'function submitFree(){'
+      + 'var n=document.getElementById("buyName").value;'
+      + 'var em=document.getElementById("buyEmail").value;'
+      + 'fetch("https://n8n.flowberry.org/webhook/ue-ticket",{method:"POST",headers:{"Content-Type":"application/json"},'
+        + 'body:JSON.stringify({event:'+JSON.stringify(esc(ev.name))+',name:n,email:em,qty:qty,free:true,ts:new Date().toISOString()})}).catch(function(){});'
+      + 'var ov=document.getElementById("successOv");if(ov){ov.style.display="flex";}'
+    + '}'
+
+    /* submit paid */
+    + 'function submitPaid(url){'
+      + 'var n=document.getElementById("buyName").value;'
+      + 'var em=document.getElementById("buyEmail").value;'
+      + 'fetch("https://n8n.flowberry.org/webhook/ue-ticket",{method:"POST",headers:{"Content-Type":"application/json"},'
+        + 'body:JSON.stringify({event:'+JSON.stringify(esc(ev.name))+',name:n,email:em,qty:qty,price:'+(activePrice||0)+',ts:new Date().toISOString()})}).catch(function(){});'
+      + 'if(url&&url!="#"&&url.length>4){'
+        + 'var sep=url.includes("?")?"&":"?";'
+        + 'window.location.href=url+sep+"prefilled_email="+encodeURIComponent(em)+"&quantity="+qty;'
+      + '}else{'
+        + 'var ov=document.getElementById("successOv");if(ov){ov.style.display="flex";}'
+      + '}'
+    + '}'
+
+    /* apple cal */
+    + 'function addAppleCal(){'
+      + 'var dt=new Date(evDate+"T"+evTime+":00");'
+      + 'var end=new Date(dt.getTime()+3*3600000);'
+      + 'function fmt(d){return d.toISOString().replace(/[-:]/g,"").replace(/\\..*$/,"")+"Z";}'
+      + 'var ics="BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nDTSTART:"+fmt(dt)+"\\r\\nDTEND:"+fmt(end)+"\\r\\nSUMMARY:'+esc(ev.name)+'\\r\\nLOCATION:'+esc(ev.venue||'Byron Bay NSW')+'\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR";'
+      + 'var blob=new Blob([ics],{type:"text/calendar"});'
+      + 'var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="event.ics";a.click();'
+    + '}'
+
+    + '<\/script>'
+    + '</body></html>';
+}
+
+</script>
+</body>
+</html>
