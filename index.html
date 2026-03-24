@@ -1,137 +1,44 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFT Claim Verification</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f0f2f5;
-      text-align: center;
-    }
-    .container {
-      padding: 20px;
-      max-width: 400px;
-      width: 100%;
-    }
-    h1 {
-      color: #333;
-      font-size: 24px;
-    }
-    p {
-      color: #666;
-      font-size: 16px;
-    }
-    .claim-button {
-      padding: 15px 30px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #4CAF50;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 20px;
-    }
-    .claim-button:hover {
-      background-color: #45a049;
-    }
-    .claim-button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    .desktop-message {
-      display: none;
-      color: #ff4444;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    @media (min-width: 768px) {
-      .mobile-only {
-        display: none;
-      }
-      .desktop-message {
-        display: block;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ULTIMATE·XP — Internal Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#07070a;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.07em;margin-bottom:8px;}
+.logo span{color:#FFD166;}
+.tagline{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6b6b80;margin-bottom:48px;}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;width:100%;}
+.tool-card{background:#141418;border:1px solid #2e2e38;border-radius:14px;padding:28px;text-decoration:none;color:#fff;transition:all .2s;}
+.tool-card:hover{border-color:#FFD166;transform:translateY(-2px);}
+.tc-icon{font-size:24px;margin-bottom:12px;}
+.tc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.05em;margin-bottom:6px;}
+.tc-desc{font-size:11px;color:#9999b0;line-height:1.6;}
+.tc-arrow{margin-top:14px;font-size:11px;font-weight:700;color:#FFD166;}
+.bar{height:2px;background:linear-gradient(90deg,#B354F1,#FFD166,#FF1B9A);border-radius:1px;width:60px;margin:0 auto 32px;}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="mobile-only">
-      <h1>Claim Your NFT</h1>
-      <p>Verify your eligibility and claim your exclusive NFT. This page is only accessible on mobile devices.</p>
-      <button id="claimButton" class="claim-button" onclick="claimNFT()">Claim NFT</button>
-    </div>
-    <div class="desktop-message">
-      <p>This page is only accessible on mobile devices.</p>
-    </div>
+  <div class="logo">ULTIMATE<span>·</span>XP</div>
+  <div class="bar"></div>
+  <div class="tagline">Internal Tools · Quote System</div>
+  <div class="tools">
+    <a class="tool-card" href="./quote-builder.html">
+      <div class="tc-icon">📋</div>
+      <div class="tc-name">Quote Builder</div>
+      <div class="tc-desc">Build and price an event quote. Configure headsets, staff, and transport.</div>
+      <div class="tc-arrow">Open Builder →</div>
+    </a>
+    <a class="tool-card" href="./client-quote.html">
+      <div class="tc-icon">✨</div>
+      <div class="tc-name">Client Quote</div>
+      <div class="tc-desc">The client-facing quote output. Reads from the last saved builder session.</div>
+      <div class="tc-arrow">Preview Quote →</div>
+    </a>
   </div>
-
-  <script>
-    function claimNFT() {
-      const button = document.getElementById('claimButton');
-      button.disabled = true;
-      button.textContent = 'NFT Already Claimed';
-    }
-
-    // Check if the user is on a mobile device
-    function isMobileDevice() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-
-    // If not on mobile, ensure the mobile-only content is hidden (backup for CSS)
-    if (!isMobileDevice()) {
-      document.querySelector('.mobile-only').style.display = 'none';
-      document.querySelector('.desktop-message').style.display = 'block';
-    }
-  </script>
+  <div style="margin-top:40px;font-size:10px;color:#2e2e38;">© Ultimate Experiences · byronbaysilentdisco.com</div>
 </body>
 </html>

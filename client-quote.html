@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Experiences — Event Quote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #07070a; }
+::-webkit-scrollbar-thumb { background: #2e2e38; border-radius: 2px; }
+
+:root {
+  --gold:   #FFD166;
+  --violet: #B354F1;
+  --pink:   #FF1B9A;
+  --green:  #28B79D;
+  --orange: #FF9F46;
+  --d0:     #07070a;
+  --d1:     #0d0d10;
+  --d2:     #141418;
+  --d3:     #1c1c22;
+  --d4:     #26262e;
+  --bdr:    #2e2e38;
+  --muted:  #6b6b80;
+  --dim:    #9999b0;
+  --font:   'Plus Jakarta Sans', sans-serif;
+  --mono:   'JetBrains Mono', monospace;
+  --dp:     'Bebas Neue', sans-serif;
+}
+
+body {
+  background: var(--d0);
+  color: #fff;
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Toolbar (screen only) ── */
+.toolbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,7,10,.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 32px; height: 54px;
+}
+.tb-logo { font-family: var(--dp); font-size: 19px; letter-spacing: .07em; }
+.tb-logo span { color: var(--gold); }
+.tb-actions { display: flex; gap: 8px; }
+.tb-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  font-family: var(--font); font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all .15s; border: none;
+  letter-spacing: .02em;
+}
+.tb-btn.primary { background: var(--gold); color: #07070a; }
+.tb-btn.primary:hover { background: #ffe08a; }
+.tb-btn.ghost { background: transparent; color: var(--dim); border: 1px solid var(--bdr); }
+.tb-btn.ghost:hover { border-color: var(--dim); color: #fff; }
+.tb-accent { height: 2px; background: linear-gradient(90deg, var(--violet), var(--gold), var(--pink)); }
+
+/* ── Quote page wrapper ── */
+.page {
+  max-width: 860px;
+  margin: 40px auto 80px;
+  padding: 0 24px;
+}
+
+/* ══════════ HERO HEADER ══════════ */
+.hero {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 2px;
+  padding: 52px 48px 44px;
+  background: var(--d2);
+  border: 1px solid var(--bdr);
+}
+
+/* Glowing blobs */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -60px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(179,84,241,.18) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 40px;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(255,209,102,.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  position: relative; z-index: 1;
+}
+.hero-logo-block {}
+.hero-logo {
+  font-family: var(--dp);
+  font-size: 32px; letter-spacing: .07em;
+  line-height: 1; margin-bottom: 6px;
+}
+.hero-logo span { color: var(--gold); }
+.hero-tagline {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero-ref-block { text-align: right; }
+.hero-ref-label {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.hero-ref-num {
+  font-family: var(--mono); font-size: 13px;
+  font-weight: 600; color: var(--gold);
+}
+.hero-ref-date {
+  font-size: 11px; color: var(--muted); margin-top: 3px;
+}
+
+.hero-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--violet) 0%, var(--gold) 40%, var(--pink) 75%, transparent 100%);
+  margin-bottom: 36px;
+  position: relative; z-index: 1;
+}
+
+.hero-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+  position: relative; z-index: 1;
+}
+
+.hero-prepared {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.hero-client {
+  font-family: var(--dp);
+  font-size: 44px; letter-spacing: .04em;
+  line-height: 1; color: #fff;
+  margin-bottom: 10px;
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;
+}
+.hero-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--d3); border: 1px solid var(--bdr);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; font-weight: 600; color: var(--dim);
+}
+.hero-pill svg { flex-shrink: 0; }
+
+.hero-experience-badge {
+  text-align: center;
+  background: var(--d3);
+  border: 1px solid var(--bdr);
+  border-radius: 14px;
+  padding: 20px 24px;
+  min-width: 160px;
+}
+.heb-label {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+.heb-type {
+  font-family: var(--dp);
+  font-size: 20px; letter-spacing: .05em;
+  color: var(--gold); margin-bottom: 8px;
+}
+.heb-days {
+  font-size: 28px; font-weight: 900; line-height: 1;
+  color: #fff;
+}
+.heb-days-sub {
+  font-size: 10px; color: var(--muted); margin-top: 2px;
+}
+
+/* ══════════ SECTION LAYOUT ══════════ */
+.section-wrap {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0;
+  margin-top: 2px;
+}
+
+.section-label-col {
+  padding: 32px 28px 32px 0;
+  border-right: 1px solid var(--bdr);
+  display: flex; flex-direction: column;
+  gap: 4px;
+  position: sticky; top: 54px;
+  align-self: start;
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); margin-bottom: 6px;
+}
+.section-title {
+  font-family: var(--dp);
+  font-size: 22px; letter-spacing: .05em;
+  line-height: 1.1; color: #fff;
+}
+.section-desc {
+  font-size: 11px; color: var(--muted);
+  line-height: 1.6; margin-top: 8px;
+}
+
+.section-body {
+  padding: 32px 0 32px 32px;
+  border-bottom: 1px solid var(--bdr);
+}
+.section-wrap:last-child .section-body { border-bottom: none; }
+
+/* ══════════ HEADSETS ══════════ */
+.hs-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.hs-stat-card {
+  background: var(--d2);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  padding: 16px;
+}
+.hsc-label {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.hsc-val {
+  font-family: var(--mono);
+  font-size: 26px; font-weight: 600;
+  line-height: 1;
+}
+.hsc-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* Channel cards */
+.channel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ch-card {
+  border-radius: 12px;
+  padding: 18px 16px;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+.ch-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.ch-card.v1 { background: rgba(179,84,241,.07); border-color: rgba(179,84,241,.2); }
+.ch-card.v1::before { background: var(--violet); }
+.ch-card.v2 { background: rgba(255,209,102,.07); border-color: rgba(255,209,102,.2); }
+.ch-card.v2::before { background: var(--gold); }
+.ch-card.v3 { background: rgba(255,27,154,.07); border-color: rgba(255,27,154,.2); }
+.ch-card.v3::before { background: var(--pink); }
+
+.ch-num {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.ch-led {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-bottom: 10px;
+}
+.ch-role-name {
+  font-size: 13px; font-weight: 800;
+  margin-bottom: 4px;
+}
+.ch-role-desc {
+  font-size: 11px; color: var(--muted);
+  line-height: 1.5;
+}
+
+.hs-specs {
+  background: var(--d2); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 18px;
+}
+.hs-spec-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: 12px;
+}
+.hs-spec-row:last-child { border-bottom: none; }
+.hs-spec-label { color: var(--dim); }
+.hs-spec-val { font-weight: 700; font-family: var(--mono); font-size: 11px; }
+
+/* ══════════ STAFF TABLE ══════════ */
+.staff-table {
+  width: 100%; border-collapse: collapse;
+}
+.staff-table th {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); padding: 0 12px 12px 0;
+  text-align: left; border-bottom: 1px solid var(--bdr);
+}
+.staff-table th:last-child { text-align: right; padding-right: 0; }
+.staff-table td {
+  padding: 12px 12px 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: 13px;
+}
+.staff-table tr:last-child td { border-bottom: none; }
+.staff-table td:last-child { text-align: right; padding-right: 0; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.role-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 700;
+}
+.role-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.staff-qty { color: var(--muted); font-size: 12px; }
+
+/* ══════════ TRANSPORT ══════════ */
+.van-grid {
+  display: grid; gap: 10px;
+}
+.van-card {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  background: var(--d2); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 16px 18px;
+}
+.van-left { display: flex; align-items: center; gap: 14px; }
+.van-icon {
+  width: 38px; height: 38px;
+  background: rgba(255,27,154,.1);
+  border: 1px solid rgba(255,27,154,.2);
+  border-radius: 10px;
+  display: flex; align-items: center;
+  justify-content: center; font-size: 16px;
+  flex-shrink: 0;
+}
+.van-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.van-detail { font-size: 11px; color: var(--muted); }
+.van-right { text-align: right; }
+.van-days-badge {
+  display: inline-block;
+  background: rgba(255,27,154,.1);
+  border: 1px solid rgba(255,27,154,.2);
+  color: var(--pink); border-radius: 6px;
+  padding: 3px 9px; font-size: 10px; font-weight: 700;
+}
+
+/* ══════════ CONTACT / FOOTER ══════════ */
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin-bottom: 24px;
+}
+.contact-card {
+  background: var(--d2); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 18px;
+}
+.cc-label {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+.cc-val { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.cc-sub { font-size: 11px; color: var(--muted); }
+
+.terms-block {
+  background: var(--d3); border-radius: 12px;
+  padding: 18px; border: 1px solid var(--bdr);
+  margin-bottom: 14px;
+}
+.terms-title {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+.terms-list {
+  list-style: none; display: flex; flex-direction: column; gap: 6px;
+}
+.terms-list li {
+  display: flex; gap: 10px;
+  font-size: 11px; color: var(--dim); line-height: 1.5;
+}
+.terms-list li::before {
+  content: '—'; color: var(--gold); flex-shrink: 0;
+  font-weight: 700;
+}
+
+.footer-strip {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid var(--bdr);
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-logo { font-family: var(--dp); font-size: 16px; letter-spacing: .07em; }
+.footer-logo span { color: var(--gold); }
+.footer-copy { font-size: 10px; color: var(--muted); }
+.footer-socials { display: flex; gap: 8px; }
+.social-pill {
+  font-size: 10px; font-weight: 700;
+  color: var(--muted); background: var(--d3);
+  border: 1px solid var(--bdr); border-radius: 6px;
+  padding: 4px 10px;
+}
+
+/* ══════════ PRICE BAND DISPLAY ══════════ */
+.price-hero {
+  position: relative; border-radius: 14px;
+  padding: 1.5px; margin-bottom: 20px;
+  background: conic-gradient(from var(--angle,0deg),#B354F1,#FFD166,#FF1B9A,#B354F1 60%,#321B68,#B354F1);
+  animation: spin-border 3s linear infinite;
+}
+.price-hero-inner {
+  background: var(--d3); border-radius: 13px;
+  padding: 24px 28px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.price-lhs {}
+.price-label {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.price-amount {
+  font-family: var(--mono);
+  font-size: 42px; font-weight: 600;
+  line-height: 1; color: var(--gold);
+}
+.price-per { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.price-rhs { text-align: right; }
+.price-breakdown {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pb-row {
+  display: flex; justify-content: space-between;
+  gap: 20px; font-size: 11px;
+}
+.pb-lbl { color: var(--muted); }
+.pb-val { font-family: var(--mono); font-weight: 600; font-size: 10px; color: #fff; }
+
+/* ══════════ NO-SHOW TOGGLE FOR PRICE ══════════ */
+.show-pricing { display: block; }
+.hide-pricing { display: none; }
+
+/* ══════════ ANIMATIONS ══════════ */
+@keyframes spin-border { to { --angle: 360deg; } }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
+.page > * { animation: fadeUp .4s ease both; }
+.page > *:nth-child(1) { animation-delay: .05s; }
+.page > *:nth-child(2) { animation-delay: .12s; }
+.page > *:nth-child(3) { animation-delay: .18s; }
+
+/* ══════════ PRINT / PDF ══════════ */
+@media print {
+  @page { margin: 12mm 15mm; size: A4; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  body { background: #07070a !important; color: #e8e8f0 !important; }
+  .toolbar { display: none !important; }
+  .page { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+  .hero { break-inside: avoid; page-break-inside: avoid; }
+  .price-hero { animation: none !important; }
+  .section-label-col { position: static !important; }
+  .section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 16px !important; }
+  .card { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tb-logo">ULTIMATE<span>·</span>XP <span style="font-family:var(--font);font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-left:10px;padding-left:10px;border-left:1px solid var(--bdr);">Client Quote</span></div>
+  <div class="tb-actions">
+    <button class="tb-btn ghost" onclick="togglePricing()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6s2-4 5-4 5 4 5 4-2 4-5 4-5-4-5-4z" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span id="pricingToggleLabel">Hide Pricing</span>
+    </button>
+    <button class="tb-btn ghost" onclick="window.print()" title="Opens print dialog — select 'Save as PDF' to download">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="3" y="7" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M2 5h8v4H2z" stroke="currentColor" stroke-width="1.2"/></svg>
+      Save PDF
+    </button>
+    <button class="tb-btn primary" onclick="copyQuoteLink()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8M8 1h3m0 0v3m0-3L5 7" stroke="#07070a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Share Quote
+    </button>
+  </div>
+</div>
+<div class="tb-accent"></div>
+
+<div class="page">
+
+  <!-- ══════ HERO ══════ -->
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-logo-block">
+        <div class="hero-logo">ULTIMATE<span>·</span>XP</div>
+        <div class="hero-tagline">We don't do events. We do experiences.</div>
+      </div>
+      <div class="hero-ref-block">
+        <div class="hero-ref-label">Quote Reference</div>
+        <div class="hero-ref-num" id="disp-ref">UE-2026-WFF-001</div>
+        <div class="hero-ref-date" id="disp-date">—</div>
+      </div>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-body">
+      <div>
+        <div class="hero-prepared">Prepared for</div>
+        <div class="hero-client" id="disp-client">WOODFORD<br>FOLK FESTIVAL</div>
+        <div class="hero-meta">
+          <div class="hero-pill">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1C3.57 1 2 2.57 2 4.5c0 2.72 3.5 5.5 3.5 5.5s3.5-2.78 3.5-5.5C9 2.57 7.43 1 5.5 1z" stroke="var(--gold)" stroke-width="1.2"/><circle cx="5.5" cy="4.5" r="1" stroke="var(--gold)" stroke-width="1.2"/></svg>
+            <span id="disp-venue">Woodford, QLD</span>
+          </div>
+          <div class="hero-pill">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x="1" y="2" width="9" height="8" rx="1" stroke="var(--gold)" stroke-width="1.2"/><path d="M1 5h9M4 1v2M7 1v2" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span id="disp-date2">27–31 Dec 2026</span>
+          </div>
+          <div class="hero-pill">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1a2 2 0 100 4 2 2 0 000-4zM1 10c0-2.21 2.01-4 4.5-4s4.5 1.79 4.5 4" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span id="disp-pax">500 pax</span>
+          </div>
+          <div class="hero-pill">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="var(--gold)" stroke-width="1.2"/><path d="M5.5 3v2.5l1.5 1.5" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span id="disp-type">Festival</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-experience-badge">
+        <div class="heb-label">Experience</div>
+        <div class="heb-type">SILENT DISCO</div>
+        <div class="heb-days" id="disp-days">2</div>
+        <div class="heb-days-sub">event days</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ SECTION 1 — HEADSETS ══════ -->
+  <div class="section-wrap">
+    <div class="section-label-col">
+      <div class="section-num">01</div>
+      <div class="section-title">HEADSET<br>SETUP</div>
+      <div class="section-desc">RF wireless headphones. Three channels. Zero setup for your guests.</div>
+    </div>
+    <div class="section-body">
+
+      <div class="hs-summary-grid">
+        <div class="hs-stat-card">
+          <div class="hsc-label">Total Headsets</div>
+          <div class="hsc-val" id="disp-hs-total" style="color:var(--violet);">400</div>
+          <div class="hsc-sub">for this event</div>
+        </div>
+        <div class="hs-stat-card">
+          <div class="hsc-label">Channels</div>
+          <div class="hsc-val" style="color:var(--gold);">3</div>
+          <div class="hsc-sub">simultaneous</div>
+        </div>
+        <div class="hs-stat-card">
+          <div class="hsc-label">Range</div>
+          <div class="hsc-val" style="color:var(--pink);">150m</div>
+          <div class="hsc-sub">from transmitter</div>
+        </div>
+      </div>
+
+      <div class="channel-grid">
+        <div class="ch-card v1">
+          <div class="ch-num" style="color:var(--violet);">Channel 01</div>
+          <div class="ch-led" style="background:var(--violet);box-shadow:0 0 10px rgba(179,84,241,.6);"></div>
+          <div class="ch-role-name">Headline</div>
+          <div class="ch-role-desc" id="ch1-desc">Curated for the event theme — the main floor energy</div>
+        </div>
+        <div class="ch-card v2">
+          <div class="ch-num" style="color:var(--gold);">Channel 02</div>
+          <div class="ch-led" style="background:var(--gold);box-shadow:0 0 10px rgba(255,209,102,.6);"></div>
+          <div class="ch-role-name">Alternative</div>
+          <div class="ch-role-desc" id="ch2-desc">A different genre or era — for the crowd with their own taste</div>
+        </div>
+        <div class="ch-card v3">
+          <div class="ch-num" style="color:var(--pink);">Channel 03</div>
+          <div class="ch-led" style="background:var(--pink);box-shadow:0 0 10px rgba(255,27,154,.6);"></div>
+          <div class="ch-role-name">Wild Card</div>
+          <div class="ch-role-desc" id="ch3-desc">Always unexpected — the channel that surprises</div>
+        </div>
+      </div>
+
+      <div class="hs-specs">
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">Transmission type</span>
+          <span class="hs-spec-val">RF (Radio Frequency)</span>
+        </div>
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">Latency</span>
+          <span class="hs-spec-val">Near-zero — syncs with live DJ</span>
+        </div>
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">App required</span>
+          <span class="hs-spec-val">None — headsets auto-receive in range</span>
+        </div>
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">Battery life</span>
+          <span class="hs-spec-val">6–8 hours per charge</span>
+        </div>
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">Hygiene</span>
+          <span class="hs-spec-val">Sanitised between every event</span>
+        </div>
+        <div class="hs-spec-row">
+          <span class="hs-spec-label">Volume control</span>
+          <span class="hs-spec-val">Per-headset user control</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ SECTION 2 — STAFF ══════ -->
+  <div class="section-wrap">
+    <div class="section-label-col">
+      <div class="section-num">02</div>
+      <div class="section-title">CREW &amp;<br>TALENT</div>
+      <div class="section-desc">Everyone you need, included and managed by UE.</div>
+    </div>
+    <div class="section-body">
+      <table class="staff-table" id="staffTable">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Qty</th>
+            <th>Days</th>
+            <th>Total Days</th>
+          </tr>
+        </thead>
+        <tbody id="staffTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════ SECTION 3 — TRANSPORT ══════ -->
+  <div class="section-wrap" id="transportSection">
+    <div class="section-label-col">
+      <div class="section-num">03</div>
+      <div class="section-title">TRANS&shy;PORT</div>
+      <div class="section-desc">Equipment logistics handled end to end by our team.</div>
+    </div>
+    <div class="section-body">
+      <div class="van-grid" id="vanGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══════ SECTION 4 — INVESTMENT ══════ -->
+  <div class="section-wrap show-pricing" id="pricingSection">
+    <div class="section-label-col">
+      <div class="section-num">04</div>
+      <div class="section-title">YOUR<br>INVEST&shy;MENT</div>
+      <div class="section-desc">All-inclusive. No hidden costs.</div>
+    </div>
+    <div class="section-body">
+      <div class="price-hero">
+        <div class="price-hero-inner">
+          <div class="price-lhs">
+            <div class="price-label">Total Investment (excl. GST)</div>
+            <div class="price-amount" id="disp-total">$—</div>
+            <div class="price-per" id="disp-price-per">—</div>
+          </div>
+          <div class="price-rhs">
+            <div class="price-breakdown" id="priceBreakdown"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--d2);border:1px solid var(--bdr);border-radius:12px;padding:16px;">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">What's Included</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            All headset equipment
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            RF transmitters &amp; setup
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Full crew &amp; DJs
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Equipment transport
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Bump in &amp; out
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Headset sanitisation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ SECTION 5 — CONTACT ══════ -->
+  <div class="section-wrap">
+    <div class="section-label-col">
+      <div class="section-num" id="contactNum">05</div>
+      <div class="section-title">LET'S<br>TALK</div>
+      <div class="section-desc">Ready to lock it in? Get in touch.</div>
+    </div>
+    <div class="section-body">
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="cc-label">Main Contact</div>
+          <div class="cc-val">Nathanael Kotzur</div>
+          <div class="cc-sub">Founder · Ultimate Experiences</div>
+        </div>
+        <div class="contact-card">
+          <div class="cc-label">Email</div>
+          <div class="cc-val">info@byronbaysilentdisco.com</div>
+          <div class="cc-sub">Response within 48 hours</div>
+        </div>
+        <div class="contact-card">
+          <div class="cc-label">Phone</div>
+          <div class="cc-val">+61 473 431 437</div>
+          <div class="cc-sub">Business hours · Byron Bay NSW</div>
+        </div>
+        <div class="contact-card">
+          <div class="cc-label">Website</div>
+          <div class="cc-val">byronbaysilentdisco.com</div>
+          <div class="cc-sub">See past events &amp; reviews</div>
+        </div>
+      </div>
+
+      <div class="terms-block">
+        <div class="terms-title">Quote Terms</div>
+        <ul class="terms-list">
+          <li>This quote is valid for 30 days from the date issued.</li>
+          <li>A 50% deposit is required to confirm your booking.</li>
+          <li>GST will be added to the above pricing where applicable.</li>
+          <li>Channel content can be customised to suit your audience and event theme.</li>
+          <li>Cancellation policy: 14+ days notice — deposit refundable. Under 14 days — deposit retained.</li>
+        </ul>
+      </div>
+
+      <div class="footer-strip">
+        <div>
+          <div class="footer-logo">ULTIMATE<span>·</span>XP</div>
+          <div class="footer-copy">ABN 50 685 072 977 · Byron Bay, NSW 2481 · Australia</div>
+        </div>
+        <div class="footer-socials">
+          <div class="social-pill">@byronbaysilentdisco</div>
+          <div class="social-pill">TikTok</div>
+          <div class="social-pill">Facebook</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script type="module">
+/* ══════════════════════════════════════
+   Pull data from the quote builder via localStorage
+══════════════════════════════════════ */
+
+const defaults = {
+  ref:      'UE-2026-DEMO-001',
+  client:   'YOUR CLIENT',
+  venue:    'Venue, QLD',
+  date:     'TBC',
+  pax:      500,
+  days:     2,
+  type:     'Festival',
+  hsNeeded: 400,
+  hsOwned:  100,
+  sellPPD:  25,
+  hireCPD:  5.50,
+  model:    'hire',
+  staffItems: [
+    { role:'Event Manager',       qty:1, days:2 },
+    { role:'DJ',                  qty:3, days:2 },
+    { role:'Crew / Headset Staff',qty:4, days:2 },
+  ],
+  vanItems:   [{ desc:'Transit Van (equipment)', rate:120, days:2 }],
+  vanEnabled: true,
+  totalCost:  17700,
+  revenue:    25000,
+  hsCost:     8640,
+  staffCost:  4560,
+  vanCost:    2500,
+  bookFee:    2000,
+  quotedBy:   'Nathanael Kotzur',
+  notes:      '',
+  generatedAt: null,
+};
+
+async function loadData() {
+  // 1. Try localStorage first (same browser, fastest)
+  try {
+    const saved = localStorage.getItem('ue_quote_data');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...defaults, ...parsed };
+    }
+  } catch(e) {}
+
+  // 2. Fall back to Cloudflare KV via API (cross-device)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id') || 'latest';
+    const r = await fetch(`/api/quote?id=${id}`);
+    if (r.ok) {
+      const parsed = await r.json();
+      localStorage.setItem('ue_quote_data', JSON.stringify(parsed));
+      return { ...defaults, ...parsed };
+    }
+  } catch(e) {}
+
+  return defaults;
+}
+
+const D = await loadData();
+
+function fmt(n) { return '$' + Math.abs(Math.round(n)).toLocaleString('en-AU'); }
+
+// ── Header ──
+document.getElementById('disp-ref').textContent    = D.ref;
+const genDate = D.generatedAt ? new Date(D.generatedAt) : new Date();
+document.getElementById('disp-date').textContent   = 'Prepared ' + genDate.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+
+// Big client name — split into two lines if long
+const clientName = (D.client || 'CLIENT').toUpperCase();
+const words = clientName.split(' ');
+const mid   = Math.ceil(words.length / 2);
+const line1 = words.slice(0, mid).join(' ');
+const line2 = words.slice(mid).join(' ');
+document.getElementById('disp-client').innerHTML   = line2 ? line1 + '<br>' + line2 : line1;
+
+document.getElementById('disp-venue').textContent  = D.venue || '—';
+document.getElementById('disp-date2').textContent  = D.date  || '—';
+document.getElementById('disp-pax').textContent    = parseInt(D.pax).toLocaleString() + ' pax';
+document.getElementById('disp-type').textContent   = D.type  || 'Event';
+document.getElementById('disp-days').textContent   = D.days  || 1;
+document.getElementById('disp-hs-total').textContent = parseInt(D.hsNeeded).toLocaleString();
+
+// ── Staff table ──
+const roleColors = ['var(--violet)','var(--gold)','var(--pink)','var(--green)','var(--orange)'];
+const tbody = document.getElementById('staffTbody');
+tbody.innerHTML = '';
+(D.staffItems || []).forEach((s, i) => {
+  const tr = document.createElement('tr');
+  const totalDays = s.qty * s.days;
+  tr.innerHTML = `
+    <td>
+      <div class="role-badge">
+        <div class="role-dot" style="background:${roleColors[i % roleColors.length]};box-shadow:0 0 6px ${roleColors[i % roleColors.length]}80;"></div>
+        ${s.role}
+      </div>
+    </td>
+    <td><span class="staff-qty">&times; ${s.qty}</span></td>
+    <td><span class="staff-qty">${s.days} day${s.days > 1 ? 's' : ''}</span></td>
+    <td>${totalDays} day${totalDays !== 1 ? 's' : ''} total</td>`;
+  tbody.appendChild(tr);
+});
+
+// ── Transport ──
+const vanGrid = document.getElementById('vanGrid');
+vanGrid.innerHTML = '';
+const transportSection = document.getElementById('transportSection');
+if (D.vanEnabled && D.vanItems && D.vanItems.length) {
+  D.vanItems.forEach(v => {
+    vanGrid.innerHTML += `
+      <div class="van-card">
+        <div class="van-left">
+          <div class="van-icon">🚐</div>
+          <div>
+            <div class="van-name">${v.desc}</div>
+            <div class="van-detail">Equipment transport — included in quote</div>
+          </div>
+        </div>
+        <div class="van-right">
+          <div class="van-days-badge">${v.days} day${v.days > 1 ? 's' : ''}</div>
+        </div>
+      </div>`;
+  });
+} else {
+  transportSection.style.display = 'none';
+}
+
+// ── Pricing ──
+const revenue  = D.pax * D.sellPPD * D.days;
+const perPax   = D.sellPPD;
+document.getElementById('disp-total').textContent     = fmt(revenue);
+document.getElementById('disp-price-per').textContent = fmt(D.sellPPD) + ' per person / per day · excl. GST';
+
+document.getElementById('priceBreakdown').innerHTML = `
+  <div class="pb-row"><span class="pb-lbl">Headsets (${D.hsNeeded} &times; ${D.days} day${D.days>1?'s':''})</span><span class="pb-val">${fmt(D.hsCost || 0)}</span></div>
+  <div class="pb-row"><span class="pb-lbl">Crew &amp; DJs</span><span class="pb-val">${fmt(D.staffCost || 0)}</span></div>
+  <div class="pb-row"><span class="pb-lbl">Transport</span><span class="pb-val">${D.vanEnabled ? fmt(D.vanCost || 0) : 'Incl.'}</span></div>
+  <div class="pb-row"><span class="pb-lbl">Booking &amp; admin</span><span class="pb-val">${fmt(D.bookFee || 0)}</span></div>`;
+
+// ── Quoted by in footer ──
+const quotedByEls = document.querySelectorAll('.cc-val');
+if (D.quotedBy && quotedByEls[0]) quotedByEls[0].textContent = D.quotedBy;
+
+// ── Section numbers ──
+if (!D.vanEnabled || !D.vanItems || !D.vanItems.length) {
+  document.getElementById('contactNum').textContent = '04';
+}
+
+// ── Pricing toggle ──
+let pricingVisible = true;
+function togglePricing() {
+  pricingVisible = !pricingVisible;
+  const sec = document.getElementById('pricingSection');
+  sec.style.display = pricingVisible ? '' : 'none';
+  document.getElementById('pricingToggleLabel').textContent = pricingVisible ? 'Hide Pricing' : 'Show Pricing';
+}
+
+// ── Share ──
+function copyQuoteLink() {
+  const btn = document.querySelector('.tb-btn.primary');
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const orig = btn.innerHTML;
+    btn.textContent = '\u2713 Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Open file locally to share';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
