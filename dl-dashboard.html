@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>admin.byronbaysilentdisco.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── Brand tokens (UE Brand Handbook v1.0) ── */
+:root{
+  --gold:#FFD166; --gold-dim:#c9952a;
+  --violet:#B354F1; --orchid:#6A14DB;
+  --pink:#FF1B9A; --orange:#FF9F46;
+  --green:#28B79D;
+  --d0:#07070a; --d1:#0d0d10; --d2:#141418; --d3:#1c1c22; --d4:#26262e;
+  --bdr:#2e2e38; --subtle:#3a3a4a; --muted:#6b6b80; --dim:#9999b0;
+  --text:#ffffff;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+  --sidebar:224px; --topbar:52px;
+}
+
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
+
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--d0)}
+::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* ══ LOGIN ══ */
+#login-screen{position:fixed;inset:0;background:var(--d0);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px}
+#login-screen.hidden{display:none}
+#stars-login{position:absolute;inset:0;pointer-events:none}
+
+.login-card{background:var(--d2);border:1px solid var(--bdr);border-radius:20px;padding:48px 40px 40px;width:100%;max-width:400px;position:relative;animation:fadeUp .4s ease both}
+.login-card::before{content:'';position:absolute;inset:-1px;border-radius:21px;background:conic-gradient(from var(--angle),#B354F1,#FFD166,#FF1B9A,#B354F1);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;-webkit-mask-composite:xor;padding:1px;animation:spin-border 4s linear infinite;pointer-events:none}
+
+.login-logo{text-align:center;margin-bottom:36px}
+.login-logotype{font-family:var(--display);font-size:28px;letter-spacing:.06em;color:#fff;line-height:1}
+.login-logotype .dot{color:var(--gold)}
+.login-logotype .sep{color:var(--bdr);margin:0 10px}
+.login-logotype .bbsd{color:var(--violet)}
+.login-sub{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:7px}
+
+.lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:block}
+.inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:10px;padding:13px 15px;font-family:var(--font);font-size:14px;font-weight:500;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:16px}
+.inp:focus{border-color:var(--violet)}
+.inp::placeholder{color:var(--muted)}
+
+.login-btn{width:100%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#07070a;font-family:var(--display);font-size:22px;letter-spacing:.06em;padding:14px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;box-shadow:0 4px 20px rgba(255,209,102,.35)}
+.login-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.login-btn:active{transform:scale(.98)}
+.login-error{background:rgba(255,27,154,.08);border:1px solid rgba(255,27,154,.25);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--pink);margin-bottom:14px;display:none;animation:fadeUp .2s ease}
+.login-error.show{display:block}
+.login-footer{text-align:center;margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.login-loader{width:18px;height:18px;border:2px solid rgba(7,7,10,.3);border-top-color:#07070a;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.login-btn.loading .login-loader{display:block}
+.login-btn.loading .btn-txt{display:none}
+
+/* ══ APP SHELL ══ */
+#app{height:100%;display:flex;flex-direction:column;opacity:0;transition:opacity .3s}
+#app.visible{opacity:1}
+
+/* TOPBAR */
+.topbar{height:var(--topbar);background:rgba(13,13,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px 0 0;flex-shrink:0;position:relative;z-index:10}
+.tb-logo-area{width:var(--sidebar);display:flex;align-items:center;padding:0 20px;border-right:1px solid var(--bdr);height:100%;flex-shrink:0;gap:10px}
+.tb-logotype{font-family:var(--display);font-size:17px;letter-spacing:.06em;color:#fff;line-height:1;white-space:nowrap}
+.tb-logotype .dot{color:var(--gold)}
+.tb-logotype .sep{width:1px;height:16px;background:var(--bdr);display:inline-block;vertical-align:middle;margin:0 10px}
+.tb-logotype .bbsd{color:var(--violet)}
+.tb-center{flex:1;display:flex;align-items:center;padding:0 20px}
+.tb-breadcrumb{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;display:flex;align-items:center;gap:6px}
+.tb-bc-sep{color:var(--bdr)}
+.tb-bc-active{color:var(--dim)}
+.tb-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.tb-status{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--green)}
+.tb-status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+.tb-user{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;border:1px solid var(--bdr);background:var(--d3);cursor:pointer;transition:all .15s}
+.tb-user:hover{border-color:var(--subtle)}
+.tb-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.tb-username{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.tb-logout{font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:6px;border:1px solid var(--bdr);transition:all .15s}
+.tb-logout:hover{border-color:var(--pink);color:var(--pink)}
+
+/* BODY */
+.body{flex:1;display:flex;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--d1);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+/* Nav — exact UiUxGuide .nav-btn spec */
+.nav-section-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:18px 18px 6px;display:block}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:none;border-left:2px solid transparent;background:transparent;width:100%;text-align:left;font-family:var(--font);transition:all .14s}
+.nav-btn:hover{color:#9999b0;background:rgba(255,255,255,.025)}
+.nav-btn.active{color:var(--gold);border-left-color:var(--gold);background:rgba(255,209,102,.07)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--bdr);flex-shrink:0;transition:all .14s}
+.nav-btn.active .nav-dot{background:var(--violet);box-shadow:0 0 7px var(--gold)}
+.nav-btn.sub{padding-left:28px}
+.nav-btn.disabled{opacity:.35;cursor:default;pointer-events:none}
+.nav-divider{height:1px;background:var(--bdr);margin:6px 0}
+.nav-badge{margin-left:auto;font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;letter-spacing:.04em}
+.nav-badge.soon{background:rgba(153,153,176,.1);color:var(--dim);border:1px solid rgba(153,153,176,.2)}
+
+/* Sidebar footer */
+.sidebar-footer{padding:16px 18px;margin-top:auto;border-top:1px solid var(--bdr)}
+.sf-domain{font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.06em;margin-bottom:4px}
+.sf-email{font-family:var(--mono);font-size:10px;color:var(--muted);word-break:break-all}
+.sf-version{font-family:var(--mono);font-size:9px;color:var(--bdr);margin-top:5px}
+
+/* CONTENT */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--d0)}
+.content-inner{flex:1;position:relative;overflow:hidden}
+
+/* IFRAME */
+.iframe-wrap{position:absolute;inset:0;display:none}
+.iframe-wrap.active{display:flex;flex-direction:column}
+.iframe-wrap iframe{flex:1;border:none;background:var(--d0)}
+
+/* LOADING */
+.iframe-loader{position:absolute;inset:0;background:var(--d0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .3s}
+.iframe-loader.hidden{opacity:0;pointer-events:none}
+.loader-ring{width:36px;height:36px;border:2px solid rgba(179,84,241,.15);border-top-color:var(--violet);border-radius:50%;animation:spin .8s linear infinite}
+.loader-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em}
+
+/* WELCOME */
+#welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;background:var(--d0)}
+#welcome.hidden{display:none}
+.wc-logotype{font-family:var(--display);font-size:clamp(36px,5vw,64px);letter-spacing:.06em;line-height:1;margin-bottom:4px}
+.wc-logotype .dot{color:var(--gold)}
+.wc-sep{width:1px;height:28px;background:var(--bdr);display:inline-block;vertical-align:middle;margin:0 14px}
+.wc-logotype .bbsd{color:var(--violet)}
+.wc-sub{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:44px}
+.wc-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:480px;width:100%}
+.wc-card{background:var(--d3);border:1px solid var(--bdr);border-radius:14px;padding:18px;cursor:pointer;transition:all .18s;text-align:left}
+.wc-card:hover{border-color:var(--violet);background:rgba(179,84,241,.06);transform:translateY(-2px)}
+.wc-card-icon{font-size:18px;margin-bottom:10px}
+.wc-card-title{font-family:var(--display);font-size:16px;letter-spacing:.03em;margin-bottom:4px}
+.wc-card-desc{font-size:11px;color:var(--dim);line-height:1.55;font-weight:500}
+
+/* STARS */
+#stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35}
+#app .topbar,#app .sidebar,#app .content{position:relative;z-index:1}
+
+/* MOBILE */
+.sidebar-toggle{display:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--bdr);background:var(--d3);align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--muted);font-size:16px}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;backdrop-filter:blur(4px)}
+@media(max-width:768px){
+  :root{--sidebar:260px}
+  .tb-logo-area{width:auto;border-right:none;padding:0 14px}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:60;transform:translateX(-100%);transition:transform .25s ease}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-toggle{display:flex}
+  .sidebar-overlay.show{display:block}
+  .tb-right .tb-status{display:none}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
+</head>
+<body>
+
+<canvas id="stars-bg"></canvas>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <canvas id="stars-login"></canvas>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logotype">ULTIMATE<span class="dot">·</span>XP<span class="sep"></span><span class="bbsd">BBSD</span></div>
+      <div class="login-sub">admin.byronbaysilentdisco.com</div>
+    </div>
+    <div class="login-error" id="loginError">Incorrect email or password.</div>
+    <label class="lbl" for="loginEmail">Email address</label>
+    <input class="inp" id="loginEmail" type="email" placeholder="your@email.com" autocomplete="email">
+    <label class="lbl" for="loginPass">Password</label>
+    <input class="inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()">
+    <button class="login-btn" id="loginBtn" onclick="attemptLogin()">
+      <span class="btn-txt">Sign In</span>
+      <div class="login-loader"></div>
+    </button>
+    <div class="login-footer">Ultimate Experiences · Byron Bay Silent Disco · Nathanael Kotzur</div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-logo-area">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="tb-logotype">ULTIMATE<span class="dot">·</span>XP<span class="sep"></span><span class="bbsd">BBSD</span></div>
+    </div>
+    <div class="tb-center">
+      <div class="tb-breadcrumb">
+        <span>admin.byronbaysilentdisco.com</span>
+        <span class="tb-bc-sep">›</span>
+        <span class="tb-bc-active" id="tbPageName">Dashboard</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-status"><div class="tb-status-dot"></div>Live</div>
+      <div class="tb-user">
+        <div class="tb-avatar" id="tbAvatar">N</div>
+        <span class="tb-username" id="tbUsername">—</span>
+      </div>
+      <div class="tb-logout" onclick="logout()">Sign out</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+
+      <!-- Dashboard -->
+      <button class="nav-btn active" onclick="nav(this,'welcome','Dashboard')" id="nav-welcome">
+        <div class="nav-dot"></div>Dashboard
+      </button>
+      <button class="nav-btn sub disabled">
+        <div class="nav-dot"></div>Analytics
+        <span class="nav-badge soon">Soon</span>
+      </button>
+
+      <div class="nav-divider"></div>
+
+      <!-- Quote Table -->
+      <span class="nav-section-label">Quote Table</span>
+      <button class="nav-btn sub" onclick="nav(this,'events-table','Events Table')" id="nav-events-table">
+        <div class="nav-dot"></div>Events Table
+      </button>
+      <button class="nav-btn sub" onclick="nav(this,'quote-party','Party Table')" id="nav-quote-party">
+        <div class="nav-dot"></div>Party Table
+      </button>
+      <button class="nav-btn sub disabled">
+        <div class="nav-dot"></div>Hire Packs Quotes
+        <span class="nav-badge soon">Soon</span>
+      </button>
+
+      <div class="nav-divider"></div>
+
+      <!-- Events -->
+      <span class="nav-section-label">Events</span>
+      <button class="nav-btn sub" onclick="nav(this,'event-builder','Event Builder')" id="nav-event-builder">
+        <div class="nav-dot"></div>Event Builder
+      </button>
+      <button class="nav-btn sub disabled">
+        <div class="nav-dot"></div>Create an Event
+        <span class="nav-badge soon">Soon</span>
+      </button>
+
+      <div class="sidebar-footer">
+        <div class="sf-domain">admin.byronbaysilentdisco.com</div>
+        <div class="sf-email" id="sfEmail">—</div>
+        <div class="sf-version">BBSD Platform v1.0 · UE Brand v1.0</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="content-inner">
+
+        <!-- WELCOME -->
+        <div class="iframe-wrap active" id="page-welcome">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;background:var(--d0)">
+            <div class="wc-logotype">ULTIMATE<span class="dot">·</span>XP<span class="wc-sep"></span><span class="bbsd">BBSD</span></div>
+            <div class="wc-sub">admin.byronbaysilentdisco.com · Internal Platform</div>
+            <div class="wc-cards">
+              <div class="wc-card" onclick="nav(document.getElementById('nav-event-builder'),'event-builder','Create an Event')">
+                <div class="wc-card-icon">⚡</div>
+                <div class="wc-card-title">Create an Event</div>
+                <div class="wc-card-desc">Build a client quote link with custom pricing</div>
+              </div>
+              <div class="wc-card" onclick="nav(document.getElementById('nav-events-table'),'events-table','Events Table')">
+                <div class="wc-card-icon">📋</div>
+                <div class="wc-card-title">Event Quotes</div>
+                <div class="wc-card-desc">All event quote history and analytics</div>
+              </div>
+              <div class="wc-card" onclick="nav(document.getElementById('nav-quote-party'),'quote-party','Party Table')">
+                <div class="wc-card-icon">🎉</div>
+                <div class="wc-card-title">Party Quotes</div>
+                <div class="wc-card-desc">Private party hire quote builder</div>
+              </div>
+              <div class="wc-card" onclick="javascript:void(0)">
+                <div class="wc-card-icon">📊</div>
+                <div class="wc-card-title">Analytics</div>
+                <div class="wc-card-desc">P&L, stock, negotiation engine</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;font-weight:700;letter-spacing:.06em">COMING SOON</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IFRAMES -->
+        <div class="iframe-wrap" id="page-director"><div class="iframe-loader" id="loader-director"><div class="loader-ring"></div><div class="loader-label">Loading analytics…</div></div><iframe src="./ue-director.html" onload="hideLoader('director')"></iframe></div>
+        <div class="iframe-wrap" id="page-events-table"><div class="iframe-loader" id="loader-events-table"><div class="loader-ring"></div><div class="loader-label">Loading event quotes…</div></div><iframe src="./events-table.html" onload="hideLoader('events-table')"></iframe></div>
+        <div class="iframe-wrap" id="page-quote-party"><div class="iframe-loader" id="loader-quote-party"><div class="loader-ring"></div><div class="loader-label">Loading party quotes…</div></div><iframe src="./quote-party.html" onload="hideLoader('quote-party')"></iframe></div>
+        <div class="iframe-wrap" id="page-event-builder"><div class="iframe-loader" id="loader-event-builder"><div class="loader-ring"></div><div class="loader-label">Loading event builder…</div></div><iframe src="./event-builder.html" onload="hideLoader('event-builder')"></iframe></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Auth ── */
+const CREDS = { email:'info@byronbaysilentdisco.com', pass:'BBSD2025!' };
+
+function attemptLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const btn   = document.getElementById('loginBtn');
+  const err   = document.getElementById('loginError');
+  err.classList.remove('show');
+  btn.classList.add('loading');
+  setTimeout(()=>{
+    btn.classList.remove('loading');
+    if(email===CREDS.email && pass===CREDS.pass){
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app').classList.add('visible');
+      document.getElementById('sfEmail').textContent = email;
+      document.getElementById('tbUsername').textContent = 'Nathanael';
+      document.getElementById('tbAvatar').textContent = 'N';
+    } else {
+      err.classList.add('show');
+    }
+  }, 600);
+}
+
+function logout(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.remove('visible');
+}
+
+/* ── Nav ── */
+let currentPage = 'welcome';
+
+function nav(btn, pageId, label){
+  // deactivate all nav btns
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  // hide all pages
+  document.querySelectorAll('.iframe-wrap').forEach(p=>p.classList.remove('active'));
+  // activate
+  if(btn) btn.classList.add('active');
+  const page = document.getElementById('page-'+pageId);
+  if(page) page.classList.add('active');
+  document.getElementById('tbPageName').textContent = label || pageId;
+  currentPage = pageId;
+  if(window.innerWidth<=768) closeSidebar();
+}
+
+function hideLoader(id){
+  const l = document.getElementById('loader-'+id);
+  if(l) l.classList.add('hidden');
+}
+
+/* ── Sidebar mobile ── */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* ── Stars ── */
+function initStars(canvasId, count){
+  const c = document.getElementById(canvasId);
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  let stars = [];
+  function resize(){ c.width=window.innerWidth; c.height=window.innerHeight; }
+  function build(){
+    resize();
+    stars = Array.from({length:count},()=>({
+      x:Math.random()*c.width, y:Math.random()*c.height,
+      r:Math.random()*1.8+.2, o:Math.random()*.8+.2,
+      tw:Math.random()*Math.PI*2, sp:Math.random()*.04+.015,
+      col:Math.random()<.08?(Math.random()<.5?'179,84,241':'255,209,102'):'255,255,255'
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    const t=Date.now()*.001;
+    stars.forEach(s=>{
+      const a=s.o*(0.2+0.8*Math.abs(Math.sin(t*s.sp*60+s.tw)));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${s.col},${Math.min(1,a).toFixed(3)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',build);
+  build(); draw();
+}
+initStars('stars-bg', 200);
+initStars('stars-login', 160);
+</script>
+</body>
+</html>

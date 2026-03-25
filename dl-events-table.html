@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events — BBSD Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#07070a}
+::-webkit-scrollbar-thumb{background:#2e2e38;border-radius:2px}
+*{box-sizing:border-box;margin:0;padding:0}
+input,select,textarea{font-family:var(--font);color-scheme:dark}
+:root{
+  --gold:#FFD166;--gold-dim:#c9952a;
+  --violet:#B354F1;--orchid:#6A14DB;
+  --pink:#FF1B9A;--orange:#FF9F46;
+  --green:#28B79D;
+  --d0:#07070a;--d1:#0d0d10;--d2:#141418;--d3:#1c1c22;--d4:#26262e;
+  --bdr:#2e2e38;--subtle:#3a3a4a;--muted:#6b6b80;--dim:#9999b0;
+  --text:#ffffff;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
+.topbar{background:rgba(7,7,10,.92);backdrop-filter:blur(20px);border-bottom:.5px solid var(--bdr);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.tb-logo{font-family:var(--display);font-size:18px;letter-spacing:.03em}.tb-logo .g{color:var(--gold)}.tb-logo .v{color:var(--violet)}.tb-logo .p{color:var(--pink)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-link{font-family:var(--mono);font-size:10px;color:var(--dim);padding:5px 10px;border:.5px solid var(--bdr);border-radius:6px;text-decoration:none;transition:all .18s;cursor:pointer;background:none;border:none}
+.tb-link:hover{color:var(--violet)}
+.tb-btn{background:var(--violet);color:#fff;font-family:var(--display);font-size:15px;letter-spacing:.05em;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all .18s;white-space:nowrap}
+.tb-btn:hover{background:var(--gold);color:var(--d0)}
+.main{padding:28px 24px 80px;max-width:1100px;margin:0 auto}
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;animation:fadeUp .3s ease both}
+.stat{background:var(--d1);border:.5px solid var(--bdr);border-radius:12px;padding:16px 18px}
+.stat-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.stat-val{font-family:var(--display);font-size:30px;letter-spacing:.03em;line-height:1}
+.stat-val.gold{color:var(--gold)}.stat-val.violet{color:var(--violet)}.stat-val.green{color:var(--green)}.stat-val.pink{color:var(--pink)}
+.stat-sub{font-size:11px;color:var(--dim);margin-top:4px;font-family:var(--mono)}
+/* TABLE */
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.th-title{font-family:var(--display);font-size:18px;letter-spacing:.04em}
+.th-actions{display:flex;gap:7px}
+.refresh-btn{background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:7px 13px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;transition:all .18s}
+.refresh-btn:hover{border-color:var(--violet);color:var(--violet)}
+.events-table{width:100%;border-collapse:collapse;animation:fadeUp .4s ease both}
+.events-table th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 12px 10px;text-align:left;border-bottom:.5px solid var(--bdr)}
+.events-table td{padding:12px 12px;border-bottom:.5px solid rgba(255,255,255,.04);font-size:13px;vertical-align:middle}
+.events-table tr:hover td{background:rgba(255,255,255,.02)}
+.event-name{font-weight:500;color:var(--text);margin-bottom:2px}
+.event-meta{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+.badge.views{background:rgba(179,84,241,.1);color:var(--violet);border:.5px solid rgba(179,84,241,.2)}
+.badge.shares{background:rgba(40,183,157,.08);color:var(--green);border:.5px solid rgba(40,183,157,.15)}
+.mono{font-family:var(--mono);font-size:12px}
+.link-cell{font-family:var(--mono);font-size:10px;color:var(--violet);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.link-cell:hover{color:var(--gold)}
+.tbl-btn{padding:5px 10px;border-radius:7px;font-family:var(--mono);font-size:10px;cursor:pointer;border:none;transition:all .18s;white-space:nowrap}
+.tbl-btn.analytics{background:rgba(255,209,102,.1);color:var(--gold);border:.5px solid rgba(255,209,102,.2)}
+.tbl-btn.analytics:hover{background:rgba(255,209,102,.18)}
+.tbl-btn.open{background:rgba(179,84,241,.1);color:var(--violet);border:.5px solid rgba(179,84,241,.2)}
+.tbl-btn.open:hover{background:rgba(179,84,241,.18)}
+.tbl-btn.copy{background:rgba(255,255,255,.06);color:var(--muted);border:.5px solid var(--bdr)}
+.tbl-btn.copy:hover{color:var(--text);border-color:var(--subtle)}
+.avg-hs{font-family:var(--display);font-size:18px;color:var(--violet)}
+.empty-state{text-align:center;padding:60px 24px;color:var(--muted)}
+.empty-state a{color:var(--violet);text-decoration:none;font-family:var(--mono)}
+.loading-spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--violet);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+/* ANALYTICS PANEL */
+.analytics-panel{display:none;background:var(--d1);border:.5px solid var(--bdr);border-radius:16px;padding:24px;margin-top:24px;animation:fadeUp .3s ease both}
+.analytics-panel.open{display:block}
+.ap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.ap-title{font-family:var(--display);font-size:20px;letter-spacing:.04em}
+.ap-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;transition:color .18s}
+.ap-close:hover{color:var(--pink)}
+.ap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.ap-stat{background:var(--d2);border-radius:10px;padding:14px}
+.aps-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.aps-val{font-family:var(--display);font-size:24px;letter-spacing:.03em}
+.aps-sub{font-size:10px;color:var(--dim);margin-top:3px;font-family:var(--mono)}
+.chart-box{background:rgba(255,255,255,.03);border-radius:10px;padding:14px;border:.5px solid var(--bdr);margin-bottom:20px}
+.chart-h{height:140px}
+.chart-lbl{font-family:var(--mono);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+/* PROFIT CALCULATOR */
+.profit-calc{background:linear-gradient(135deg,rgba(255,209,102,.06),rgba(179,84,241,.06));border:.5px solid rgba(255,209,102,.18);border-radius:14px;padding:18px 20px;margin-top:20px}
+.pc-title{font-family:var(--display);font-size:18px;letter-spacing:.04em;margin-bottom:4px}
+.pc-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:16px}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.pc-section-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.cost-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.cost-lbl{font-size:12px;color:var(--muted);flex:1}
+.cost-inp{width:90px;background:rgba(255,255,255,.06);border:.5px solid var(--subtle);border-radius:8px;padding:6px 9px;font-family:var(--mono);font-size:13px;color:var(--text);outline:none;text-align:right;transition:border-color .18s}
+.cost-inp:focus{border-color:var(--violet)}
+.cost-unit{font-family:var(--mono);font-size:11px;color:var(--dim);white-space:nowrap}
+.add-row-btn{background:none;border:.5px dashed rgba(255,255,255,.2);border-radius:7px;padding:5px 10px;font-family:var(--mono);font-size:10px;color:var(--dim);cursor:pointer;transition:all .18s;width:100%;margin-bottom:7px}
+.add-row-btn:hover{border-color:var(--violet);color:var(--violet)}
+.profit-result{background:var(--d2);border-radius:10px;padding:14px}
+.pr-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:.5px solid var(--bdr);font-size:13px}
+.pr-row:last-child{border-bottom:none}
+.pr-row.total{border-top:.5px solid rgba(255,255,255,.12);margin-top:5px;padding-top:12px;border-bottom:none}
+.pr-lbl{color:var(--muted)}
+.pr-row.total .pr-lbl{font-weight:600;color:var(--text);font-size:14px}
+.pr-val{font-family:var(--mono);font-weight:500}
+.pr-row.total .pr-val{font-family:var(--display);font-size:26px;letter-spacing:.03em;color:var(--green)}
+.pr-val.neg{color:var(--pink)}
+.neg-msg{font-family:var(--mono);font-size:10px;color:var(--pink);margin-top:6px}
+@media(max-width:768px){.stat-row,.ap-grid{grid-template-columns:1fr 1fr}.pc-grid{grid-template-columns:1fr}.events-table th:nth-child(4),.events-table td:nth-child(4){display:none}.events-table th:nth-child(5),.events-table td:nth-child(5){display:none}}
+@media(max-width:480px){.stat-row,.ap-grid{grid-template-columns:1fr}}
+
+/* ── SELF QUOTE MODAL ── */
+.sq-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.sq-overlay.open{opacity:1;pointer-events:all}
+.sq-modal{background:#141418;border:1px solid #2e2e38;border-radius:20px;padding:32px;width:100%;max-width:520px;position:relative;animation:fadeUp .3s ease both}
+.sq-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid #2e2e38;color:#6b6b80;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.sq-close:hover{background:rgba(255,27,154,.1);border-color:#FF1B9A;color:#FF1B9A}
+.sq-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;margin-bottom:4px}
+.sq-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:#6b6b80;margin-bottom:28px;letter-spacing:.06em}
+.sq-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sq-card{background:#1c1c22;border:1px solid #2e2e38;border-radius:14px;padding:22px 18px;cursor:pointer;transition:all .2s;text-align:left;position:relative;overflow:hidden}
+.sq-card::after{content:'';position:absolute;inset:0;border-radius:14px;opacity:0;transition:opacity .2s}
+.sq-card.green:hover{border-color:#28B79D;background:rgba(40,183,157,.08)}
+.sq-card.green:hover::after{background:radial-gradient(circle at 50% 0%,rgba(40,183,157,.12),transparent 70%);opacity:1}
+.sq-card.violet:hover{border-color:#B354F1;background:rgba(179,84,241,.08)}
+.sq-card.violet:hover::after{background:radial-gradient(circle at 50% 0%,rgba(179,84,241,.12),transparent 70%);opacity:1}
+.sq-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:18px}
+.sq-card.green .sq-card-icon{background:rgba(40,183,157,.12);border:1px solid rgba(40,183,157,.2)}
+.sq-card.violet .sq-card-icon{background:rgba(179,84,241,.12);border:1px solid rgba(179,84,241,.2)}
+.sq-card-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;margin-bottom:6px}
+.sq-card.green .sq-card-title{color:#28B79D}
+.sq-card.violet .sq-card-title{color:#B354F1}
+.sq-card-desc{font-size:12px;color:#9999b0;line-height:1.6;font-weight:500}
+.sq-card-flow{font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b6b80;margin-top:10px;padding-top:10px;border-top:1px solid #2e2e38;line-height:1.8}
+.sq-card-flow span{color:#FFD166}
+@media(max-width:500px){.sq-cards{grid-template-columns:1fr}}
+.btn-press{transition:transform .12s linear,opacity .12s linear,filter .12s linear;cursor:pointer}
+.btn-press:active{transform:scale(.97);opacity:.88}
+.btn-press:hover{filter:brightness(1.1)}
+.chrome-sweep{position:relative;overflow:hidden}
+.chrome-sweep::after{content:'';position:absolute;top:-50%;left:-75%;width:55%;height:200%;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.55) 50%,transparent 75%);animation:liquid-sweep 2.4s ease-in-out infinite;pointer-events:none;border-radius:inherit}
+.chrome-green-btn{background:linear-gradient(135deg,#b8f0e8 0%,#ffffff 12%,#40c0a8 28%,#28B79D 44%,#20a888 56%,#60c8b0 70%,#ffffff 84%,#a8e8e0 100%);background-size:250% 250%;animation:chrome-shift 3s ease infinite;border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:15px 24px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);cursor:pointer;position:relative;overflow:hidden;box-shadow:0 6px 24px rgba(40,183,157,.4),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;transition:box-shadow .2s,transform .2s}
+.chrome-green-btn::after{content:'';position:absolute;top:-50%;left:-75%;width:55%;height:200%;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.55) 50%,transparent 75%);animation:liquid-sweep 2.4s ease-in-out infinite;pointer-events:none}
+.chrome-green-btn:hover{box-shadow:0 10px 36px rgba(40,183,157,.65),inset 0 1px 0 rgba(255,255,255,.3);transform:translateY(-2px)}
+.chrome-green-btn:active{transform:scale(.98)}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-logo">ULTIMATE<span style="color:#FFD166">·</span>XP<span style="display:inline-block;width:1px;height:14px;background:#2e2e38;margin:0 10px;vertical-align:middle"></span><span style="color:#B354F1">BBSD</span></div>
+  <div class="tb-right">
+    <button class="tb-link" onclick="loadEvents()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button>
+    <a href="./dashboard.html" class="tb-link"><i data-lucide="arrow-left" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Dashboard</a>
+    <button class="tb-btn btn-press" onclick="openSelfQuoteModal()"><i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>Create Self Quote</button>
+  </div>
+</div>
+<div class="main">
+  <!-- OVERVIEW STATS -->
+  <div class="stat-row" id="overviewStats">
+    <div class="stat"><div class="stat-lbl">Total events</div><div class="stat-val violet" id="statTotal">—</div><div class="stat-sub">active quote links</div></div>
+    <div class="stat"><div class="stat-lbl">Total views</div><div class="stat-val gold" id="statViews">—</div><div class="stat-sub">across all events</div></div>
+    <div class="stat"><div class="stat-lbl">Total shares</div><div class="stat-val green" id="statShares">—</div><div class="stat-sub">links copied</div></div>
+    <div class="stat"><div class="stat-lbl">Avg headset interest</div><div class="stat-val pink" id="statAvgHS">—</div><div class="stat-sub">avg hs across sessions</div></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-header">
+    <div class="th-title">All Event Quotes</div>
+    <div class="th-actions"><button class="refresh-btn" onclick="loadEvents()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button></div>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="events-table" id="eventsTable">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Dates</th>
+          <th>Views</th>
+          <th>Avg HS interest</th>
+          <th>Avg quote seen</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="eventsBody">
+        <tr><td colspan="7"><div class="empty-state"><div class="loading-spinner"></div>Loading events...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ANALYTICS PANEL (expands per event) -->
+  <div class="analytics-panel" id="analyticsPanel">
+    <div class="ap-header">
+      <div>
+        <div class="ap-title" id="apTitle">—</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px" id="apMeta">—</div>
+      </div>
+      <button class="ap-close" onclick="closeAnalytics()">✕</button>
+    </div>
+    <div class="ap-grid">
+      <div class="ap-stat"><div class="aps-lbl">Total views</div><div class="aps-val" style="color:var(--violet)" id="apViews">—</div><div class="aps-sub">unique sessions</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Shares</div><div class="aps-val" style="color:var(--green)" id="apShares">—</div><div class="aps-sub">link copied</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Avg headsets explored</div><div class="aps-val" style="color:var(--gold)" id="apAvgHS">—</div><div class="aps-sub">per session</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Avg quote seen</div><div class="aps-val" style="color:var(--pink)" id="apAvgTotal">—</div><div class="aps-sub">at avg HS count</div></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-lbl">Headset interest over time</div>
+      <div class="chart-h"><canvas id="apChart"></canvas></div>
+    </div>
+
+    <!-- PROFIT CALCULATOR -->
+    <div class="profit-calc">
+      <div class="pc-title">Profit Calculator — Negotiation Prep</div>
+      <div class="pc-sub">Enter your costs below to calculate net profit based on what the client has been exploring. Add DJs, fuel, staff — so you're ready to negotiate.</div>
+      <div class="pc-grid">
+        <!-- LEFT: COSTS -->
+        <div>
+          <div class="pc-section-title">Our costs to deliver</div>
+          <div id="costRows">
+            <div class="cost-row"><span class="cost-lbl">DJ rate × 3</span><input class="cost-inp" data-key="djRate" value="500" oninput="calcProfit()"><span class="cost-unit">/ night</span></div>
+            <div class="cost-row"><span class="cost-lbl">Event staff (×<span id="pcStaff">4</span>)</span><input class="cost-inp" data-key="staffRate" value="250" oninput="calcProfit()"><span class="cost-unit">/ person / night</span></div>
+            <div class="cost-row"><span class="cost-lbl">Event manager</span><input class="cost-inp" data-key="mgrRate" value="400" oninput="calcProfit()"><span class="cost-unit">/ night</span></div>
+            <div class="cost-row"><span class="cost-lbl">Headset hire cost</span><input class="cost-inp" data-key="hsCost" value="5" oninput="calcProfit()"><span class="cost-unit">/ headset / night</span></div>
+            <div class="cost-row"><span class="cost-lbl">Fuel / transport</span><input class="cost-inp" data-key="fuel" value="200" oninput="calcProfit()"><span class="cost-unit">total</span></div>
+            <div class="cost-row"><span class="cost-lbl">Misc / contingency</span><input class="cost-inp" data-key="misc" value="300" oninput="calcProfit()"><span class="cost-unit">total</span></div>
+          </div>
+          <button class="add-row-btn" onclick="addCostRow()">+ Add cost line</button>
+          <div style="margin-top:8px">
+            <div class="pc-section-title">Override with actual quote data</div>
+            <div class="cost-row"><span class="cost-lbl">Headsets (from analytics)</span><input class="cost-inp" id="pcHS" value="1000" oninput="calcProfit()"><span class="cost-unit">/ night</span></div>
+            <div class="cost-row"><span class="cost-lbl">Nights</span><input class="cost-inp" id="pcDays" value="3" oninput="calcProfit()"><span class="cost-unit">nights</span></div>
+            <div class="cost-row"><span class="cost-lbl">Our rate to client</span><input class="cost-inp" id="pcRate" value="15" oninput="calcProfit()"><span class="cost-unit">/ headset</span></div>
+          </div>
+        </div>
+        <!-- RIGHT: RESULT -->
+        <div>
+          <div class="pc-section-title">Profit breakdown</div>
+          <div class="profit-result" id="profitResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const fmt=n=>'$'+Math.abs(Math.round(n)).toLocaleString('en-AU');
+const fmtN=n=>Math.round(n).toLocaleString('en-AU');
+function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+
+let allEvents=[];
+let activeEvent=null;
+let apChart=null;
+let extraCosts=[];
+
+async function loadEvents(){
+  const tbody=document.getElementById('eventsBody');
+  tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="loading-spinner"></div>Loading...</div></td></tr>';
+  try{
+    const r=await fetch('/api/events');
+    if(!r.ok) throw new Error();
+    allEvents=await r.json();
+  }catch(e){
+    // Demo data fallback
+    allEvents=[
+      {id:'demo1',name:'Woodford Folk Festival 2025',start:'2025-12-27',end:'2025-12-31',location:'Woodfordia, QLD',type:'Folk / Cultural Festival',createdAt:Date.now()-86400000*2,views:12,shares:3,analytics:{avgHS:1850,avgDays:3.2,avgTotal:66750,sessions:[{ts:Date.now()-3600*1000*5,hs:2000},{ts:Date.now()-3600*1000*8,hs:1500},{ts:Date.now()-86400000,hs:1000},{ts:Date.now()-86400000*2,hs:3000}]}},
+      {id:'demo2',name:'Splendour in the Grass 2025',start:'2025-07-18',end:'2025-07-20',location:'North Byron Parklands',type:'Music Festival',createdAt:Date.now()-86400000*5,views:28,shares:7,analytics:{avgHS:2400,avgDays:2.1,avgTotal:82800,sessions:[{ts:Date.now()-86400000*2,hs:2500},{ts:Date.now()-86400000*3,hs:2200}]}},
+    ];
+  }
+  renderTable();
+  renderOverviewStats();
+}
+
+function renderOverviewStats(){
+  const total=allEvents.length;
+  const views=allEvents.reduce((a,e)=>a+(e.views||0),0);
+  const shares=allEvents.reduce((a,e)=>a+(e.shares||0),0);
+  const avgHS=allEvents.length?Math.round(allEvents.reduce((a,e)=>a+(e.analytics?.avgHS||0),0)/allEvents.length):0;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statViews').textContent=views;
+  document.getElementById('statShares').textContent=shares;
+  document.getElementById('statAvgHS').textContent=avgHS?fmtN(avgHS):'—';
+}
+
+function renderTable(){
+  const tbody=document.getElementById('eventsBody');
+  if(!allEvents.length){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state">No events yet — <a href="./event-builder.html">create your first event quote</a></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=allEvents.map(e=>{
+    const avgHS=e.analytics?.avgHS||0;
+    const avgTot=e.analytics?.avgTotal||0;
+    const link=`${window.location.origin}/quote-event.html?id=${e.id}`;
+    const dates=e.start&&e.end?new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' – '+new Date(e.end+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):e.start||'—';
+    return `<tr>
+      <td><div class="event-name">${e.name}</div><div class="event-meta">${e.type||''} ${e.location?'· '+e.location:''}</div></td>
+      <td class="mono">${dates}</td>
+      <td><span class="badge views">👁 ${e.views||0}</span> <span class="badge shares">↗ ${e.shares||0}</span></td>
+      <td><span class="avg-hs">${avgHS?fmtN(avgHS):'—'}</span></td>
+      <td class="mono">${avgTot?fmt(avgTot):'—'}</td>
+      <td class="mono" style="color:var(--dim)">${timeAgo(e.createdAt)}</td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="tbl-btn analytics" onclick="openAnalytics('${e.id}')">📊 Analytics</button>
+          <button class="tbl-btn open" onclick="window.open('quote-event.html?id=${e.id}','_blank')">↗ Open</button>
+          <button class="tbl-btn copy" onclick="copyLink('${link}',this)">📋 Copy</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function copyLink(url,btn){navigator.clipboard.writeText(url).then(()=>{const o=btn.textContent;btn.textContent='✓ Copied';setTimeout(()=>btn.textContent=o,2000);});}
+
+function openAnalytics(id){
+  const e=allEvents.find(ev=>ev.id===id);
+  if(!e) return;
+  activeEvent=e;
+  document.getElementById('analyticsPanel').classList.add('open');
+  document.getElementById('analyticsPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('apTitle').textContent=e.name;
+  document.getElementById('apMeta').textContent=(e.type||'')+' · '+(e.location||'')+(e.start?' · '+new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}):'');
+  document.getElementById('apViews').textContent=e.views||0;
+  document.getElementById('apShares').textContent=e.shares||0;
+  document.getElementById('apAvgHS').textContent=e.analytics?.avgHS?fmtN(e.analytics.avgHS):'—';
+  document.getElementById('apAvgTotal').textContent=e.analytics?.avgTotal?fmt(e.analytics.avgTotal):'—';
+  // Pre-fill profit calc with analytics data
+  if(e.analytics?.avgHS){document.getElementById('pcHS').value=e.analytics.avgHS;}
+  if(e.analytics?.avgDays){document.getElementById('pcDays').value=Math.round(e.analytics.avgDays);}
+  buildAPChart(e);
+  calcProfit();
+}
+function closeAnalytics(){document.getElementById('analyticsPanel').classList.remove('open');activeEvent=null;}
+
+function buildAPChart(e){
+  if(apChart) apChart.destroy();
+  const sessions=e.analytics?.sessions||[];
+  if(!sessions.length) return;
+  const pts=sessions.slice(-20).map(s=>({x:s.ts,y:s.hs}));
+  const ctx=document.getElementById('apChart').getContext('2d');
+  apChart=new Chart(ctx,{type:'scatter',data:{datasets:[{data:pts,borderColor:'#B354F1',backgroundColor:'rgba(179,84,241,.15)',pointRadius:5,pointHoverRadius:8,showLine:true,tension:.4,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'time',time:{unit:'hour'},ticks:{font:{size:9},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},y:{ticks:{callback:v=>fmtN(v),font:{size:9},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${fmtN(i.parsed.y)} headsets`},backgroundColor:'#1a1a2a',bodyColor:'#B354F1',padding:8,cornerRadius:6,displayColors:false}}}});
+}
+
+function calcProfit(){
+  if(!activeEvent) return;
+  const hs=parseInt(document.getElementById('pcHS').value)||1000;
+  const nights=parseInt(document.getElementById('pcDays').value)||1;
+  const rate=parseFloat(document.getElementById('pcRate').value)||15;
+  const revenue=hs*nights*rate+2000;
+  const djRate=parseFloat(document.querySelector('[data-key=djRate]').value)||0;
+  const staffCount=hs<500?2:Math.max(3,Math.floor(hs/1000)*4);
+  document.getElementById('pcStaff').textContent=staffCount;
+  const staffRate=parseFloat(document.querySelector('[data-key=staffRate]').value)||0;
+  const mgrRate=parseFloat(document.querySelector('[data-key=mgrRate]').value)||0;
+  const hsCost=parseFloat(document.querySelector('[data-key=hsCost]').value)||0;
+  const fuel=parseFloat(document.querySelector('[data-key=fuel]').value)||0;
+  const misc=parseFloat(document.querySelector('[data-key=misc]').value)||0;
+  const extraTotal=extraCosts.reduce((a,k)=>{const el=document.querySelector(`[data-key=${k}]`);return a+(el?parseFloat(el.value)||0:0);},0);
+  const djTotal=djRate*3*nights;
+  const staffTotal=staffRate*staffCount*nights;
+  const mgrTotal=mgrRate*nights;
+  const hsHireCost=hsCost*hs*nights;
+  const totalCost=djTotal+staffTotal+mgrTotal+hsHireCost+fuel+misc+extraTotal;
+  const net=revenue-totalCost;
+  const margin=revenue>0?Math.round((net/revenue)*100):0;
+  const rows=[
+    {l:'Revenue (headset hire)',v:fmt(hs*nights*rate),pos:true},
+    {l:'Booking fee',v:fmt(2000),pos:true},
+    {l:'Total revenue',v:fmt(revenue),pos:true,bold:true},
+    {l:'',v:'',divider:true},
+    {l:`DJs (3 × $${djRate} × ${nights}n)`,v:'−'+fmt(djTotal),neg:true},
+    {l:`Staff (${staffCount} × $${staffRate} × ${nights}n)`,v:'−'+fmt(staffTotal),neg:true},
+    {l:`Manager × ${nights} nights`,v:'−'+fmt(mgrTotal),neg:true},
+    {l:`Headset hire ($${hsCost}/hs × ${nights}n)`,v:'−'+fmt(hsHireCost),neg:true},
+    {l:'Fuel / transport',v:'−'+fmt(fuel),neg:true},
+    {l:'Misc / contingency',v:'−'+fmt(misc),neg:true},
+    {l:'Total costs',v:'−'+fmt(totalCost),neg:true,bold:true},
+  ];
+  if(extraCosts.length){rows.push({l:'Extra costs',v:'−'+fmt(extraTotal),neg:true});}
+  document.getElementById('profitResult').innerHTML=rows.map(r=>{
+    if(r.divider) return '<div style="height:8px;border-bottom:.5px solid rgba(255,255,255,.06);margin-bottom:5px"></div>';
+    return `<div class="pr-row${r.bold?' total':''}"><span class="pr-lbl">${r.l}</span><span class="pr-val${r.neg?' neg':''}">${r.v}</span></div>`;
+  }).join('')+`
+  <div class="pr-row total"><span class="pr-lbl">Net profit (ex-GST)</span><span class="pr-val" style="color:${net>=0?'var(--green)':'var(--pink)'}${net>=0?'':'"'};font-family:var(--display);font-size:26px;letter-spacing:.03em">${net>=0?fmt(net):'−'+fmt(-net)}</span></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px">Margin: ${margin}% · Floor: ${fmt(totalCost)} · Room to move: ${fmt(Math.max(0,revenue-totalCost))}</div>
+  `;
+}
+
+let extraIdx=0;
+function addCostRow(){
+  extraIdx++;
+  const key='extra'+extraIdx;
+  extraCosts.push(key);
+  const div=document.createElement('div');
+  div.className='cost-row';
+  div.innerHTML=`<input style="flex:1;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.1);border-radius:7px;padding:5px 8px;font-size:12px;color:var(--text);outline:none;margin-right:6px" placeholder="Label" oninput="calcProfit()"><input class="cost-inp" data-key="${key}" value="0" oninput="calcProfit()"><span class="cost-unit">total</span>`;
+  document.getElementById('costRows').appendChild(div);
+}
+
+loadEvents();
+</script>
+<script>document.addEventListener("DOMContentLoaded",()=>lucide.createIcons());</script>
+
+<!-- SELF QUOTE MODAL -->
+<div class="sq-overlay" id="sqOverlay" onclick="closeSQOutside(event)">
+  <div class="sq-modal">
+    <button class="sq-close" onclick="closeSelfQuoteModal()">✕</button>
+    <div class="sq-title">Create Self Quote</div>
+    <div class="sq-sub">Choose the type of quote to generate</div>
+    <div class="sq-cards">
+
+      <div class="sq-card green" onclick="goPartyQuote()">
+        <div class="sq-card-icon">🎉</div>
+        <div class="sq-card-title">Party Self Quote</div>
+        <div class="sq-card-desc">Private party hire — guests, venue, date. Instant quote for the client.</div>
+        <div class="sq-card-flow">→ <span>Party Quote Builder</span></div>
+      </div>
+
+      <div class="sq-card violet" onclick="goEventQuote()">
+        <div class="sq-card-icon">🎪</div>
+        <div class="sq-card-title">Event Self Quote</div>
+        <div class="sq-card-desc">Festival or event hire — white-labelled, per-headset pricing with P1 hero + P2 quote.</div>
+        <div class="sq-card-flow">→ <span>Event Builder</span> → P1 Hero → P2 Quote</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function openSelfQuoteModal(){ document.getElementById('sqOverlay').classList.add('open'); }
+function closeSelfQuoteModal(){ document.getElementById('sqOverlay').classList.remove('open'); }
+function closeSQOutside(e){ if(e.target===document.getElementById('sqOverlay')) closeSelfQuoteModal(); }
+function goPartyQuote(){ closeSelfQuoteModal(); window.location.href='./quote-party.html'; }
+function goEventQuote(){ closeSelfQuoteModal(); window.location.href='./event-builder.html'; }
+</script>
+
+</body>
+</html>

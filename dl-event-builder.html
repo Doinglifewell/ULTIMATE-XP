@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Quote Builder — BBSD Internal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes chrome-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes liquid-sweep{0%{left:-75%;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:125%;opacity:0}}
+@keyframes liquid-blob{0%{border-radius:14px}20%{border-radius:18px 11px 16px 13px}40%{border-radius:11px 17px 13px 18px}60%{border-radius:16px 13px 18px 11px}80%{border-radius:13px 18px 11px 16px}100%{border-radius:14px}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 4px 20px rgba(179,84,241,.35)}50%{box-shadow:0 4px 32px rgba(179,84,241,.65),0 0 60px rgba(179,84,241,.2)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#07070a}
+::-webkit-scrollbar-thumb{background:#2e2e38;border-radius:2px}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#FFD166;--gold-dim:#c9952a;
+  --violet:#B354F1;--orchid:#6A14DB;
+  --pink:#FF1B9A;--orange:#FF9F46;
+  --green:#28B79D;
+  --d0:#07070a;--d1:#0d0d10;--d2:#141418;--d3:#1c1c22;--d4:#26262e;
+  --bdr:#2e2e38;--subtle:#3a3a4a;--muted:#6b6b80;--dim:#9999b0;
+  --text:#ffffff;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh}
+.topbar{background:rgba(7,7,10,.92);backdrop-filter:blur(20px);border-bottom:.5px solid var(--bdr);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.tb-logo{font-family:var(--display);font-size:18px;letter-spacing:.03em}.tb-logo .g{color:var(--gold)}.tb-logo .v{color:var(--violet)}.tb-logo .p{color:var(--pink)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-back{font-family:var(--mono);font-size:10px;color:var(--dim);padding:5px 10px;border:.5px solid var(--bdr);border-radius:6px;text-decoration:none;transition:all .18s}
+.tb-back:hover{border-color:var(--violet);color:var(--violet)}
+.main{max-width:680px;margin:0 auto;padding:32px 20px 60px}
+.page-title{font-family:var(--display);font-size:clamp(32px,6vw,52px);letter-spacing:.02em;line-height:.95;margin-bottom:6px;animation:fadeUp .3s ease both}
+.page-title .g{color:var(--gold)}.page-title .v{color:var(--violet)}.page-title .p{color:var(--pink)}
+.page-sub{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;animation:fadeUp .35s ease both}
+.card{background:var(--d1);border:.5px solid var(--bdr);border-radius:16px;padding:24px;margin-bottom:14px;animation:fadeUp .4s ease both}
+.card-title{font-family:var(--display);font-size:18px;letter-spacing:.04em;margin-bottom:4px}
+.card-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:18px}
+.lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.inp{width:100%;background:rgba(255,255,255,.05);border:.5px solid var(--subtle);border-radius:10px;padding:12px 14px;font-family:var(--font);font-size:15px;color:var(--text);outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--violet)}.inp::placeholder{color:var(--dim)}
+.inp[type=date]{color-scheme:dark}.inp[type=date]::-webkit-calendar-picker-indicator{filter:invert(.7) sepia(1) saturate(3) hue-rotate(200deg);cursor:pointer}
+.sel{width:100%;background:rgba(255,255,255,.05);border:.5px solid var(--subtle);border-radius:10px;padding:12px 14px;font-family:var(--font);font-size:15px;color:var(--text);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,240,248,.4)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.sel:focus{border-color:var(--violet);outline:none}.sel option{background:#1c1c22}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mb{margin-bottom:12px}
+.ta{resize:vertical;min-height:80px;line-height:1.5}
+/* Google Maps Autocomplete */
+.loc-wrap{position:relative}
+.loc-pin-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--violet);display:flex;align-items:center}
+.loc-pin-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.inp.loc{padding-left:36px}
+.loc-result{display:none;margin-top:6px;background:rgba(179,84,241,.08);border:.5px solid rgba(179,84,241,.2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--violet);font-family:var(--mono)}
+.pac-container{background:var(--d2)!important;border:.5px solid var(--subtle)!important;border-radius:12px!important;margin-top:4px!important;box-shadow:0 8px 28px rgba(0,0,0,.5)!important;z-index:9999!important;font-family:var(--font)!important}
+.pac-item{padding:10px 14px!important;cursor:pointer!important;border-top:.5px solid var(--bdr)!important;color:var(--muted)!important;font-size:13px!important}
+.pac-item:hover,.pac-item-selected{background:rgba(179,84,241,.1)!important}
+.pac-item-query{color:var(--text)!important;font-weight:500!important}
+.pac-matched{color:var(--violet)!important}
+.pac-icon{display:none!important}
+/* Custom pricing tiers */
+.pricing-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.pt{background:var(--d2);border:.5px solid var(--bdr);border-radius:10px;padding:12px;text-align:center;transition:border-color .15s}
+.pt:focus-within{border-color:var(--violet)}
+.pt-qty{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:7px}
+.pt-inp-wrap{display:flex;align-items:center;justify-content:center;gap:2px}
+.pt-dollar{font-family:var(--display);font-size:16px;color:var(--gold);line-height:1}
+.pt-price{width:56px;background:transparent;border:none;font-family:var(--display);font-size:26px;letter-spacing:.02em;color:var(--text);text-align:center;outline:none;padding:0;-moz-appearance:textfield}
+.pt-price::-webkit-inner-spin-button{-webkit-appearance:none}
+.pt-unit{font-family:var(--mono);font-size:8px;color:var(--dim);margin-top:3px;text-transform:uppercase;letter-spacing:.08em}
+/* Generate button */
+.curve-btn{width:100%;background:rgba(40,183,157,.1);color:var(--green);border:.5px solid rgba(40,183,157,.25);font-family:var(--display);font-size:18px;letter-spacing:.06em;padding:13px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s}
+.curve-btn:hover{background:rgba(40,183,157,.18);border-color:rgba(40,183,157,.5);transform:translateY(-1px)}
+.curve-btn.locked{background:rgba(255,209,102,.08);color:var(--gold);border-color:rgba(255,209,102,.25)}
+.curve-btn.locked:hover{background:rgba(255,209,102,.14)}
+/* Curve preview */
+.curve-wrap{display:none;margin-top:14px;background:rgba(255,255,255,.02);border:.5px solid rgba(40,183,157,.18);border-radius:13px;overflow:hidden;animation:fadeUp .3s ease both}
+.curve-wrap.visible{display:block}
+.curve-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--bdr)}
+.curve-title{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:6px}
+.curve-badge{font-family:var(--display);font-size:16px;letter-spacing:.04em;color:var(--gold)}
+.curve-chart-wrap{padding:16px 16px 8px;height:180px}
+.curve-keypoints{display:flex;justify-content:space-around;padding:10px 16px;border-top:.5px solid var(--bdr);border-bottom:.5px solid var(--bdr)}
+.ck{text-align:center}
+.ck-qty{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.ck-price{font-family:var(--display);font-size:20px;letter-spacing:.02em;color:var(--text)}
+.ck-price span{font-size:11px;color:var(--gold)}
+.curve-note{padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--dim);display:flex;align-items:center;gap:6px}
+/* AI search button */
+.evt-name-wrap{display:flex;gap:8px;align-items:stretch}
+.evt-name-wrap .inp{flex:1}
+.ai-search-btn{flex-shrink:0;background:linear-gradient(135deg,rgba(179,84,241,.2),rgba(255,27,154,.15));border:.5px solid rgba(179,84,241,.4);border-radius:10px;padding:0 16px;font-family:var(--display);font-size:14px;letter-spacing:.06em;color:var(--violet);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .18s;white-space:nowrap}
+.ai-search-btn:hover{background:linear-gradient(135deg,rgba(179,84,241,.32),rgba(255,27,154,.24));border-color:rgba(179,84,241,.7);color:#fff;transform:translateY(-1px)}
+.ai-search-btn:active{transform:scale(.97)}
+.ai-search-btn.loading{pointer-events:none;opacity:.7}
+.ai-search-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ai-spinner{width:13px;height:13px;border:1.5px solid rgba(179,84,241,.3);border-top-color:var(--violet);border-radius:50%;animation:spin .6s linear infinite}
+.ai-result-strip{display:none;margin-top:8px;background:linear-gradient(135deg,rgba(179,84,241,.08),rgba(255,27,154,.06));border:.5px solid rgba(179,84,241,.2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--muted);font-family:var(--mono);line-height:1.6}
+.ai-result-strip.show{display:block;animation:fadeUp .25s ease both}
+.ai-result-strip strong{color:var(--violet)}
+.ai-result-strip .ai-err{color:var(--pink)}
+.gen-btn{width:100%;background:linear-gradient(135deg,#b8f0e8 0%,#ffffff 12%,#40c0a8 28%,#28B79D 44%,#20a888 56%,#60c8b0 70%,#ffffff 84%,#a8e8e0 100%);background-size:250% 250%;animation:chrome-shift 3s ease infinite;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);font-family:var(--display);font-size:22px;letter-spacing:.06em;padding:16px 24px;border-radius:14px;border:1.5px solid rgba(255,255,255,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;box-shadow:0 6px 24px rgba(40,183,157,.4),inset 0 1px 0 rgba(255,255,255,.3);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.gen-btn:hover{background:var(--gold);color:var(--d0)}.gen-btn:active{transform:scale(.98)}
+.gen-btn.loading{opacity:.7;pointer-events:none}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.gen-btn.loading .spinner{display:block}
+/* Result */
+.result-card{background:linear-gradient(135deg,rgba(40,183,157,.07),rgba(179,84,241,.06));border:1px solid rgba(40,183,157,.2);border-radius:16px;padding:20px 22px;margin-top:16px;display:none;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;inset:-1px;border-radius:17px;background:conic-gradient(from var(--angle),#28B79D,#B354F1,#FFD166,#28B79D);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;-webkit-mask-composite:xor;padding:1px;animation:spin-border 3s linear infinite;pointer-events:none}
+.rc-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(40,183,157,.6);margin-bottom:8px}
+.rc-title{font-family:var(--display);font-size:22px;letter-spacing:.03em;color:var(--green);margin-bottom:12px}
+.link-box{background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;font-family:var(--mono);font-size:12px;color:var(--text);word-break:break-all;margin-bottom:12px;line-height:1.5;cursor:text}
+.rc-btns{display:flex;gap:8px;flex-wrap:wrap}
+.rc-btn{padding:10px 18px;border-radius:9px;font-family:var(--display);font-size:16px;letter-spacing:.05em;cursor:pointer;border:none;transition:all .18s;display:flex;align-items:center;gap:7px}
+.btn-copy{background:var(--green);color:var(--d0)}
+.btn-copy:hover{background:#fff}
+.btn-open{background:rgba(179,84,241,.15);color:var(--violet);border:.5px solid rgba(179,84,241,.3)}
+.btn-open:hover{background:rgba(179,84,241,.25)}
+.btn-dash{background:rgba(255,209,102,.1);color:var(--gold);border:.5px solid rgba(255,209,102,.2)}
+.btn-dash:hover{background:rgba(255,209,102,.18)}
+.copied-msg{font-family:var(--mono);font-size:11px;color:var(--green);display:none;align-items:center;gap:5px}
+.copied-msg.show{display:flex}
+@media(max-width:560px){.row2{grid-template-columns:1fr}.pricing-tiers{grid-template-columns:1fr 1fr}}
+.btn-press{transition:transform .12s linear,opacity .12s linear,filter .12s linear;cursor:pointer}
+.btn-press:active{transform:scale(.97);opacity:.88}
+.btn-press:hover{filter:brightness(1.1)}
+.chrome-sweep{position:relative;overflow:hidden}
+.chrome-sweep::after{content:'';position:absolute;top:-50%;left:-75%;width:55%;height:200%;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.55) 50%,transparent 75%);animation:liquid-sweep 2.4s ease-in-out infinite;pointer-events:none;border-radius:inherit}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-logo">ULTIMATE<span style="color:#FFD166">·</span>XP<span style="display:inline-block;width:1px;height:14px;background:#2e2e38;margin:0 10px;vertical-align:middle"></span><span style="color:#B354F1">BBSD</span></div>
+  <div class="tb-right">
+    <a class="tb-back" href="./events-table.html"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:4px"></i>All Events</a>
+    <a class="tb-back" href="./dashboard.html"><i data-lucide="arrow-left" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Dashboard</a>
+  </div>
+</div>
+<div class="main">
+  <div class="page-title"><span style="color:var(--gold)">Build</span> <span style="color:var(--violet)">Event</span><br><span style="color:var(--pink)">Quote Link</span></div>
+  <div class="page-sub">Internal tool · Fill in once, share the link with the client</div>
+
+  <!-- EVENT DETAILS -->
+  <div class="card">
+    <div class="card-title">Event Details</div>
+    <div class="card-sub">The client will see this on their quote page</div>
+    <div class="mb">
+      <label class="lbl">Event / Festival name *</label>
+      <div class="evt-name-wrap">
+        <input class="inp" id="evtName" placeholder="e.g. Splendour in the Grass 2025" required>
+        <button class="ai-search-btn" id="aiSearchBtn" onclick="aiSearchEvent()" title="Search the web for event details">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>
+          AI Search
+        </button>
+      </div>
+      <div class="ai-result-strip" id="aiResultStrip"></div>
+    </div>
+    <div class="row2 mb">
+      <div><label class="lbl">Start date *</label><input class="inp" type="date" id="evtStart" required></div>
+      <div><label class="lbl">End date *</label><input class="inp" type="date" id="evtEnd" required></div>
+    </div>
+    <div class="row2 mb">
+      <div>
+        <label class="lbl">Location / Venue</label>
+        <div class="loc-wrap">
+          <span class="loc-pin-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <input class="inp loc" id="evtLocation" placeholder="Search venue or address..." autocomplete="off">
+        </div>
+        <div class="loc-result" id="locResult"></div>
+      </div>
+      <div><label class="lbl">Event type</label><select class="sel" id="evtType">
+        <option>Music Festival</option><option>Folk / Cultural Festival</option><option>Food & Wine Festival</option>
+        <option>Corporate Event</option><option>New Year's Eve</option><option>Private Festival</option><option>Other</option>
+      </select></div>
+    </div>
+    <div><label class="lbl">Client contact name (optional)</label><input class="inp" id="evtContact" placeholder="e.g. Sarah Johnson — Festival Director"></div>
+  </div>
+
+  <!-- CUSTOM PRICING -->
+  <div class="card">
+    <div class="card-title">Custom Pricing Tiers</div>
+    <div class="card-sub">Set anchor points — the curve interpolates smoothly between them</div>
+    <div class="pricing-tiers">
+      <div class="pt">
+        <div class="pt-qty">100 headsets</div>
+        <div class="pt-inp-wrap"><span class="pt-dollar">$</span><input class="pt-price" id="p100" type="number" value="25" step="0.5" oninput="clearCurve()"></div>
+        <div class="pt-unit">per unit</div>
+      </div>
+      <div class="pt">
+        <div class="pt-qty">500 headsets</div>
+        <div class="pt-inp-wrap"><span class="pt-dollar">$</span><input class="pt-price" id="p500" type="number" value="20" step="0.5" oninput="clearCurve()"></div>
+        <div class="pt-unit">per unit</div>
+      </div>
+      <div class="pt">
+        <div class="pt-qty">1,000 headsets</div>
+        <div class="pt-inp-wrap"><span class="pt-dollar">$</span><input class="pt-price" id="p1000" type="number" value="15" step="0.5" oninput="clearCurve()"></div>
+        <div class="pt-unit">per unit</div>
+      </div>
+      <div class="pt">
+        <div class="pt-qty">2,000+ headsets</div>
+        <div class="pt-inp-wrap"><span class="pt-dollar">$</span><input class="pt-price" id="p2000" type="number" value="13" step="0.5" oninput="clearCurve()"></div>
+        <div class="pt-unit">per unit</div>
+      </div>
+    </div>
+
+    <button class="curve-btn" id="curveBtn" onclick="generateCurve()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Generate Price Curve
+    </button>
+
+    <!-- CURVE PREVIEW — hidden until generated -->
+    <div class="curve-wrap" id="curveWrap">
+      <div class="curve-header">
+        <div class="curve-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Price curve — this is what the client will see
+        </div>
+        <div class="curve-badge" id="curveBadge">—</div>
+      </div>
+      <div class="curve-chart-wrap"><canvas id="curveChart"></canvas></div>
+      <div class="curve-keypoints" id="curveKeypoints"></div>
+      <div class="curve-note">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Curve locked in — this pricing will be embedded in the client quote link. Edit the tiers and regenerate to change it.
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    <div class="card-title">Internal Notes</div>
+    <div class="card-sub">Not shown to client — for your reference in the events table</div>
+    <textarea class="inp ta" id="evtNotes" placeholder="e.g. Referred by Nathanael · expects 1,500–2,000 headsets · NYE slot available..."></textarea>
+  </div>
+
+  <button class="gen-btn" id="genBtn" onclick="generateLink()">
+    <div class="spinner"></div>
+    <span class="btn-txt"><i data-lucide="zap" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:6px"></i>Generate Client Quote Link</span>
+  </button>
+
+  <!-- RESULT -->
+  <div class="result-card" id="resultCard">
+    <div class="rc-label"><i data-lucide="check-circle" style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:4px"></i>Quote link created</div>
+    <div class="rc-title" id="rcTitle">—</div>
+    <div class="link-box" id="rcLink">—</div>
+    <div class="rc-btns">
+      <button class="rc-btn btn-copy" onclick="copyLink()"><i data-lucide="clipboard" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>Copy Link</button>
+      <button class="rc-btn btn-open" onclick="openLink()"><i data-lucide="external-link" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>Open Quote</button>
+      <button class="rc-btn btn-dash" onclick="window.location.href='./events-table.html'"><i data-lucide="bar-chart-2" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>View All Events</button>
+    </div>
+    <div class="copied-msg" id="copiedMsg"><i data-lucide="check" style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:4px"></i>Copied to clipboard</div>
+  </div>
+</div>
+
+<script>
+let generatedLink = '';
+
+async function generateLink() {
+  const name = document.getElementById('evtName').value.trim();
+  const start = document.getElementById('evtStart').value;
+  const end = document.getElementById('evtEnd').value;
+  if (!name || !start || !end) {
+    alert('Please fill in event name and dates.');
+    return;
+  }
+  const btn = document.getElementById('genBtn');
+  btn.classList.add('loading');
+
+  const payload = {
+    name,
+    start,
+    end,
+    location: document.getElementById('evtLocation').value,
+    type: document.getElementById('evtType').value,
+    contact: document.getElementById('evtContact').value,
+    notes: document.getElementById('evtNotes').value,
+    pricing: {
+      p100:  parseFloat(document.getElementById('p100').value) || 25,
+      p500:  parseFloat(document.getElementById('p500').value) || 20,
+      p1000: parseFloat(document.getElementById('p1000').value) || 15,
+      p2000: parseFloat(document.getElementById('p2000').value) || 13,
+    }
+  };
+
+  try {
+    const r = await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    generatedLink = data.url || (window.location.origin + '/woodford-quote-FINAL-p1.html?' + new URLSearchParams({n:payload.name,s:payload.start,e:payload.end,l:payload.location,p100:payload.pricing.p100,p500:payload.pricing.p500,p1000:payload.pricing.p1000,p2000:payload.pricing.p2000}).toString());
+    document.getElementById('rcTitle').textContent = name;
+    document.getElementById('rcLink').textContent = generatedLink;
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (e) {
+    // Fallback: build URL from params directly (works without backend)
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    const params = new URLSearchParams({
+      n: payload.name, s: payload.start, e: payload.end,
+      l: payload.location, t: payload.type, c: payload.contact,
+      p100: payload.pricing.p100, p500: payload.pricing.p500,
+      p1000: payload.pricing.p1000, p2000: payload.pricing.p2000
+    });
+    generatedLink = window.location.origin + '/woodford-quote-FINAL-p1.html?' + params.toString();
+    document.getElementById('rcTitle').textContent = payload.name;
+    document.getElementById('rcLink').textContent = generatedLink;
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  btn.classList.remove('loading');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(generatedLink).then(() => {
+    const msg = document.getElementById('copiedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2500);
+  });
+}
+function openLink() { window.open(generatedLink, '_blank'); }
+
+// Defaults
+document.getElementById('evtStart').value = new Date().toISOString().split('T')[0];
+const end = new Date(); end.setDate(end.getDate() + 4);
+document.getElementById('evtEnd').value = end.toISOString().split('T')[0];
+</script>
+
+<script>
+// ── CATMULL-ROM SPLINE PRICE CURVE ──────────────────────────────────────
+// Generates a mathematically smooth arc through all 4 anchor points
+// using Catmull-Rom spline interpolation (no kinks, beautiful arc)
+
+function catmullRom(t, p0, p1, p2, p3) {
+  const t2 = t * t, t3 = t2 * t;
+  return 0.5 * (
+    (2 * p1) +
+    (-p0 + p2) * t +
+    (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+    (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+  );
+}
+
+function buildSplinePts(p100, p500, p1000, p2000) {
+  // Control points: [x, y]
+  const anchors = [
+    [100,  p100],
+    [500,  p500],
+    [1000, p1000],
+    [2000, p2000],
+  ];
+  // Add phantom boundary points so the curve starts/ends smoothly
+  const first  = [anchors[0][0]  - (anchors[1][0] - anchors[0][0]),   anchors[0][1]  + (anchors[0][1]  - anchors[1][1])];
+  const last   = [anchors[3][0]  + (anchors[3][0] - anchors[2][0]),   anchors[3][1]  + (anchors[3][1]  - anchors[2][1])];
+  const pts    = [first, ...anchors, last];
+
+  const result = [];
+  const STEPS  = 80; // per segment → very smooth
+
+  for (let seg = 1; seg <= anchors.length - 1; seg++) {
+    const p0 = pts[seg - 1], p1 = pts[seg], p2 = pts[seg + 1], p3 = pts[seg + 2];
+    for (let i = 0; i < STEPS; i++) {
+      const t = i / STEPS;
+      const x = catmullRom(t, p0[0], p1[0], p2[0], p3[0]);
+      const y = catmullRom(t, p0[1], p1[1], p2[1], p3[1]);
+      if (x >= 100 && x <= 2000) result.push({ x: Math.round(x), y: Math.round(y * 100) / 100 });
+    }
+  }
+  // Always include the exact anchor points
+  anchors.forEach(([x, y]) => result.push({ x, y }));
+  result.sort((a, b) => a.x - b.x);
+  return result;
+}
+
+let curveChart = null;
+
+function clearCurve() {
+  document.getElementById('curveWrap').classList.remove('visible');
+  const btn = document.getElementById('curveBtn');
+  btn.classList.remove('locked');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Generate Price Curve`;
+}
+
+function generateCurve() {
+  const p100  = parseFloat(document.getElementById('p100').value)  || 25;
+  const p500  = parseFloat(document.getElementById('p500').value)  || 20;
+  const p1000 = parseFloat(document.getElementById('p1000').value) || 15;
+  const p2000 = parseFloat(document.getElementById('p2000').value) || 13;
+
+  const pts = buildSplinePts(p100, p500, p1000, p2000);
+
+  // Show wrap
+  const wrap = document.getElementById('curveWrap');
+  wrap.classList.add('visible');
+
+  document.getElementById('curveBadge').textContent = `$${p2000.toFixed(2)} – $${p100.toFixed(2)} / headset`;
+
+  // Key points
+  const kps = [
+    { qty: '100', price: p100 },
+    { qty: '500', price: p500 },
+    { qty: '1,000', price: p1000 },
+    { qty: '2,000+', price: p2000 },
+  ];
+  document.getElementById('curveKeypoints').innerHTML = kps.map(k => `
+    <div class="ck">
+      <div class="ck-qty">${k.qty} hs</div>
+      <div class="ck-price"><span>$</span>${k.price.toFixed(2)}</div>
+    </div>`).join('');
+
+  // Build chart
+  if (curveChart) curveChart.destroy();
+  const ctx = document.getElementById('curveChart').getContext('2d');
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, 160);
+  grad.addColorStop(0, 'rgba(179,84,241,.22)');
+  grad.addColorStop(1, 'rgba(179,84,241,.01)');
+
+  curveChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          // Smooth spline line
+          data: pts,
+          borderColor: '#B354F1',
+          backgroundColor: grad,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          fill: true,
+          tension: 0,          // tension=0 because we pre-computed smooth points
+          cubicInterpolationMode: 'default',
+          spanGaps: true,
+        },
+        {
+          // Gold anchor dots
+          data: [
+            { x: 100,  y: p100  },
+            { x: 500,  y: p500  },
+            { x: 1000, y: p1000 },
+            { x: 2000, y: p2000 },
+          ],
+          borderColor: '#FFD166',
+          backgroundColor: '#FFD166',
+          pointRadius: 8,
+          pointHoverRadius: 11,
+          pointBorderWidth: 2,
+          pointBorderColor: 'rgba(255,255,255,.6)',
+          showLine: false,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      scales: {
+        x: {
+          type: 'linear', min: 100, max: 2000,
+          ticks: {
+            values: [100, 500, 1000, 1500, 2000],
+            callback: v => v === 100 ? '100' : v.toLocaleString(),
+            font: { size: 9 }, color: 'rgba(255,255,255,.3)',
+          },
+          grid: { color: 'rgba(255,255,255,.05)' }, border: { display: false },
+        },
+        y: {
+          min: Math.max(0, p2000 - 2),
+          max: p100 + 3,
+          ticks: { callback: v => '$' + v.toFixed(0), font: { size: 9 }, color: 'rgba(255,255,255,.3)' },
+          grid: { color: 'rgba(255,255,255,.05)' }, border: { display: false },
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: i => i.datasetIndex === 1,
+          callbacks: {
+            title: () => '',
+            label: i => `${i.parsed.x.toLocaleString()} headsets · $${i.parsed.y.toFixed(2)}/unit`,
+          },
+          backgroundColor: '#1a1a2a', bodyColor: '#FFD166',
+          padding: 9, cornerRadius: 7, displayColors: false,
+        }
+      }
+    }
+  });
+
+  // Lock button
+  const btn = document.getElementById('curveBtn');
+  btn.classList.add('locked');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Curve Locked — Edit tiers to regenerate`;
+
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── AI EVENT SEARCH ──────────────────────────────────────────────────────
+// Calls Claude via Anthropic API with web_search to find event details
+// and auto-fills the form fields
+
+async function aiSearchEvent() {
+  const name = document.getElementById('evtName').value.trim();
+  if (!name || name.length < 3) {
+    document.getElementById('evtName').focus();
+    document.getElementById('evtName').placeholder = 'Type the event name first...';
+    return;
+  }
+
+  const btn     = document.getElementById('aiSearchBtn');
+  const strip   = document.getElementById('aiResultStrip');
+  btn.classList.add('loading');
+  btn.innerHTML = `<div class="ai-spinner"></div> Searching...`;
+  strip.className = 'ai-result-strip show';
+  strip.innerHTML = `<span style="color:var(--violet)">Searching the web for <strong>${name}</strong>...</span>`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: `You are a festival/event research assistant. The user will give you an event name.
+Search the web and return ONLY a valid JSON object (no markdown, no explanation) with these exact fields:
+{
+  "name": "Official full event name",
+  "start": "YYYY-MM-DD",
+  "end": "YYYY-MM-DD",
+  "location": "Venue name, City, State",
+  "type": "Music Festival|Folk / Cultural Festival|Food & Wine Festival|Corporate Event|New Year's Eve|Private Festival|Other",
+  "contact": "Festival Director name if found, or empty string",
+  "summary": "One sentence describing the event for internal notes",
+  "confidence": "high|medium|low"
+}
+If you cannot find specific dates use your best estimate and set confidence to "low".
+Return ONLY the JSON object, nothing else.`,
+        messages: [{ role: 'user', content: `Find details for this event: ${name}` }]
+      })
+    });
+
+    const data = await response.json();
+
+    // Extract text from response (handle tool_use blocks)
+    const textBlocks = (data.content || []).filter(b => b.type === 'text');
+    const rawText = textBlocks.map(b => b.text).join('');
+
+    // Parse JSON — strip any accidental markdown fences
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    const evt = JSON.parse(clean);
+
+    // Fill form fields
+    if (evt.name)    document.getElementById('evtName').value    = evt.name;
+    if (evt.start)   document.getElementById('evtStart').value   = evt.start;
+    if (evt.end)     document.getElementById('evtEnd').value     = evt.end;
+    if (evt.location) document.getElementById('evtLocation').value = evt.location;
+    if (evt.contact) document.getElementById('evtContact').value = evt.contact;
+    if (evt.type) {
+      const sel = document.getElementById('evtType');
+      for (const opt of sel.options) {
+        if (opt.value === evt.type || opt.text === evt.type) { sel.value = opt.value; break; }
+      }
+    }
+    if (evt.summary) {
+      const notes = document.getElementById('evtNotes');
+      notes.value = (notes.value ? notes.value + '\n' : '') + evt.summary;
+    }
+
+    strip.innerHTML = `
+      <strong>Found:</strong> ${evt.name || name}<br>
+      ${evt.start ? `Dates: ${evt.start} → ${evt.end}` : ''} ${evt.location ? '· ' + evt.location : ''}<br>
+      <span style="color:var(--${evt.confidence === 'high' ? 'green' : evt.confidence === 'medium' ? 'gold' : 'pink'})">
+        Confidence: ${evt.confidence || '—'}
+      </span> · Check dates and confirm before sending to client`;
+
+  } catch (err) {
+    console.error('AI search error:', err);
+    strip.innerHTML = `<span class="ai-err">Search failed — check your API key or fill in manually. (${err.message})</span>`;
+  }
+
+  btn.classList.remove('loading');
+  btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg> AI Search`;
+}
+
+
+// Set your key here or via NEXT_PUBLIC_GOOGLE_MAPS_KEY env var
+window.GMAPS_KEY = '';
+
+function initMapsEB() {
+  const key = window.GMAPS_KEY;
+  if (!key) {
+    // No key — plain text fallback, still functional
+    document.getElementById('evtLocation').addEventListener('input', function() {
+      const res = document.getElementById('locResult');
+      if (this.value.length > 2) { res.style.display = 'block'; res.textContent = this.value; }
+      else res.style.display = 'none';
+    });
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=initACEB`;
+  s.async = true;
+  document.head.appendChild(s);
+}
+
+window.initACEB = function() {
+  const input = document.getElementById('evtLocation');
+  const ac = new google.maps.places.Autocomplete(input, {
+    types: ['establishment', 'geocode'],
+    fields: ['name', 'formatted_address', 'geometry']
+  });
+  ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
+    if (place.formatted_address) {
+      const res = document.getElementById('locResult');
+      res.style.display = 'block';
+      res.textContent = (place.name ? place.name + '  ·  ' : '') + place.formatted_address;
+      // Write full address back to input value for form submission
+      input.value = (place.name ? place.name + ', ' : '') + place.formatted_address;
+    }
+  });
+};
+
+window.addEventListener('load', initMapsEB);
+</script>
+<script>document.addEventListener("DOMContentLoaded",()=>lucide.createIcons());</script>
+</body>
+</html>
