@@ -387,11 +387,17 @@ async function generateQuote() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: p.name, url })
     });
-    if (sr.ok) {
-      const sd = await sr.json();
-      if (sd.shortUrl) displayUrl = sd.shortUrl;
+    const sd = await sr.json();
+    if (sr.ok && sd.shortUrl) {
+      displayUrl = sd.shortUrl;
+    } else {
+      // Short link failed — show full URL with a note
+      console.warn('Short link failed:', sd.error || sr.status);
+      // Still show full URL — works fine, just long
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('Short link error:', e.message);
+  }
 
   document.getElementById("resultName").textContent = p.name;
   document.getElementById("resultUrl").textContent  = displayUrl;
