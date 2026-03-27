@@ -703,13 +703,84 @@ function downloadAnalyticsPDF(){
       </div>
     </div>
 
+    <!-- Financials section — pulled from profit calculator current state -->
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.35);font-family:monospace;margin-bottom:12px">Profit Calculator — Current Estimate</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Revenue</div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:12px">
+            <span style="color:rgba(0,0,0,.5)">Headset hire</span>
+            <span style="font-family:monospace;color:#0a8050">${fmt_revenue}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:12px">
+            <span style="color:rgba(0,0,0,.5)">Booking fee</span>
+            <span style="font-family:monospace;color:#0a8050">$2,000</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Costs</div>
+          <div id="pdfCostRows_placeholder"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:2px solid rgba(0,0,0,.1)">
+        <div style="font-size:14px;font-weight:700;color:rgba(0,0,0,.7)">Net Profit (ex-GST)</div>
+        <div style="font-size:28px;font-weight:800;color:${profit_color}">${fmt_net}</div>
+      </div>
+      <div style="font-family:monospace;font-size:10px;color:rgba(0,0,0,.4);margin-top:4px">Margin: ${margin}% · ${fmt_hs} headsets × ${nights}n × $${rate}/hs</div>
+    </div>
+
     <div style="text-align:center;padding-top:16px;border-top:1px solid rgba(0,0,0,.08)">
       <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:rgba(0,0,0,.3);text-transform:uppercase">Ultimate Experiences · Byron Bay Silent Disco · byronbaysilentdisco.com</div>
     </div>
   </div>`;
 
-  doc.style.display='block';
-  setTimeout(()=>{ window.print(); setTimeout(()=>{ doc.style.display='none'; },500); },100);
+  // Read current profit calc values
+  const pcHS    = parseInt(document.getElementById('pcHS')?.value) || 1000;
+  const pcDays  = parseInt(document.getElementById('pcDays')?.value) || 1;
+  const pcRate  = parseFloat(document.getElementById('pcRate')?.value) || 15;
+  const djRate  = parseFloat(document.querySelector('[data-key=djRate]')?.value) || 500;
+  const staffRt = parseFloat(document.querySelector('[data-key=staffRate]')?.value) || 250;
+  const mgrRt   = parseFloat(document.querySelector('[data-key=mgrRate]')?.value) || 400;
+  const hsCost  = parseFloat(document.querySelector('[data-key=hsCost]')?.value) || 5;
+  const fuel    = parseFloat(document.querySelector('[data-key=fuel]')?.value) || 200;
+  const misc    = parseFloat(document.querySelector('[data-key=misc]')?.value) || 300;
+  const sc      = Math.min(8, pcHS <= 500 ? 4 : 4 + Math.ceil((pcHS-500)/200));
+  const revenue = pcHS * pcDays * pcRate + 2000;
+  const costs   = (djRate*3*pcDays) + (staffRt*sc*pcDays) + (mgrRt*pcDays) + (hsCost*pcHS*pcDays) + fuel + misc;
+  const net     = revenue - costs;
+  const margin  = revenue > 0 ? Math.round((net/revenue)*100) : 0;
+  const fmtN    = n => '$'+Math.abs(Math.round(n)).toLocaleString('en-AU');
+
+  // Replace financial placeholders in doc HTML
+  let docHTML = doc.innerHTML;
+  docHTML = docHTML.replace('${fmt_revenue}', fmtN(pcHS*pcDays*pcRate));
+  docHTML = docHTML.replace('${profit_color}', net >= 0 ? '#0a8050' : '#CC0077');
+  docHTML = docHTML.replace('${fmt_net}', (net < 0 ? '−' : '') + fmtN(net));
+  docHTML = docHTML.replace('${margin}', margin);
+  docHTML = docHTML.replace('${fmt_hs}', pcHS.toLocaleString('en-AU'));
+  docHTML = docHTML.replace('${nights}', pcDays);
+  docHTML = docHTML.replace('${rate}', pcRate);
+  const costRows = [
+    [`DJs (3 × $${djRate} × ${pcDays}n)`, fmtN(djRate*3*pcDays)],
+    [`Staff (${sc} × $${staffRt} × ${pcDays}n)`, fmtN(staffRt*sc*pcDays)],
+    [`Manager × ${pcDays}n`, fmtN(mgrRt*pcDays)],
+    [`Headset hire ($${hsCost}/hs)`, fmtN(hsCost*pcHS*pcDays)],
+    ['Fuel / transport', fmtN(fuel)],
+    ['Misc / contingency', fmtN(misc)],
+  ].map(([l,v]) => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:12px"><span style="color:rgba(0,0,0,.5)">${l}</span><span style="font-family:monospace;color:#CC0077">−${v}</span></div>`).join('');
+  docHTML = docHTML.replace('<div id="pdfCostRows_placeholder"></div>', costRows);
+
+  // Blob PDF
+  const printCSS = '*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f4}@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}';
+  const toolbar  = `<div style="padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10"><button onclick="window.print()" style="padding:9px 22px;background:#B354F1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">⬇ Save as PDF</button><span style="font-size:12px;color:#666">File → Print → Save as PDF</span></div>`;
+  const html = \`<!DOCTYPE html><html><head><title>Analytics — \${e.name}</title><style>\${printCSS}</style></head><body>\${toolbar}\${docHTML}</body></html>\`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = blobUrl; anchor.target = '_blank'; anchor.rel = 'noopener';
+  document.body.appendChild(anchor); anchor.click();
+  setTimeout(() => { document.body.removeChild(anchor); URL.revokeObjectURL(blobUrl); }, 1000);
 }
 
 
