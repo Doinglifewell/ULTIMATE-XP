@@ -354,44 +354,44 @@ function initPlacesAutocomplete() {
   });
 }
 // Load Maps API key from server (keeps key out of client HTML)
-fetch('/api/maps-key').then(r=>r.text()).then(eval).catch(function(){
-  console.warn('Google Places not configured — location fields work as plain text');
-});
 </script>
+
+
 
 <script>
-async function initGooglePlaces() {
-  try {
-    const r = await fetch("/api/maps-key");
-    if (!r.ok) return;
-    const { key } = await r.json();
-    if (!key) return;
-    await new Promise((res, rej) => {
-      const s = document.createElement("script");
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_gmapsReady`;
-      s.onerror = rej;
-      window._gmapsReady = res;
-      document.head.appendChild(s);
+/* ── Google Places Autocomplete ── */
+let _pL=false,_pLing=false,_pQ=[];
+async function loadPlaces(){
+  if(_pL)return true;
+  if(_pLing)return new Promise(r=>_pQ.push(r));
+  _pLing=true;
+  try{
+    const j=await fetch("/api/maps-key").then(r=>r.json());
+    if(!j.key)return false;
+    await new Promise((res,rej)=>{
+      const s=document.createElement("script");
+      s.src=`https://maps.googleapis.com/maps/api/js?key=${j.key}&libraries=places&callback=initPlacesReady`;
+      s.async=true; s.onerror=rej; document.head.appendChild(s);
+      window.initPlacesReady=()=>{_pL=true;_pLing=false;_pQ.forEach(r=>r(true));_pQ=[];res();};
     });
-    document.querySelectorAll("[data-places]").forEach(inp => {
-      const ac = new google.maps.places.Autocomplete(inp, {
-        componentRestrictions: { country: "au" },
-        fields: ["formatted_address", "name", "geometry"],
-        types: ["establishment", "geocode"]
-      });
-      ac.addListener("place_changed", () => {
-        const p = ac.getPlace();
-        const val = p.name && p.formatted_address ? `${p.name}, ${p.formatted_address}` : (p.formatted_address || p.name || "");
-        inp.value = val;
-        inp.dispatchEvent(new Event("input", { bubbles: true }));
-        inp.dispatchEvent(new Event("change", { bubbles: true }));
-      });
-      inp.setAttribute("autocomplete", "off");
-    });
-  } catch(e) { console.warn("Google Places:", e.message); }
+    const st=document.createElement("style");
+    st.textContent=`.pac-container{background:#1c1c22!important;border:1px solid #3a3a4a!important;border-radius:10px!important;margin-top:4px!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important;z-index:99999!important}.pac-item{padding:8px 14px!important;color:#9999b0!important;font-size:13px!important;cursor:pointer!important;border-top:1px solid #2e2e38!important}.pac-item:hover,.pac-item-selected{background:rgba(179,84,241,.12)!important}.pac-item-query{color:#fff!important;font-weight:600!important}.pac-icon{display:none!important}.pac-matched{color:#B354F1!important}`;
+    document.head.appendChild(st);
+    return true;
+  }catch(e){return false;}
 }
-document.addEventListener("DOMContentLoaded", initGooglePlaces);
+async function placesOn(id,cb){
+  if(!await loadPlaces())return;
+  const el=document.getElementById(id);
+  if(!el||el._pi)return; el._pi=true;
+  const ac=new google.maps.places.Autocomplete(el,{fields:["formatted_address","name"]});
+  ac.addListener("place_changed",()=>{
+    const p=ac.getPlace();
+    el.value=p.name?p.name+", "+p.formatted_address:p.formatted_address;
+    if(cb)cb(el.value,p);
+  });
+}
 </script>
-
+<script>window.addEventListener("load",()=>placesOn("evtLocation"));</script>
 </body>
 </html>
