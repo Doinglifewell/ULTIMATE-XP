@@ -217,11 +217,49 @@ hr{border:none;border-top:.5px solid var(--bdr);margin:28px 0}
 
   <!-- Staff Roles (internal only) -->
   <div class="field" style="margin-bottom:0">
-    <label style="display:flex;align-items:center;justify-content:space-between">
-      <span>Staff roles &amp; day rates <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;font-family:var(--mono)">Internal only</span></span>
-      <button type="button" onclick="addRoleRow()" style="background:none;border:.5px dashed rgba(179,84,241,.4);border-radius:6px;padding:3px 10px;font-family:var(--mono);font-size:10px;color:var(--violet);cursor:pointer;transition:all .18s">+ Add role</button>
-    </label>
-    <div id="rolesContainer" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
+    <label>Staff day rates <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;font-family:var(--mono)">Internal only · headcount auto-scales with headsets</span></label>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="rolesGrid">
+
+      <div style="background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">DJs</div>
+        <div style="font-family:var(--display);font-size:13px;color:var(--violet);margin-bottom:8px" id="dj-count-label">3 DJs</div>
+        <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:7px 10px">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">$</span>
+          <input type="number" id="rate_dj" value="500" oninput="updateStaffCalc()"
+            style="width:100%;background:none;border:none;font-family:var(--mono);font-size:14px;color:var(--text);outline:none">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap">/day each</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:6px" id="dj-total-label">= $1,500 / night</div>
+      </div>
+
+      <div style="background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Event Manager</div>
+        <div style="font-family:var(--display);font-size:13px;color:var(--gold);margin-bottom:8px">1 Manager</div>
+        <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:7px 10px">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">$</span>
+          <input type="number" id="rate_mgr" value="450" oninput="updateStaffCalc()"
+            style="width:100%;background:none;border:none;font-family:var(--mono);font-size:14px;color:var(--text);outline:none">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap">/day</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:6px" id="mgr-total-label">= $450 / night</div>
+      </div>
+
+      <div style="background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Event Staff</div>
+        <div style="font-family:var(--display);font-size:13px;color:var(--green);margin-bottom:8px" id="staff-count-label">4 Staff</div>
+        <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:7px 10px">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">$</span>
+          <input type="number" id="rate_staff" value="250" oninput="updateStaffCalc()"
+            style="width:100%;background:none;border:none;font-family:var(--mono);font-size:14px;color:var(--text);outline:none">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap">/day each</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:6px" id="staff-total-label">= $1,000 / night</div>
+      </div>
+
+    </div>
+    <div style="margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(255,255,255,.03);border:.5px solid var(--bdr);border-radius:8px;padding:8px 12px" id="staff-summary">
+      Staff scales with headsets · enter headset count above to see totals
+    </div>
   </div>
 
   <!-- Generate -->
@@ -310,21 +348,17 @@ async function generateQuote() {
   };
   // Build quote URL directly — no API call needed
   const QUOTES_BASE = 'https://quotes.byronbaysilentdisco.com';
-  // Extract staff day rates from roles for P2
-  const roles = window._roles || [];
-  const djRole    = roles.find(r => r.role.toLowerCase().includes('dj'));
-  const staffRole = roles.find(r => r.role.toLowerCase().includes('staff'));
-  const mgrRole   = roles.find(r => r.role.toLowerCase().includes('manager'));
+  // Read fixed staff rates directly from inputs
+  const dr_dj    = parseInt(document.getElementById('rate_dj')?.value)    || 500;
+  const dr_staff = parseInt(document.getElementById('rate_staff')?.value) || 250;
+  const dr_mgr   = parseInt(document.getElementById('rate_mgr')?.value)   || 450;
 
   const params = new URLSearchParams({
     n: p.name, s: p.start, e: p.end, l: p.location,
     t: p.type, c: p.contact,
     p100: p.pricing.p100, p500: p.pricing.p500,
     p1000: p.pricing.p1000, p2000: p.pricing.p2000,
-    // Staff day rates (internal, passed to P2 cost calc)
-    dr_dj:    djRole    ? djRole.rate    : 500,
-    dr_staff: staffRole ? staffRole.rate : 250,
-    dr_mgr:   mgrRole   ? mgrRole.rate   : 450,
+    dr_dj, dr_staff, dr_mgr,
   });
   const url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
 
@@ -371,42 +405,53 @@ async function generateQuote() {
 }
 
 // ── Default roles ──
-const DEFAULT_ROLES = [
-  { role: 'Event Manager',    rate: 450 },
-  { role: 'DJ (×3)',          rate: 500 },
-  { role: 'Event Staff',      rate: 250 },
-];
-
-function renderRoles() {
-  const container = document.getElementById('rolesContainer');
-  if (!container) return;
-  const roles = window._roles || [];
-  container.innerHTML = roles.map((r, i) => `
-    <div style="display:flex;gap:8px;align-items:center">
-      <input value="${r.role}" oninput="window._roles[${i}].role=this.value"
-        style="flex:1;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--text);outline:none;font-family:var(--font)"
-        placeholder="Role title">
-      <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:8px 11px">
-        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">$</span>
-        <input type="number" value="${r.rate}" oninput="window._roles[${i}].rate=parseInt(this.value)||0"
-          style="width:70px;background:none;border:none;font-family:var(--mono);font-size:13px;color:var(--text);outline:none" placeholder="450">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">/day</span>
-      </div>
-      <button onclick="window._roles.splice(${i},1);renderRoles()"
-        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;line-height:1;transition:color .15s"
-        onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='var(--muted)'">×</button>
-    </div>`).join('');
+// Staff scale formula: 4 for ≤500 hs, +1 per 200 after, max 8
+function staffCount(hs) {
+  return Math.min(8, hs <= 500 ? 4 : 4 + Math.ceil((hs - 500) / 200));
 }
 
-function addRoleRow() {
-  if (!window._roles) window._roles = [...DEFAULT_ROLES];
-  window._roles.push({ role: '', rate: 0 });
-  renderRoles();
+function updateStaffCalc() {
+  const hs = parseInt(document.getElementById('p500')?.value) || 500;
+  // Use the headset slider value if available, else fall back to 500
+  const hsVal = window._lastHS || hs;
+  const djRate    = parseInt(document.getElementById('rate_dj')?.value)    || 500;
+  const mgrRate   = parseInt(document.getElementById('rate_mgr')?.value)   || 450;
+  const staffRate = parseInt(document.getElementById('rate_staff')?.value) || 250;
+  const sc = staffCount(hsVal);
+
+  const djEl    = document.getElementById('dj-count-label');
+  const staffEl = document.getElementById('staff-count-label');
+  const djTot   = document.getElementById('dj-total-label');
+  const mgrTot  = document.getElementById('mgr-total-label');
+  const staffTot= document.getElementById('staff-total-label');
+  const summary = document.getElementById('staff-summary');
+
+  if(djEl)    djEl.textContent    = '3 DJs';
+  if(staffEl) staffEl.textContent = sc + ' Staff';
+  if(djTot)   djTot.textContent   = '= $' + (3 * djRate).toLocaleString('en-AU') + ' / night';
+  if(mgrTot)  mgrTot.textContent  = '= $' + mgrRate.toLocaleString('en-AU') + ' / night';
+  if(staffTot)staffTot.textContent= '= $' + (sc * staffRate).toLocaleString('en-AU') + ' / night';
+
+  const totalNight = 3*djRate + mgrRate + sc*staffRate;
+  if(summary) summary.textContent =
+    `${hsVal.toLocaleString()} headsets → ${sc} floor staff + 1 manager + 3 DJs · $${totalNight.toLocaleString('en-AU')} total staff cost / night`;
+
+  // Keep window._roles in sync for URL params
+  window._roles = [
+    { role: 'DJ (×3)',       rate: djRate    },
+    { role: 'Event Manager', rate: mgrRate   },
+    { role: 'Event Staff',   rate: staffRate },
+  ];
 }
 
-// Init default roles
-window._roles = [...DEFAULT_ROLES];
-setTimeout(renderRoles, 0);
+// Hook into headset pricing inputs to update staff count live
+setTimeout(() => {
+  // Watch p-tier inputs for hs context (use p500 as proxy)
+  document.querySelectorAll('.price-inp').forEach(inp => {
+    inp.addEventListener('input', updateStaffCalc);
+  });
+  updateStaffCalc();
+}, 100);
 
 function copyUrl() {
   navigator.clipboard.writeText(document.getElementById('resultUrl').textContent||window._quoteUrl||'').then(() => {
