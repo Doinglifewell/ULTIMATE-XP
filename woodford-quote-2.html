@@ -470,9 +470,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     </div>
 
     <!-- Expert Mode toggle -->
-    <div id="expertModeRow" style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 0;padding:12px 14px;background:rgba(179,84,241,.06);border:1px solid rgba(179,84,241,.18);border-radius:10px;cursor:pointer;transition:all .2s" onclick="toggleExpertMode()">
+    <div id="expertModeRow" style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 0;padding:12px 16px;background:linear-gradient(135deg,rgba(179,84,241,.12),rgba(255,27,154,.06));border:1px solid rgba(179,84,241,.4);border-radius:12px;cursor:pointer;transition:all .22s;box-shadow:0 0 18px rgba(179,84,241,.18),inset 0 1px 0 rgba(255,255,255,.06)" onclick="toggleExpertMode()" onmouseover="this.style.boxShadow='0 0 28px rgba(179,84,241,.35),inset 0 1px 0 rgba(255,255,255,.08)';this.style.borderColor='rgba(179,84,241,.7)'" onmouseout="this.style.boxShadow='0 0 18px rgba(179,84,241,.18),inset 0 1px 0 rgba(255,255,255,.06)';this.style.borderColor='rgba(179,84,241,.4)'">
       <div>
-        <div style="font-size:12px;font-weight:700;color:var(--violet)">⚡ Expert Mode</div>
+        <div style="font-size:13px;font-weight:800;color:var(--violet);letter-spacing:.02em;text-shadow:0 0 12px rgba(179,84,241,.5)">⚡ Expert Mode</div>
         <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px">Set a different price per night — e.g. $40 NYE, $20 other nights</div>
       </div>
       <div id="expertToggle" style="width:42px;height:24px;border-radius:12px;background:#2e2e38;position:relative;transition:background .2s;flex-shrink:0">
