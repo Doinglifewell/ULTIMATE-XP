@@ -783,7 +783,6 @@ window.addEventListener('load', function(){
     }).catch(function(){});
   }, 300);
 });
-</script>
 
 <!-- SELF QUOTE MODAL -->
 <div class="sq-overlay" id="sqOverlay" onclick="closeSQOutside(event)">
@@ -816,7 +815,7 @@ function openSelfQuoteModal(){ document.getElementById('sqOverlay').classList.ad
 function closeSelfQuoteModal(){ document.getElementById('sqOverlay').classList.remove('open'); }
 function closeSQOutside(e){ if(e.target===document.getElementById('sqOverlay')) closeSelfQuoteModal(); }
 function goPartyQuote(){ closeSelfQuoteModal(); window.location.href='./quote-party.html'; }
-function goEventQuote(){ closeSelfQuoteModal(); window.location.href='./event-builder.html'; }
+function goEventQuote(){ closeSelfQuoteModal(); window.location.href='./self-quote.html'; }
 </script>
 
 <div id="pdf-doc" style="display:none"></div>
