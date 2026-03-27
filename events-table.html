@@ -790,17 +790,15 @@ function addCostRow(){
 // Backwards compat alias
 function loadEvents(){ loadAll(); }
 
+// Boot: seed demos, load real quotes from localStorage, render
 seedDemoData();
-renderOverviewStats();
-updateTabCounts();
-renderTable();
+loadSavedQuotes();
+safeRender();
 window.addEventListener('load', function(){
   try{ lucide.createIcons(); }catch(e){}
-  setTimeout(function(){
-    fetch('/api/events').then(function(r){return r.ok?r.json():null;}).then(function(d){
-      if(d&&Array.isArray(d)&&d.length){allEvents=d;safeRender();}
-    }).catch(function(){});
-  }, 300);
+  // Also re-run loadSavedQuotes in case localStorage updated after page parse
+  loadSavedQuotes();
+  safeRender();
 });
 </script>
 
