@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InB1bHNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjFhNmUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiNmZmVjMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0ZmQ4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzBhMGExYSIvPgogIDx0ZXh0IHg9IjYwIiB5PSI3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNTgiIGZpbGw9IndoaXRlIiBsZXR0ZXItc3BhY2luZz0iLTMiPlhQPC90ZXh0PgogIDxyZWN0IHg9IjE4IiB5PSI4MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjciIHJ4PSIzLjUiIGZpbGw9InVybCgjcHVsc2UpIj4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9IndpZHRoIiB2YWx1ZXM9Ijg0Ozk2Ozg0IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4IiB2YWx1ZXM9IjE4OzEyOzE4IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjE7MC44NTsxIiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgPC9yZWN0Pgo8L3N2Zz4K">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UDJ Director — Byron Bay Silent Disco</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes drawerOut{from{transform:translateX(0)}to{transform:translateX(100%)}}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+@keyframes previewIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes triggerPulse{0%,100%{box-shadow:0 0 0 0 var(--tc,rgba(34,197,94,.3))}60%{box-shadow:0 0 0 8px transparent}}
+@keyframes countPop{0%{transform:translateY(-4px);opacity:0}60%{transform:translateY(2px)}100%{transform:translateY(0);opacity:1}}
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:#2e2e38;border-radius:2px}
+html,body{background:#07070a;color:#fff;font-family:"Plus Jakarta Sans",sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+/* MAIN PAGE (behind drawer) */
+.main-bg{position:fixed;inset:0;background:#07070a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:20px}
+.main-logo{font-family:"Bebas Neue",sans-serif;font-size:clamp(36px,10vw,72px);letter-spacing:.04em;line-height:.95}
+.main-logo .dot{color:#FFD166}.main-logo .sep{display:inline-block;width:1px;height:14px;background:#2e2e38;margin:0 10px;vertical-align:middle}.main-logo .bbsd{color:#B354F1}
+.main-sub{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6b6b80}
+/* TRIGGER */
+.udj-trigger{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:100;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;writing-mode:vertical-rl;padding:18px 10px;border-radius:12px 0 0 12px;border:1px solid #2e2e38;border-right:none;background:rgba(10,10,14,.95);backdrop-filter:blur(12px);font-family:"Bebas Neue",sans-serif;font-size:14px;letter-spacing:2px;color:#fff;transition:all .2s;animation:triggerPulse 2.5s ease infinite}
+.udj-trigger:hover{padding-right:14px}
+/* OVERLAY */
+.udj-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:overlayIn .2s ease}
+/* DRAWER */
+.udj-drawer{position:fixed;top:0;right:0;bottom:0;z-index:300;width:min(820px,100vw);background:#000;border-left:1px solid #2e2e38;box-shadow:-20px 0 60px rgba(0,0,0,.8);display:flex;flex-direction:column;overflow:hidden}
+.udj-drawer.open{animation:drawerIn .32s cubic-bezier(.22,.68,0,1.2) forwards}
+.udj-drawer.close{animation:drawerOut .25s cubic-bezier(.4,0,1,1) forwards}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;flex-shrink:0;background:rgba(0,0,0,.95);border-bottom:1px solid #2e2e38;backdrop-filter:blur(18px)}
+.drawer-inner{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+/* CHANNEL HEADER */
+.ch-header{background:rgba(0,0,0,.92);backdrop-filter:blur(18px);border-bottom:1px solid #2e2e38;position:sticky;top:0;z-index:10;flex-shrink:0}
+.ch-topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px}
+.ch-tabs{display:flex;padding:0 20px;gap:0;border-bottom:1px solid #2e2e38;overflow-x:auto;scrollbar-width:none}
+.ch-tabs::-webkit-scrollbar{display:none}
+.ch-tab{display:flex;align-items:center;gap:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;font-family:"Plus Jakarta Sans",sans-serif;color:#6b6b80;transition:all .2s;white-space:nowrap;letter-spacing:.02em}
+.ch-tab:hover{color:#9999b0}
+.ch-tab.active{color:#fff}
+.ch-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tab-bubble{min-width:18px;height:18px;border-radius:9px;font-size:9px;font-weight:900;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 5px;animation:blink 1.5s ease infinite}
+/* CONTENT */
+.ch-content{padding:20px;max-width:820px;margin:0 auto;flex:1}
+.sub-tabs{display:flex;border-bottom:1px solid #2e2e38;margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
+.sub-tabs::-webkit-scrollbar{display:none}
+.sub-tab{padding:10px 16px;font-size:12px;font-weight:700;color:#6b6b80;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;font-family:"Plus Jakarta Sans",sans-serif;transition:all .15s;white-space:nowrap}
+.sub-tab:hover{color:#9999b0}
+.sub-tab.on{color:#fff}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.stat-card{background:rgba(13,13,16,.85);border:1px solid;border-radius:12px;padding:12px 14px;text-align:center}
+.stat-val{font-family:"Bebas Neue",sans-serif;font-size:clamp(24px,5vw,36px);line-height:1;margin-bottom:2px}
+.stat-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80}
+/* LIMIT PANEL */
+.limit-panel{background:rgba(0,0,0,.5);border:1px solid #2e2e38;border-radius:12px;padding:16px;margin-bottom:16px}
+.limit-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:#2e2e38;outline:none;margin:10px 0 6px;cursor:pointer}
+/* QUEUE ROWS */
+.card{background:rgba(13,13,16,.85);border:1px solid #2e2e38;border-radius:14px;overflow:hidden;margin-bottom:12px}
+.q-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid rgba(46,46,56,.4);transition:background .12s}
+.q-row:last-child{border-bottom:none}
+.q-row:hover{background:rgba(255,255,255,.02)}
+.list-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(46,46,56,.3)}
+.list-row:last-child{border-bottom:none}
+.sec-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b6b80;padding:7px 16px;background:rgba(0,0,0,.3);border-bottom:1px solid #2e2e38}
+/* ART */
+.art{border-radius:8px;object-fit:cover;flex-shrink:0}
+.art-placeholder{border-radius:8px;background:rgba(20,20,24,.9);border:1px solid #2e2e38;display:flex;align-items:center;justify-content:center;color:#6b6b80;flex-shrink:0;font-size:14px}
+/* BADGE */
+.badge{font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:5px;flex-shrink:0;white-space:nowrap}
+/* BTNS */
+.btn{border-radius:10px;cursor:pointer;font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;letter-spacing:.02em;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border:1.5px solid;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.btn:active{transform:scale(.96);opacity:.85}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:8px}
+.btn-ghost{background:rgba(20,20,24,.7);border-color:#2e2e38;color:#9999b0}
+.btn-ghost:hover{color:#fff;border-color:#3a3a4a}
+.btn-danger{background:linear-gradient(135deg,#7a0a0a,#c0392b);border-color:#c0392b;color:#fff}
+/* SECTION TITLE */
+.sec-title{font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:2px;color:#9999b0;margin-bottom:12px}
+/* EMPTY */
+.empty{text-align:center;padding:28px 20px;color:#6b6b80;font-size:12px}
+.empty-icon{font-size:26px;margin-bottom:8px;opacity:.35}
+/* TOGGLE */
+.toggle{width:46px;height:26px;border-radius:13px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-knob{position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.8);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;animation:overlayIn .2s ease}
+.phone-frame{width:360px;max-width:calc(100vw - 40px);height:min(780px,calc(100vh - 80px));border-radius:44px;background:#000;border:8px solid #1c1c22;box-shadow:0 0 0 1px #2e2e38,0 40px 100px rgba(0,0,0,.85);display:flex;flex-direction:column;overflow:hidden;position:relative;animation:previewIn .28s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:28px;background:#000;border-radius:0 0 16px 16px;z-index:10}
+.phone-screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-top:28px}
+.share-card{width:min(420px,calc(100vw - 40px));background:#0d0d10;border-radius:22px;border:1px solid #2e2e38;box-shadow:0 40px 100px rgba(0,0,0,.8);overflow:hidden;animation:previewIn .25s cubic-bezier(.34,1.56,.64,1)}
+/* STARS */
+#stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4}
+/* LOADING */
+.loading-ring{width:20px;height:20px;border:2px solid rgba(255,255,255,.1);border-top-color:currentColor;border-radius:50%;animation:spin-border .7s linear infinite}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(3,1fr)}.ch-tab{padding:10px 14px;font-size:12px}.ch-content{padding:14px}}
+@media(max-width:420px){.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<canvas id="stars-bg"></canvas>
+
+<!-- MAIN BG PAGE -->
+<div class="main-bg">
+  <div class="main-logo">ULTIMATE<span class="dot">·</span>XP<span class="sep"></span><span class="bbsd">BBSD</span></div>
+  <div class="main-sub">Song Request System · Internal</div>
+</div>
+
+<!-- TRIGGER TAB -->
+<div class="udj-trigger" id="udjTrigger" style="--tc:rgba(34,197,94,.3)" onclick="openDrawer()">
+  <div id="triggerDots" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
+  <span id="triggerLabel" style="color:#22c55e;writing-mode:vertical-rl;letter-spacing:3px;font-size:13px">UDJ</span>
+  <div id="triggerBubble" style="display:none;min-width:18px;height:18px;border-radius:9px;background:#22c55e;font-size:9px;font-weight:900;color:#fff;writing-mode:horizontal-tb;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:blink 1.5s ease infinite"></div>
+  <span style="font-size:10px;color:#6b6b80;writing-mode:vertical-rl;transform:rotate(180deg)">◀</span>
+</div>
+
+<!-- DRAWER -->
+<div id="drawerOverlay" style="display:none" class="udj-overlay" onclick="closeDrawer()"></div>
+<div id="udjDrawer" style="display:none" class="udj-drawer">
+  <!-- Drawer header -->
+  <div class="drawer-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="drawerDot" style="width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 1.8s ease infinite"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px">UDJ DIRECTOR</div>
+      <span style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#FFD166;padding:2px 8px;border-radius:5px;background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.2)">LIVE</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="drawerClock" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9999b0"></span>
+      <button class="btn btn-ghost btn-sm" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+
+  <!-- Channel header -->
+  <div class="ch-header">
+    <div class="ch-topbar">
+      <div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#FFD166;margin-bottom:2px">Ultimate Experiences</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;line-height:1">ULTIMATE<span style="color:#FFD166">·</span>XP <span style="display:inline-block;width:1px;height:13px;background:#2e2e38;margin:0 8px;vertical-align:middle"></span><span style="color:#B354F1">BBSD</span></div>
+      </div>
+      <div style="font-size:10px;color:#6b6b80;font-weight:600;text-align:right;font-family:'JetBrains Mono',monospace">
+        <div style="color:#9999b0;letter-spacing:.06em;text-transform:uppercase;font-size:9px">UDJ Director</div>
+        <div id="topbarClock" style="font-size:10px;color:#9999b0;margin-top:2px"></div>
+      </div>
+    </div>
+    <div class="ch-tabs" id="chTabs"></div>
+    <div id="chAccent" style="height:2px;background:linear-gradient(90deg,#15803d,#22c55e,transparent);transition:background .3s"></div>
+  </div>
+
+  <!-- Channel content -->
+  <div class="drawer-inner">
+    <div class="ch-content" id="chContent">
+      <div class="empty"><div class="empty-icon">🎧</div>Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE PREVIEW MODAL -->
+<div id="previewModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePreview()">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+    <div id="previewLabel" style="display:flex;align-items:center;gap:10px;padding:8px 18px;border-radius:50px;background:rgba(20,20,24,.9);border:1px solid #2e2e38;backdrop-filter:blur(10px)">
+      <span id="previewDot" style="width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e"></span>
+      <span id="previewTitle" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.08em">CH 1 · GREEN — Guest View</span>
+      <button onclick="closePreview()" style="background:none;border:none;color:#6b6b80;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;margin-left:4px">✕</button>
+    </div>
+    <div class="phone-frame" id="phoneFrame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" id="phoneScreen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeShare()">
+  <div class="share-card" id="shareCard"></div>
+</div>
+
+<script>
+// ── Channels config ──
+const CHANNELS = [
+  {id:1, slug:"green", label:"CH 1", name:"GREEN", genre:"Disco & 80s",   color:"#22c55e", dim:"#15803d", faint:"rgba(34,197,94,.08)"},
+  {id:2, slug:"red",   label:"CH 2", name:"RED",   genre:"Pop Hits",      color:"#ef4444", dim:"#b91c1c", faint:"rgba(239,68,68,.08)"},
+  {id:3, slug:"blue",  label:"CH 3", name:"BLUE",  genre:"Electronic",    color:"#3b82f6", dim:"#1d4ed8", faint:"rgba(59,130,246,.08)"},
+];
+const GENRES = ["Pop","Dance","Electronic","Hip-Hop/Rap","R&B/Soul","Rock","Alternative","Indie","Country","Latin","Reggae","Jazz","Disco","Funk","Folk"];
+const D = {gold:"#FFD166",violet:"#B354F1",bdr:"#2e2e38",muted:"#6b6b80",dim:"#9999b0"};
+
+let activeCh = 1;
+let channelData = {1:null, 2:null, 3:null};
+let pollTimer = null;
+let drawerOpen = false;
+const API = '/api/udj';
+
+// ── Stars ──
+(function(){
+  const c = document.getElementById('stars-bg'), ctx = c.getContext('2d');
+  let S = [];
+  function init(){
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    S = Array.from({length:180},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.6+.2,o:Math.random()*.7+.15,tw:Math.random()*Math.PI*2,sp:Math.random()*.04+.015,col:Math.random()<.07?'179,84,241':Math.random()<.05?'255,209,102':'255,255,255'}));
+  }
+  function draw(){ctx.clearRect(0,0,c.width,c.height);const t=Date.now()*.001;S.forEach(s=>{const a=s.o*(0.2+0.8*Math.abs(Math.sin(t*s.sp*60+s.tw)));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(${s.col},${Math.min(1,a).toFixed(3)})`;ctx.fill();});requestAnimationFrame(draw);}
+  window.addEventListener('resize',init);init();draw();
+})();
+
+// ── Clock ──
+function updateClock(){
+  const t = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  const el1 = document.getElementById('drawerClock');
+  const el2 = document.getElementById('topbarClock');
+  if(el1) el1.textContent = t;
+  if(el2) el2.textContent = t;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── API ──
+async function fetchChannel(slug) {
+  try {
+    const r = await fetch(`${API}?ch=${slug}`);
+    return await r.json();
+  } catch(e) {
+    // Local fallback
+    const stored = localStorage.getItem(`udj:${slug}`);
+    return stored ? JSON.parse(stored) : {requests:[],history:[],maxPerDevice:3,blockedGenres:[],allowExplicit:true,nextId:1};
+  }
+}
+
+async function patchChannel(slug, body) {
+  try {
+    await fetch(`${API}?ch=${slug}`, {method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  } catch(e) {
+    // Local fallback: update localStorage
+    const data = await fetchChannel(slug);
+    if(body.settings) Object.assign(data, body.settings);
+    else {
+      const {id, status} = body;
+      data.requests = data.requests.map(r=>r.id===id?{...r,status}:r);
+      if(status==='played'){
+        const req = data.requests.find(r=>r.id===id);
+        if(req){
+          const ex = data.history.find(h=>h.name===req.name&&h.artist===req.artist);
+          data.history = ex ? data.history.map(h=>h.name===req.name&&h.artist===req.artist?{...h,playCount:h.playCount+1,lastPlayed:new Date().toISOString()}:h) : [{name:req.name,artist:req.artist,artwork:req.artwork,playCount:1,lastPlayed:new Date().toISOString()},...data.history];
+        }
+      }
+    }
+    localStorage.setItem(`udj:${slug}`, JSON.stringify(data));
+  }
+  await loadChannel(CHANNELS.find(c=>c.slug===slug));
+}
+
+async function deleteChannel(slug, clearHistory=false) {
+  try {
+    await fetch(`${API}?ch=${slug}`, {method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({clearHistory})});
+  } catch(e) {
+    const data = await fetchChannel(slug);
+    if(clearHistory) data.history = []; else data.requests = [];
+    localStorage.setItem(`udj:${slug}`, JSON.stringify(data));
+  }
+  await loadChannel(CHANNELS.find(c=>c.slug===slug));
+}
+
+// ── Load ──
+async function loadChannel(ch) {
+  const data = await fetchChannel(ch.slug);
+  channelData[ch.id] = data;
+  if(activeCh === ch.id) renderContent();
+  updateTrigger();
+}
+
+async function loadAll() {
+  for(const ch of CHANNELS) await loadChannel(ch);
+}
+
+// ── Trigger ──
+function updateTrigger() {
+  const dotsEl = document.getElementById('triggerDots');
+  const bubbleEl = document.getElementById('triggerBubble');
+  let total = 0;
+  dotsEl.innerHTML = CHANNELS.map(c=>{
+    const d = channelData[c.id];
+    const n = d ? d.requests.filter(r=>r.status==='pending').length : 0;
+    total += n;
+    return `<div style="width:6px;height:6px;border-radius:50%;background:${c.color};box-shadow:${n>0?`0 0 8px ${c.color}`:'none'};opacity:${n>0?1:.3};transition:all .3s"></div>`;
+  }).join('');
+  bubbleEl.textContent = total;
+  if(total > 0) { bubbleEl.style.display='flex'; } else { bubbleEl.style.display='none'; }
+}
+
+// ── Drawer ──
+function openDrawer() {
+  drawerOpen = true;
+  const d = document.getElementById('udjDrawer');
+  const o = document.getElementById('drawerOverlay');
+  d.style.display = 'flex';
+  o.style.display = 'block';
+  d.className = 'udj-drawer open';
+  document.getElementById('udjTrigger').style.display = 'none';
+  renderTabs();
+  loadAll();
+  pollTimer = setInterval(()=>loadAll(), 3000);
+}
+
+function closeDrawer() {
+  const d = document.getElementById('udjDrawer');
+  const o = document.getElementById('drawerOverlay');
+  d.className = 'udj-drawer close';
+  setTimeout(()=>{
+    d.style.display='none';
+    o.style.display='none';
+    document.getElementById('udjTrigger').style.display='flex';
+    drawerOpen = false;
+  }, 240);
+  clearInterval(pollTimer);
+}
+
+// ── Tabs ──
+function renderTabs() {
+  const ch = CHANNELS.find(c=>c.id===activeCh);
+  document.getElementById('chAccent').style.background = `linear-gradient(90deg,${ch.dim},${ch.color},transparent)`;
+  document.getElementById('drawerDot').style.background = ch.color;
+  document.getElementById('drawerDot').style.boxShadow = `0 0 8px ${ch.color}`;
+
+  document.getElementById('chTabs').innerHTML = CHANNELS.map(c=>{
+    const d = channelData[c.id];
+    const n = d ? d.requests.filter(r=>r.status==='pending').length : 0;
+    return `<button class="ch-tab${activeCh===c.id?' active':''}" onclick="switchCh(${c.id})" style="border-bottom-color:${activeCh===c.id?c.color:'transparent'}">
+      <div class="ch-tab-dot" style="background:${c.color};box-shadow:${activeCh===c.id?`0 0 10px ${c.color}`:'none'};animation:${activeCh===c.id?'pulse 1.8s ease infinite':'none'}"></div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1.5px">${c.name}</span>
+      <span style="font-size:10px;opacity:.5;font-weight:500">${c.label} · ${c.genre}</span>
+      ${n>0?`<div class="tab-bubble" style="background:${c.color}">${n}</div>`:''}
+    </button>`;
+  }).join('');
+}
+
+function switchCh(id) {
+  activeCh = id;
+  renderTabs();
+  renderContent();
+}
+
+// ── Content ──
+let subTab = 'queue';
+function setSubTab(t) { subTab = t; renderContent(); }
+
+function renderContent() {
+  const ch = CHANNELS.find(c=>c.id===activeCh);
+  const data = channelData[ch.id];
+  if(!data) { document.getElementById('chContent').innerHTML = `<div class="empty"><div class="loading-ring" style="color:${ch.color};margin:0 auto 8px"></div>Loading...</div>`; return; }
+
+  const pending  = data.requests.filter(r=>r.status==='pending');
+  const approved = data.requests.filter(r=>r.status==='approved');
+  const played   = data.requests.filter(r=>r.status==='played');
+  const allReal  = data.requests.filter(r=>!r.autoQueue);
+  const top10    = [...data.history].sort((a,b)=>b.playCount-a.playCount).slice(0,10);
+  const deviceMap = {};
+  data.requests.forEach(r=>{if(!r.autoQueue){if(!deviceMap[r.deviceId])deviceMap[r.deviceId]={pending:0,total:0,id:r.deviceId};deviceMap[r.deviceId].total++;if(r.status==='pending')deviceMap[r.deviceId].pending++;}});
+  const devices = Object.values(deviceMap).sort((a,b)=>b.total-a.total);
+
+  const guestUrl = `https://udj.byronbaysilentdisco.com/${ch.slug}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=000000&bgcolor=ffffff&data=${encodeURIComponent(guestUrl)}`;
+
+  const ago = d => {const s=Math.floor((Date.now()-new Date(d))/1e3);return s<60?'now':s<3600?Math.floor(s/60)+'m':s<86400?Math.floor(s/3600)+'h':Math.floor(s/86400)+'d';};
+  const art = (src,size=38) => src
+    ? `<img src="${src}" class="art" width="${size}" height="${size}">`
+    : `<div class="art-placeholder" style="width:${size}px;height:${size}px">♪</div>`;
+  const badge = (status,color) => {
+    const map={pending:[color||ch.color,`${color||ch.color}18`],approved:['#22c55e','rgba(34,197,94,.12)'],played:[D.violet,'rgba(179,84,241,.12)'],rejected:[D.muted,'rgba(20,20,24,.8)'],auto:[D.gold,'rgba(255,209,102,.1)']};
+    const [col,bg]=map[status]||map.pending;
+    return `<span class="badge" style="color:${col};background:${bg};border:1px solid ${col}35">${status}</span>`;
+  };
+
+  let html = `
+    <!-- Actions -->
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="openShare('${ch.slug}')">🔗 Share</button>
+      <button class="btn btn-sm" style="background:${ch.color}22;border-color:${ch.color}60;color:${ch.color}" onclick="openPreview('${ch.slug}')">📱 Guest View</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      ${[
+        {n:pending.length,  label:'Pending', col:ch.color},
+        {n:approved.length, label:'Approved',col:'#22c55e'},
+        {n:played.length,   label:'Played',  col:D.violet},
+        {n:devices.length,  label:'Devices', col:D.gold},
+        {n:data.history.length,label:'History',col:D.muted},
+      ].map(s=>`<div class="stat-card" style="border-color:${s.col}28"><div class="stat-val" style="color:${s.col}">${s.n}</div><div class="stat-lbl">${s.label}</div></div>`).join('')}
+    </div>
+
+    <!-- Limit -->
+    <div class="limit-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80;margin-bottom:4px">Request Limit Per Device</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${ch.color};line-height:1">${data.maxPerDevice}</span>
+            <span style="font-size:12px;color:#9999b0">requests per phone</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${[1,2,3,5,10,15].map(n=>`<button onclick="setLimit('${ch.slug}',${n})" style="width:34px;height:34px;border-radius:50%;cursor:pointer;font-weight:800;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;border:1.5px solid ${data.maxPerDevice===n?ch.color:D.bdr};background:${data.maxPerDevice===n?ch.color+'20':'rgba(20,20,24,.7)'};color:${data.maxPerDevice===n?ch.color:D.muted}">${n}</button>`).join('')}
+        </div>
+      </div>
+      <input type="range" class="limit-slider" min="1" max="20" value="${data.maxPerDevice}"
+        style="background:linear-gradient(90deg,${ch.color} 0%,${ch.color} ${(data.maxPerDevice/20)*100}%,#2e2e38 ${(data.maxPerDevice/20)*100}%,#2e2e38 100%)"
+        oninput="setLimit('${ch.slug}',this.value)" onchange="setLimit('${ch.slug}',this.value)">
+      <style>.limit-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:${ch.color};cursor:pointer;box-shadow:0 0 8px ${ch.color}80}</style>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#6b6b80"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
+    </div>
+
+    <!-- Sub tabs -->
+    <div class="sub-tabs">
+      ${[['queue',`Queue (${pending.length+approved.length})`],['history',`Top Songs (${top10.length})`],['devices',`Devices (${devices.length})`],['all',`All (${allReal.length})`],['settings','⚙ Settings']].map(([k,l])=>`<button class="sub-tab${subTab===k?' on':''}" style="border-bottom-color:${subTab===k?ch.color:'transparent'}" onclick="setSubTab('${k}')">${l}</button>`).join('')}
+    </div>`;
+
+  // ── QUEUE TAB ──
+  if(subTab === 'queue') {
+    html += `<div class="sec-title">PENDING</div>`;
+    if(!pending.length && !approved.length) {
+      html += `<div class="card"><div class="empty"><div class="empty-icon">🎧</div>Queue empty — requests will appear here</div></div>`;
+    } else {
+      html += `<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn btn-danger btn-sm" onclick="clearQueue('${ch.slug}')">🗑 Clear Queue</button></div>`;
+      html += `<div class="card">`;
+      html += pending.map(r=>`
+        <div class="q-row">
+          ${art(r.artwork,40)}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+            <div style="font-size:11px;color:#9999b0;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.artist}</div>
+            <div style="font-size:9px;color:#6b6b80;margin-top:2px;font-family:'JetBrains Mono',monospace">${r.deviceId||'?'} · ${ago(r.ts)}</div>
+          </div>
+          ${badge(r.autoQueue?'auto':'pending',ch.color)}
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" style="background:${ch.color}22;border-color:${ch.color}60;color:${ch.color}" onclick="updateStatus('${ch.slug}',${r.id},'approved')">✓ Approve</button>
+            <button class="btn btn-ghost btn-sm" onclick="updateStatus('${ch.slug}',${r.id},'rejected')">✕</button>
+          </div>
+        </div>`).join('');
+
+      if(approved.length) {
+        html += `<div class="sec-label">APPROVED — UP NEXT</div>`;
+        html += approved.map(r=>`
+          <div class="q-row" style="background:${ch.color}06">
+            ${art(r.artwork,40)}
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+              <div style="font-size:11px;color:#9999b0;margin-top:1px">${r.artist}</div>
+            </div>
+            ${badge('approved')}
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm" style="background:${D.violet}22;border-color:${D.violet}60;color:${D.violet}" onclick="updateStatus('${ch.slug}',${r.id},'played')">▶ Played</button>
+              <button class="btn btn-ghost btn-sm" onclick="updateStatus('${ch.slug}',${r.id},'rejected')">✕</button>
+            </div>
+          </div>`).join('');
+      }
+      html += `</div>`;
+    }
+
+    if(played.length) {
+      html += `<div class="sec-title" style="margin-top:16px">RECENTLY PLAYED</div><div class="card">`;
+      html += played.slice(0,5).map(r=>`
+        <div class="q-row" style="opacity:.5">
+          ${art(r.artwork,36)}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+            <div style="font-size:10px;color:#9999b0">${r.artist}</div>
+          </div>
+          ${badge('played')}
+          <span style="font-size:9px;color:#6b6b80;font-family:'JetBrains Mono',monospace">${ago(r.ts)}</span>
+        </div>`).join('');
+      html += `</div>`;
+    }
+  }
+
+  // ── TOP SONGS TAB ──
+  else if(subTab === 'history') {
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sec-title">TOP ${top10.length} MOST PLAYED</div>
+      <button class="btn btn-ghost btn-sm" onclick="clearHistory('${ch.slug}')">Clear History</button>
+    </div>`;
+    if(!top10.length) {
+      html += `<div class="card"><div class="empty"><div class="empty-icon">🎵</div>No history yet — mark songs as played to build the chart</div></div>`;
+    } else {
+      html += `<div class="card">`;
+      html += top10.map((s,i)=>`
+        <div class="list-row">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${i===0?D.gold:i<3?ch.color:D.bdr};width:26px;text-align:center;flex-shrink:0">${i+1}</div>
+          ${art(s.artwork,40)}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+            <div style="font-size:11px;color:#9999b0;margin-top:1px">${s.artist}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${i===0?D.gold:i<3?ch.color:D.dim};line-height:1">${s.playCount}×</div>
+            <div style="font-size:9px;color:#6b6b80;margin-top:2px">${ago(s.lastPlayed)}</div>
+          </div>
+        </div>`).join('');
+      html += `</div>`;
+    }
+  }
+
+  // ── DEVICES TAB ──
+  else if(subTab === 'devices') {
+    html += `<div class="sec-title">DEVICES — ${devices.length}</div>`;
+    if(!devices.length) {
+      html += `<div class="card"><div class="empty"><div class="empty-icon">📱</div>No devices have made requests yet</div></div>`;
+    } else {
+      html += `<div class="card">`;
+      html += devices.map((d,i)=>`
+        <div class="list-row">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#2e2e38;width:24px;text-align:center;flex-shrink:0">${i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#9999b0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.id}</div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <span style="font-size:11px;color:${ch.color};font-weight:700">${d.pending} pending</span>
+              <span style="font-size:11px;color:#6b6b80">${d.total} total</span>
+            </div>
+          </div>
+          <div style="width:72px;flex-shrink:0">
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:#6b6b80;margin-bottom:4px;font-family:'JetBrains Mono',monospace"><span>usage</span><span>${d.total}/${data.maxPerDevice}</span></div>
+            <div style="height:4px;background:#2e2e38;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;background:linear-gradient(90deg,${ch.dim},${ch.color});width:${Math.min(100,(d.total/data.maxPerDevice)*100)}%;transition:width .3s"></div></div>
+          </div>
+        </div>`).join('');
+      html += `</div>`;
+    }
+  }
+
+  // ── ALL REQUESTS TAB ──
+  else if(subTab === 'all') {
+    html += `<div class="sec-title">ALL REQUESTS — ${allReal.length}</div>`;
+    if(!allReal.length) {
+      html += `<div class="card"><div class="empty"><div class="empty-icon">📋</div>No requests yet</div></div>`;
+    } else {
+      html += `<div class="card">`;
+      html += [...allReal].reverse().map(r=>`
+        <div class="list-row">
+          ${art(r.artwork,36)}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+            <div style="font-size:10px;color:#9999b0;margin-top:1px">${r.artist}</div>
+            <div style="font-size:9px;color:#6b6b80;margin-top:2px;font-family:'JetBrains Mono',monospace">${r.deviceId||'?'}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            ${badge(r.status,ch.color)}
+            <div style="font-size:9px;color:#6b6b80;margin-top:4px">${ago(r.ts)}</div>
+          </div>
+        </div>`).join('');
+      html += `</div>`;
+    }
+  }
+
+  // ── SETTINGS TAB ──
+  else if(subTab === 'settings') {
+    html += `<div class="sec-title">CONTENT FILTER</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="list-row" style="padding:14px 16px">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px">Allow Explicit Songs</div>
+          <div style="font-size:11px;color:#9999b0;margin-top:3px">When off, explicit songs are hidden from guest search</div>
+        </div>
+        <div class="toggle" onclick="toggleSetting('${ch.slug}','allowExplicit',${!data.allowExplicit})" style="background:${data.allowExplicit?ch.color:'#2e2e38'}">
+          <div class="toggle-knob" style="left:${data.allowExplicit?'23px':'3px'}"></div>
+        </div>
+      </div>
+      ${!data.allowExplicit?`<div style="padding:8px 16px;background:rgba(239,68,68,.06);border-top:1px solid rgba(239,68,68,.15);font-size:11px;color:#fca5a5">🔞 Explicit songs hidden from guests on this channel</div>`:''}
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="sec-title" style="margin-bottom:0">GENRES</div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-ghost btn-sm" onclick="setAllGenres('${ch.slug}',false)">Allow All</button>
+        <button class="btn btn-ghost btn-sm" onclick="setAllGenres('${ch.slug}',true)">Block All</button>
+      </div>
+    </div>
+    ${data.blockedGenres?.length?`<div style="padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;font-size:11px;color:#fca5a5;margin-bottom:10px">🚫 ${data.blockedGenres.length} genre${data.blockedGenres.length>1?'s':''} blocked: ${data.blockedGenres.join(', ')}</div>`:''}
+    <div class="card">
+      ${GENRES.map(g=>{
+        const blocked = data.blockedGenres?.includes(g);
+        return `<div class="list-row" style="padding:11px 16px">
+          <div style="flex:1;font-weight:600;font-size:12px;color:${blocked?'#6b6b80':'#fff'};transition:color .2s">${g}</div>
+          <div class="toggle" onclick="toggleGenre('${ch.slug}','${g}',${!blocked})" style="background:${!blocked?ch.color:'#2e2e38'}">
+            <div class="toggle-knob" style="left:${!blocked?'23px':'3px'}"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  document.getElementById('chContent').innerHTML = html;
+}
+
+// ── Actions ──
+async function updateStatus(slug, id, status) {
+  await patchChannel(slug, {id, status});
+}
+async function setLimit(slug, n) {
+  await patchChannel(slug, {settings:{maxPerDevice:parseInt(n)}});
+}
+async function clearQueue(slug) {
+  if(confirm('Clear the request queue?')) await deleteChannel(slug, false);
+}
+async function clearHistory(slug) {
+  if(confirm('Clear history?')) await deleteChannel(slug, true);
+}
+async function toggleSetting(slug, key, val) {
+  await patchChannel(slug, {settings:{[key]:val}});
+}
+async function toggleGenre(slug, genre, allow) {
+  const data = channelData[CHANNELS.find(c=>c.slug===slug).id];
+  const cur = data.blockedGenres||[];
+  const newBlocked = allow ? cur.filter(g=>g!==genre) : [...cur, genre];
+  await patchChannel(slug, {settings:{blockedGenres:newBlocked}});
+}
+async function setAllGenres(slug, blockAll) {
+  await patchChannel(slug, {settings:{blockedGenres:blockAll?[...GENRES]:[]}});
+}
+
+// ── Preview ──
+function openPreview(slug) {
+  const ch = CHANNELS.find(c=>c.slug===slug);
+  const data = channelData[ch.id];
+  document.getElementById('previewDot').style.background = ch.color;
+  document.getElementById('previewDot').style.boxShadow = `0 0 8px ${ch.color}`;
+  document.getElementById('previewTitle').textContent = `${ch.label} · ${ch.name} — Guest View`;
+  document.getElementById('previewTitle').style.color = ch.color;
+  document.getElementById('phoneFrame').style.borderColor = `${ch.color}40`;
+  document.getElementById('phoneFrame').style.boxShadow = `0 0 0 1px ${ch.color}20, 0 40px 100px rgba(0,0,0,.85)`;
+  document.getElementById('phoneScreen').innerHTML = buildGuestPage(ch, data);
+  document.getElementById('previewModal').style.display = 'flex';
+}
+function closePreview() {
+  document.getElementById('previewModal').style.display = 'none';
+}
+
+// ── Share ──
+function openShare(slug) {
+  const ch = CHANNELS.find(c=>c.slug===slug);
+  const guestUrl = `https://udj.byronbaysilentdisco.com/${slug}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=000000&bgcolor=ffffff&data=${encodeURIComponent(guestUrl)}`;
+  document.getElementById('shareCard').innerHTML = `
+    <div style="padding:18px 20px 14px;border-bottom:1px solid #2e2e38;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+          <span style="width:7px;height:7px;border-radius:50%;background:${ch.color};box-shadow:0 0 8px ${ch.color};display:inline-block"></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:${ch.color};letter-spacing:.08em">${ch.label} · ${ch.name}</span>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px">SHARE GUEST PAGE</div>
+      </div>
+      <button onclick="closeShare()" style="background:rgba(255,255,255,.06);border:1px solid #2e2e38;border-radius:50%;width:32px;height:32px;cursor:pointer;color:#9999b0;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="padding:12px;border-radius:16px;background:linear-gradient(135deg,${ch.color}20,${ch.color}08);border:1.5px solid ${ch.color}35">
+        <div style="border-radius:8px;overflow:hidden;box-shadow:0 0 0 4px #fff,0 0 0 8px ${ch.color}25">
+          <img src="${qrUrl}" width="180" height="180" style="display:block;border-radius:5px">
+        </div>
+      </div>
+      <div style="font-size:11px;color:#9999b0;text-align:center;line-height:1.6">Guests scan to open the <span style="color:${ch.color};font-weight:700">${ch.name}</span> request page</div>
+      <div style="width:100%">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80;margin-bottom:7px">Guest URL</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="shareUrl" style="flex:1;background:#000;border:1px solid #2e2e38;border-radius:8px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9999b0;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" readonly value="${guestUrl}" onclick="this.select()">
+          <button id="copyShareBtn" class="btn btn-sm" style="background:${ch.color}22;border-color:${ch.color}60;color:${ch.color};flex-shrink:0;min-width:70px" onclick="copyShareUrl('${guestUrl}')">Copy</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('shareModal').style.display = 'flex';
+}
+function closeShare() {
+  document.getElementById('shareModal').style.display = 'none';
+}
+function copyShareUrl(url) {
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn = document.getElementById('copyShareBtn');
+    btn.textContent = '✓ Copied'; setTimeout(()=>btn.textContent='Copy', 2000);
+  });
+}
+
+// ── Guest Page Builder (for preview) ──
+function buildGuestPage(ch, data) {
+  const pending = data ? data.requests.filter(r=>r.status==='pending') : [];
+  return `
+  <div style="background:#07070a;min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;color:#fff;font-size:14px">
+    <div style="position:sticky;top:0;z-index:10;background:rgba(7,7,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid ${ch.color}25;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.05em">ULTIMATE<span style="color:#FFD166">·</span>XP<span style="display:inline-block;width:1px;height:11px;background:#2e2e38;margin:0 7px;vertical-align:middle"></span><span style="color:#B354F1">BBSD</span></div>
+      <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:50px;border:1px solid ${ch.color}40;background:${ch.faint}">
+        <span style="width:5px;height:5px;border-radius:50%;background:${ch.color};box-shadow:0 0 5px ${ch.color};display:inline-block"></span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:${ch.color};letter-spacing:.07em">${ch.label} · ${ch.name}</span>
+      </div>
+      <div style="height:2px;position:absolute;bottom:0;left:0;right:0;background:linear-gradient(90deg,${ch.dim},${ch.color},transparent)"></div>
+    </div>
+    <div style="padding:16px 14px 32px">
+      <div style="text-align:center;padding:20px 0 16px">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.04em;line-height:.9;margin-bottom:8px">
+          <span style="background:linear-gradient(135deg,${ch.dim},${ch.color});-webkit-background-clip:text;-webkit-text-fill-color:transparent">SONG </span><span>REQUEST</span>
+        </h1>
+        <p style="font-size:12px;color:#9999b0">${ch.label} · ${ch.genre}</p>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#6b6b80;margin-bottom:7px">Find a Song</div>
+        <div style="background:rgba(10,14,10,.9);border:1px solid ${ch.color}40;border-radius:11px;padding:10px;display:flex;gap:8px;align-items:center">
+          <div style="flex:1;padding:9px 10px;background:rgba(8,12,8,.9);border-radius:7px;font-size:12px;color:${ch.color}35;font-style:italic">Artist or song title…</div>
+          <div style="padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,${ch.dim},${ch.color});font-size:11px;font-weight:800;color:#fff;flex-shrink:0">Search</div>
+        </div>
+      </div>
+      ${pending.length>0?`
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#9999b0;margin-bottom:8px">UP NEXT</div>
+      ${pending.slice(0,4).map((r,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 11px;background:rgba(10,10,14,.75);border:1px solid #2e2e38;border-radius:11px;margin-bottom:6px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#2e2e38;width:18px;text-align:center;flex-shrink:0">${i+1}</div>
+          ${r.artwork?`<img src="${r.artwork}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0">` : `<div style="width:32px;height:32px;border-radius:6px;background:rgba(20,20,24,.8);border:1px solid #2e2e38;display:flex;align-items:center;justify-content:center;font-size:12px;color:#6b6b80;flex-shrink:0">♪</div>`}
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+            <div style="font-size:9px;color:#9999b0;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.artist}</div>
+          </div>
+        </div>`).join('')}` : `<div style="text-align:center;padding:24px 14px;background:rgba(10,10,14,.6);border:1px dashed #2e2e38;border-radius:12px;color:#6b6b80;font-size:11px"><div style="font-size:22px;margin-bottom:7px;opacity:.4">🎵</div>Queue is empty</div>`}
+    </div>
+  </div>`;
+}
+
+// ── Init ──
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drawerOpen) closeDrawer(); });
+loadAll();
+setInterval(updateTrigger, 2000);
+</script>
+</body>
+</html>

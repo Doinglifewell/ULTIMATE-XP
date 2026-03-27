@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InB1bHNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjFhNmUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiNmZmVjMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0ZmQ4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzBhMGExYSIvPgogIDx0ZXh0IHg9IjYwIiB5PSI3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNTgiIGZpbGw9IndoaXRlIiBsZXR0ZXItc3BhY2luZz0iLTMiPlhQPC90ZXh0PgogIDxyZWN0IHg9IjE4IiB5PSI4MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjciIHJ4PSIzLjUiIGZpbGw9InVybCgjcHVsc2UpIj4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9IndpZHRoIiB2YWx1ZXM9Ijg0Ozk2Ozg0IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4IiB2YWx1ZXM9IjE4OzEyOzE4IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjE7MC44NTsxIiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgPC9yZWN0Pgo8L3N2Zz4K">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Woodford Folk Festival — Woodfordia Silent Disco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --violet:#B354F1;--gold:#FFD166;--pink:#FF1B9A;--green:#3DFF8F;
+  --ink:#07070a;--text:#e8e8f0;--muted:#8888a0;
+  --card:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+
+/* ── STARS ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:var(--lo)}100%{opacity:var(--hi)}}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:60px 24px 52px}
+.festival-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,209,102,.1);border:.5px solid rgba(255,209,102,.3);border-radius:20px;padding:5px 16px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
+.festival-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,209,102,.6)}50%{box-shadow:0 0 0 6px rgba(255,209,102,0)}}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,110px);letter-spacing:.02em;line-height:.88;margin-bottom:10px}
+.h1g{color:var(--gold)}.h1v{color:var(--violet)}.h1p{color:var(--pink)}
+.hero-byline{font-size:clamp(13px,2vw,18px);letter-spacing:.22em;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:44px}
+.hero-desc{max-width:620px;font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.72);line-height:1.75;margin-bottom:48px;font-weight:300}
+.hero-desc strong{color:#fff;font-weight:500}
+.scroll-cta{display:inline-flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-family:'DM Mono',monospace;text-decoration:none;transition:color .2s}
+.scroll-cta:hover{color:var(--gold)}
+.scroll-arrow{width:36px;height:36px;border:1px solid rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+.hero-glows{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.glow-v{top:-100px;right:-80px;width:400px;height:400px;background:var(--violet)}
+.glow-p{bottom:-80px;left:-60px;width:300px;height:300px;background:var(--pink)}
+.glow-g{top:40%;left:30%;width:200px;height:200px;background:var(--gold);opacity:.08}
+
+.hero-main{display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
+.hero-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding-bottom:4px}
+.scroll-hint{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace}
+
+/* ── VIDEO INTRO ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes heroReveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+#video-intro{
+  position:fixed;inset:0;z-index:1000;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;animation:fadeIn .4s ease both;
+}
+#video-intro iframe{
+  /* Cover the viewport — portrait crop for Shorts */
+  position:absolute;
+  width:100vw; height:56.25vw; /* 16:9 */
+  min-height:100vh; min-width:177.78vh;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;border:none;
+}
+#video-intro.fading{animation:fadeOut 1.4s ease forwards}
+
+/* Skip button */
+#skip-btn{
+  position:absolute;bottom:32px;right:32px;z-index:10;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);border-radius:50px;
+  padding:9px 20px;font-family:'DM Mono',monospace;font-size:11px;
+  font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);cursor:pointer;
+  transition:all .18s;display:flex;align-items:center;gap:8px;
+}
+#skip-btn:hover{background:rgba(0,0,0,.8);color:#fff;border-color:rgba(255,255,255,.4)}
+#skip-timer{
+  font-family:'Bebas Neue',sans-serif;font-size:15px;
+  color:var(--gold);line-height:1;min-width:14px;text-align:center;
+}
+
+/* Progress bar */
+#video-progress{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:rgba(255,255,255,.1);
+}
+#video-progress-bar{
+  height:100%;background:linear-gradient(90deg,var(--violet),var(--gold));
+  width:0%;transition:width .2s linear;
+}
+
+/* Hero starts hidden, reveals after video */
+.hero-hidden{opacity:0;pointer-events:none}
+.hero-visible{animation:heroReveal .9s ease both}
+
+#page2{scroll-snap-align:start;min-height:100vh;position:relative;z-index:1}
+
+/* ── SECTION ── */
+.section{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.sec-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,44px);letter-spacing:.02em;color:var(--gold);margin-bottom:32px}
+
+/* ── DATE TILES ── */
+.date-row{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+.date-tile{flex:1;min-width:80px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .18s;user-select:none}
+.date-tile:hover{border-color:rgba(179,84,241,.4)}
+.date-tile.active{background:rgba(179,84,241,.15);border-color:var(--violet)}
+.date-tile .dt-day{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.date-tile .dt-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text);letter-spacing:.02em;line-height:1}
+.date-tile.active .dt-num{color:var(--violet)}
+.dates-selected{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:28px;min-height:16px}
+.dates-selected span{color:var(--violet)}
+
+/* ── HEADSET SLIDER ── */
+.slider-section{margin-bottom:32px}
+.slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.slider-header label{font-size:13px;color:rgba(255,255,255,.6)}
+.slider-bignum{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--gold);letter-spacing:.02em;line-height:1}
+input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;cursor:pointer;margin-bottom:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--ink);box-shadow:0 0 0 4px rgba(255,209,102,.2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--ink)}
+.slider-hints{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ── CHART ── */
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:32px;position:relative;height:160px}
+.chart-annotation{position:absolute;font-family:'DM Mono',monospace;font-size:11px;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.3);border-radius:6px;padding:4px 10px;color:var(--gold);pointer-events:none;white-space:nowrap;transition:all .3s}
+
+/* ── INVOICE ── */
+.invoice{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:36px}
+.inv-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.inv-head-left .inv-from{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:2px}
+.inv-head-left .inv-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);letter-spacing:.03em}
+.inv-head-right{text-align:right}
+.inv-head-right .inv-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+.inv-head-right .inv-event{font-size:14px;font-weight:500;color:var(--text)}
+.inv-head-right .inv-dates{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+.inv-body{padding:0}
+.inv-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center}
+.inv-row:last-child{border-bottom:none}
+.inv-row-head{display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:10px 24px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.inv-row-head span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+.inv-row-head span:nth-child(2),.inv-row-head span:nth-child(3),.inv-row .qty,.inv-row .line-total{text-align:right}
+.inv-item-name{font-size:14px;color:var(--text)}
+.inv-item-sub{font-size:11px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace}
+.inv-item-check{color:var(--green);font-size:11px;font-family:'DM Mono',monospace}
+.qty{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
+.line-total{font-family:'DM Mono',monospace;font-size:14px;color:var(--text)}
+.inv-totals{border-top:1px solid var(--border);padding:16px 24px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.inv-subtotal{display:flex;gap:40px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace}
+.inv-subtotal span:last-child{color:var(--text);min-width:100px;text-align:right}
+.inv-grand{display:flex;gap:40px;align-items:baseline;margin-top:4px}
+.inv-grand-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
+.inv-grand-val{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);letter-spacing:.02em;line-height:1}
+.inv-note{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:6px}
+.inc-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--green);font-family:'DM Mono',monospace;letter-spacing:.06em}
+
+/* ── CTA BUTTONS ── */
+.cta-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+@media(max-width:580px){.cta-row{grid-template-columns:1fr}}
+
+/* ── Chrome buttons (from UE Brand Handbook) ── */
+@keyframes chrome-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes liquid-sweep{0%{left:-75%;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:125%;opacity:0}}
+
+.btn{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:12px;cursor:pointer;border:none;text-align:left;width:100%;position:relative;overflow:hidden;background-size:250% 250%;transition:transform .2s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.btn:active{transform:scale(.97);opacity:.9}
+
+/* liquid shimmer sweep */
+.btn::after{content:'';position:absolute;top:-50%;left:-75%;width:50%;height:200%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.45) 50%,transparent 60%);animation:liquid-sweep 3.2s ease-in-out infinite;pointer-events:none}
+
+/* Chrome Green — Free / Safe / Go psychology */
+.btn-free{
+  background:linear-gradient(135deg,#b8f0e8 0%,#ffffff 12%,#40c0a8 28%,#28B79D 44%,#20a888 56%,#60c8b0 70%,#ffffff 84%,#a8e8e0 100%);
+  animation:chrome-shift 3s ease infinite;
+  box-shadow:0 6px 24px rgba(40,183,157,.45),inset 0 1px 0 rgba(255,255,255,.3);
+}
+.btn-free:hover{box-shadow:0 10px 36px rgba(40,183,157,.6),inset 0 1px 0 rgba(255,255,255,.3)}
+
+/* Chrome Orange — Action / Earnings / Urgency psychology */
+.btn-charge{
+  background:linear-gradient(135deg,#f8e0b0 0%,#ffffff 12%,#e09040 28%,#FF9F46 44%,#d07020 56%,#e8a860 70%,#ffffff 84%,#f0d898 100%);
+  animation:chrome-shift 3s ease infinite;
+  box-shadow:0 6px 24px rgba(255,159,70,.45),inset 0 1px 0 rgba(255,255,255,.3);
+}
+.btn-charge:hover{box-shadow:0 10px 36px rgba(255,159,70,.6),inset 0 1px 0 rgba(255,255,255,.3)}
+
+.btn-icon{font-size:20px;flex-shrink:0;position:relative;z-index:1}
+.btn-text{flex:1;position:relative;z-index:1}
+.btn-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.04em;line-height:1;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.btn-free .btn-title,.btn-charge .btn-title{color:#1a0a00}
+.btn-desc{font-size:11px;line-height:1.4;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.btn-free .btn-desc,.btn-charge .btn-desc{color:rgba(0,0,0,.6)}
+.btn-arrow{margin-left:auto;font-size:16px;flex-shrink:0;opacity:.5;position:relative;z-index:1}
+
+/* ── FREE PANEL ── */
+.free-panel{display:none;background:rgba(61,255,143,.04);border:1px solid rgba(61,255,143,.2);border-radius:14px;padding:28px;margin-bottom:24px}
+.free-panel.visible{display:block}
+.free-panel-title{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--green);letter-spacing:.03em;margin-bottom:18px}
+.free-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:500px){.free-grid{grid-template-columns:1fr 1fr}}
+.free-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;text-align:center}
+.free-box .fb-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);letter-spacing:.02em;line-height:1;margin-bottom:4px}
+.free-box .fb-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.free-blurb{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;border-left:3px solid var(--green);padding-left:14px}
+
+/* ── MODAL ── */
+@media(min-width:600px){.modal-overlay{align-items:center}}
+@media(min-width:600px){.modal{border-radius:20px;transform:translateY(10px)}}
+.custom-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'DM Mono',monospace;font-size:20px;outline:none;transition:border .15s;-moz-appearance:textfield}
+.custom-input::-webkit-outer-spin-button,.custom-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.custom-input:focus{border-color:var(--violet)}
+
+/* ── BLOB + CONIC BUTTON ── */
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes liquid-blob{
+  0%  {border-radius:14px 14px 14px 14px}
+  20% {border-radius:20px 11px 18px 13px}
+  40% {border-radius:11px 19px 13px 20px}
+  60% {border-radius:18px 13px 20px 11px}
+  80% {border-radius:13px 20px 11px 18px}
+  100%{border-radius:14px 14px 14px 14px}
+}
+@keyframes pulse-glow{0%,100%{box-shadow:0 4px 20px rgba(179,84,241,.35)}50%{box-shadow:0 4px 40px rgba(179,84,241,.7),0 0 70px rgba(255,209,102,.2)}}
+.conic-blob-btn{
+  display:inline-block;text-decoration:none;
+  position:relative;border-radius:14px;padding:2px;
+  background:conic-gradient(from var(--angle,0deg),#B354F1,#FFD166,#FF1B9A,#3DFF8F,#B354F1 40%,#FFD166 60%,#B354F1);
+  animation:spin-border 2.5s linear infinite, liquid-blob 3.5s ease-in-out infinite, pulse-glow 2.5s ease-in-out infinite;
+  cursor:pointer;
+}
+.conic-blob-btn:hover .conic-blob-inner{background:#1a1a28}
+.conic-blob-inner{
+  display:flex;align-items:center;gap:10px;
+  background:#141420;border-radius:12px;
+  padding:16px 32px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;
+  color:#fff;white-space:nowrap;
+  animation:liquid-blob 3.5s ease-in-out infinite;
+  transition:background .2s;
+}
+.conic-blob-icon{font-size:20px;font-family:sans-serif}
+.conic-blob-arrow{color:var(--gold);font-size:18px}
+.footer{position:relative;z-index:1;text-align:center;padding:40px 24px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- ═══════════ VIDEO INTRO ═══════════ -->
+<div id="video-intro">
+  <iframe
+    src="https://www.youtube.com/embed/vdsy-r9w4wE?autoplay=1&mute=1&controls=0&loop=1&playlist=vdsy-r9w4wE&playsinline=1&rel=0&modestbranding=1"
+    allow="autoplay; encrypted-media"
+    allowfullscreen>
+  </iframe>
+  <div id="video-progress"><div id="video-progress-bar"></div></div>
+  <button id="skip-btn" onclick="skipIntro()">
+    <span id="skip-timer">10</span>
+    Skip
+    <span style="opacity:.5">→</span>
+  </button>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero hero-hidden" id="heroSection">
+  <div class="hero-glows">
+    <div class="glow glow-v"></div>
+    <div class="glow glow-p"></div>
+    <div class="glow glow-g"></div>
+  </div>
+
+  <div class="hero-main">
+    <div class="festival-tag">
+      <div class="festival-dot"></div>
+      Woodford Folk Festival 2026/27
+    </div>
+
+    <h1 id="heroTitle">
+      <span class="h1g">Silent</span> <span class="h1v">Disco</span> <span class="h1p">Quote</span>
+    </h1>
+    <div class="hero-byline">by Byron Bay Silent Disco</div>
+
+    <p class="hero-desc">
+      Byron Bay Silent Disco charges a <strong>flat fee per headset per day</strong> — for a white-labelled silent disco experience, an all-inclusive rate covering mobilisation, demobilisation, staffing, DJs and full equipment management and logistics for a solid disco experience at your festival.<br><br>
+      Headsets can be offered <strong>complimentary</strong> to patrons as part of the festival experience, or <strong>charged to patrons</strong> with the profit going directly to the festival organisation.<br><br>
+      Silent disco is <strong>perfect for all ages</strong> and allows party-goers to dance and celebrate while others are sleeping — no noise complaints, no curfew battles.
+    </p>
+  </div>
+
+  <div class="hero-cta-wrap">
+    <a href="woodford-quote-2.html" class="conic-blob-btn">
+      <div class="conic-blob-inner">
+        <span class="conic-blob-icon">🎧</span>
+        Free SD Event Quote
+        <span class="conic-blob-arrow">↓</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+
+
+
+<script>
+// ── Video Intro ──
+(function(){
+  const DURATION = 10; // seconds before auto-skip
+  let elapsed = 0;
+  let done = false;
+
+  function revealHero(){
+    if(done) return;
+    done = true;
+    const intro = document.getElementById('video-intro');
+    const hero  = document.getElementById('heroSection');
+    // Fade out video
+    intro.classList.add('fading');
+    // After fade completes, remove overlay and show hero
+    setTimeout(()=>{
+      intro.remove();
+      hero.classList.remove('hero-hidden');
+      hero.classList.add('hero-visible');
+    }, 1400);
+  }
+
+  function skipIntro(){ revealHero(); }
+  window.skipIntro = skipIntro;
+
+  // Countdown + progress bar
+  const timer  = document.getElementById('skip-timer');
+  const bar    = document.getElementById('video-progress-bar');
+  const tick   = setInterval(()=>{
+    elapsed++;
+    const remaining = Math.max(0, DURATION - elapsed);
+    if(timer) timer.textContent = remaining;
+    if(bar)   bar.style.width   = ((elapsed / DURATION) * 100) + '%';
+    if(elapsed >= DURATION){
+      clearInterval(tick);
+      revealHero();
+    }
+  }, 1000);
+})();
+
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  const name = p.get('n');
+  const loc  = p.get('l');
+  const s    = p.get('s');
+  const e    = p.get('e');
+
+  // Update browser tab title
+  if(name) document.title = name + ' — Silent Disco Quote';
+
+  // Update festival tag
+  const tag = document.querySelector('.festival-tag');
+  if(tag) tag.innerHTML = '<div class="festival-dot"></div>' + (name || 'Silent Disco') + ' — Quote';
+
+  // Update hero h1 with event name
+  const h1 = document.getElementById('heroTitle');
+  if(h1 && name) {
+    // Split name into up to 3 words for coloured spans
+    const words = name.split(' ');
+    const cols = ['h1g','h1v','h1p'];
+    h1.innerHTML = words.map((w,i) => `<span class="${cols[i%3]}">${w}</span>`).join(' ');
+  }
+
+  // Pass params through to the conic button link (P2)
+  const conicBtn = document.querySelector('.conic-blob-btn');
+  if(conicBtn && window.location.search) {
+    conicBtn.setAttribute('href', 'https://quotes.byronbaysilentdisco.com/woodford-quote-2.html' + window.location.search);
+  }
+})();
+</script>
+
+</body>
+</html>

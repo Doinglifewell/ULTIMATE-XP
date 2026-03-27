@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InB1bHNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjFhNmUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiNmZmVjMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0ZmQ4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzBhMGExYSIvPgogIDx0ZXh0IHg9IjYwIiB5PSI3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNTgiIGZpbGw9IndoaXRlIiBsZXR0ZXItc3BhY2luZz0iLTMiPlhQPC90ZXh0PgogIDxyZWN0IHg9IjE4IiB5PSI4MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjciIHJ4PSIzLjUiIGZpbGw9InVybCgjcHVsc2UpIj4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9IndpZHRoIiB2YWx1ZXM9Ijg0Ozk2Ozg0IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4IiB2YWx1ZXM9IjE4OzEyOzE4IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjE7MC44NTsxIiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgPC9yZWN0Pgo8L3N2Zz4K">
+  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>admin.byronbaysilentdisco.com</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -163,6 +165,10 @@ html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--f
   .sidebar-toggle{display:flex}
   .sidebar-overlay.show{display:block}
   .tb-right .tb-status{display:none}
+  .wc-cards{grid-template-columns:repeat(2,1fr) !important;max-width:100% !important}
+}
+@media(max-width:480px){
+  .wc-cards{grid-template-columns:1fr !important}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
@@ -252,12 +258,26 @@ html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--f
 
       <!-- Events -->
       <span class="nav-section-label">Events</span>
+      <button class="nav-btn sub" onclick="nav(this,'self-quote','Event Self-Quote')" id="nav-self-quote">
+        <div class="nav-dot"></div>07 Event Self-Quote
+      </button>
       <button class="nav-btn sub" onclick="nav(this,'event-builder','Event Builder')" id="nav-event-builder">
         <div class="nav-dot"></div>Event Builder
       </button>
       <button class="nav-btn sub disabled">
         <div class="nav-dot"></div>Create an Event
         <span class="nav-badge soon">Soon</span>
+      </button>
+
+      <div class="nav-divider"></div>
+
+      <!-- UDJ -->
+      <span class="nav-section-label">Song Requests</span>
+      <button class="nav-btn sub" onclick="nav(this,'udj-director','UDJ Director')" id="nav-udj-director">
+        <div class="nav-dot"></div>UDJ Director
+      </button>
+      <button class="nav-btn sub" onclick="nav(this,'udj-guest','UDJ Guest Page')" id="nav-udj-guest">
+        <div class="nav-dot"></div>UDJ Guest Page
       </button>
 
       <div class="sidebar-footer">
@@ -276,27 +296,36 @@ html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--f
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;background:var(--d0)">
             <div class="wc-logotype">ULTIMATE<span class="dot">·</span>XP<span class="wc-sep"></span><span class="bbsd">BBSD</span></div>
             <div class="wc-sub">admin.byronbaysilentdisco.com · Internal Platform</div>
-            <div class="wc-cards">
-              <div class="wc-card" onclick="nav(document.getElementById('nav-event-builder'),'event-builder','Create an Event')">
+            <div class="wc-cards" style="grid-template-columns:repeat(3,1fr);max-width:680px">
+              <div class="wc-card" onclick="nav(document.getElementById('nav-self-quote'),'self-quote','Event Self-Quote')">
                 <div class="wc-card-icon">⚡</div>
-                <div class="wc-card-title">Create an Event</div>
-                <div class="wc-card-desc">Build a client quote link with custom pricing</div>
+                <div class="wc-card-title">Event Self-Quote</div>
+                <div class="wc-card-desc">Generate a client quote link with custom pricing</div>
               </div>
               <div class="wc-card" onclick="nav(document.getElementById('nav-events-table'),'events-table','Events Table')">
                 <div class="wc-card-icon">📋</div>
-                <div class="wc-card-title">Event Quotes</div>
-                <div class="wc-card-desc">All event quote history and analytics</div>
+                <div class="wc-card-title">Quote Tracker</div>
+                <div class="wc-card-desc">All event & party quotes · status · analytics</div>
               </div>
               <div class="wc-card" onclick="nav(document.getElementById('nav-quote-party'),'quote-party','Party Table')">
                 <div class="wc-card-icon">🎉</div>
                 <div class="wc-card-title">Party Quotes</div>
-                <div class="wc-card-desc">Private party hire quote builder</div>
+                <div class="wc-card-desc">Private party hire · self-quote builder</div>
               </div>
-              <div class="wc-card" onclick="javascript:void(0)">
-                <div class="wc-card-icon">📊</div>
-                <div class="wc-card-title">Analytics</div>
-                <div class="wc-card-desc">P&L, stock, negotiation engine</div>
-              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;font-weight:700;letter-spacing:.06em">COMING SOON</div>
+              <div class="wc-card" onclick="nav(document.getElementById('nav-event-builder'),'event-builder','Event Builder')">
+                <div class="wc-card-icon">🔨</div>
+                <div class="wc-card-title">Event Builder</div>
+                <div class="wc-card-desc">AI-powered event search & builder</div>
+              </div>
+              <div class="wc-card" onclick="nav(document.getElementById('nav-udj-director'),'udj-director','UDJ Director')">
+                <div class="wc-card-icon">🎧</div>
+                <div class="wc-card-title">UDJ Director</div>
+                <div class="wc-card-desc">Live song request queue · 3 channels</div>
+              </div>
+              <div class="wc-card" onclick="nav(document.getElementById('nav-udj-guest'),'udj-guest','UDJ Guest Page')">
+                <div class="wc-card-icon">📱</div>
+                <div class="wc-card-title">UDJ Guest Page</div>
+                <div class="wc-card-desc">Patron-facing song request page</div>
               </div>
             </div>
           </div>
@@ -304,9 +333,12 @@ html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--f
 
         <!-- IFRAMES -->
         <div class="iframe-wrap" id="page-director"><div class="iframe-loader" id="loader-director"><div class="loader-ring"></div><div class="loader-label">Loading analytics…</div></div><iframe src="./ue-director.html" onload="hideLoader('director')"></iframe></div>
+        <div class="iframe-wrap" id="page-self-quote"><div class="iframe-loader" id="loader-self-quote"><div class="loader-ring"></div><div class="loader-label">Loading self-quote…</div></div><iframe src="./self-quote.html" onload="hideLoader('self-quote')"></iframe></div>
         <div class="iframe-wrap" id="page-events-table"><div class="iframe-loader" id="loader-events-table"><div class="loader-ring"></div><div class="loader-label">Loading event quotes…</div></div><iframe src="./events-table.html" onload="hideLoader('events-table')"></iframe></div>
         <div class="iframe-wrap" id="page-quote-party"><div class="iframe-loader" id="loader-quote-party"><div class="loader-ring"></div><div class="loader-label">Loading party quotes…</div></div><iframe src="./quote-party.html" onload="hideLoader('quote-party')"></iframe></div>
         <div class="iframe-wrap" id="page-event-builder"><div class="iframe-loader" id="loader-event-builder"><div class="loader-ring"></div><div class="loader-label">Loading event builder…</div></div><iframe src="./event-builder.html" onload="hideLoader('event-builder')"></iframe></div>
+        <div class="iframe-wrap" id="page-udj-director"><div class="iframe-loader" id="loader-udj-director"><div class="loader-ring"></div><div class="loader-label">Loading UDJ Director…</div></div><iframe src="./udj-director.html" onload="hideLoader('udj-director')"></iframe></div>
+        <div class="iframe-wrap" id="page-udj-guest"><div class="iframe-loader" id="loader-udj-guest"><div class="loader-ring"></div><div class="loader-label">Loading UDJ Guest…</div></div><iframe src="./udj-guest.html" onload="hideLoader('udj-guest')"></iframe></div>
 
       </div>
     </div>
@@ -315,18 +347,29 @@ html,body{height:100%;background:var(--d0);color:var(--text);font-family:var(--f
 
 <script>
 /* ── Auth ── */
-const CREDS = { email:'info@byronbaysilentdisco.com', pass:'BBSD2025!' };
+// Auth — credentials stored as SHA-256 hash (not plaintext)
+const AUTH = {
+  emailHash: '6110920cfe6cba55eda781a11d765515beef311c302abe876af7912cfaef8b65'
+  passHash:  '469c3900769bab1d9b6fc7d51208b555c2e425747944c051e1030515898513e7'
+};
 
-function attemptLogin(){
+async function hashStr(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function attemptLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass  = document.getElementById('loginPass').value;
   const btn   = document.getElementById('loginBtn');
   const err   = document.getElementById('loginError');
   err.classList.remove('show');
   btn.classList.add('loading');
-  setTimeout(()=>{
+  try {
+    const [eHash, pHash] = await Promise.all([hashStr(email), hashStr(pass)]);
+    await new Promise(r => setTimeout(r, 600));
     btn.classList.remove('loading');
-    if(email===CREDS.email && pass===CREDS.pass){
+    if(eHash === AUTH.emailHash && pHash === AUTH.passHash){
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('app').classList.add('visible');
       document.getElementById('sfEmail').textContent = email;
@@ -335,7 +378,10 @@ function attemptLogin(){
     } else {
       err.classList.add('show');
     }
-  }, 600);
+  } catch(e) {
+    btn.classList.remove('loading');
+    err.classList.add('show');
+  }
 }
 
 function logout(){

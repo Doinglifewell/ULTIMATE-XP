@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InB1bHNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjFhNmUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiNmZmVjMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0ZmQ4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzBhMGExYSIvPgogIDx0ZXh0IHg9IjYwIiB5PSI3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNTgiIGZpbGw9IndoaXRlIiBsZXR0ZXItc3BhY2luZz0iLTMiPlhQPC90ZXh0PgogIDxyZWN0IHg9IjE4IiB5PSI4MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjciIHJ4PSIzLjUiIGZpbGw9InVybCgjcHVsc2UpIj4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9IndpZHRoIiB2YWx1ZXM9Ijg0Ozk2Ozg0IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4IiB2YWx1ZXM9IjE4OzEyOzE4IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjE7MC44NTsxIiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgPC9yZWN0Pgo8L3N2Zz4K">
+  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Events — BBSD Platform</title>
+<title>UE Quote Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
 <style>
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -72,8 +75,10 @@ html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit
 .empty-state a{color:var(--violet);text-decoration:none;font-family:var(--mono)}
 .loading-spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--violet);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
 /* ANALYTICS PANEL */
-.analytics-panel{display:none;background:var(--d1);border:.5px solid var(--bdr);border-radius:16px;padding:24px;margin-top:24px;animation:fadeUp .3s ease both}
-.analytics-panel.open{display:block}
+.ap-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.ap-overlay.open{opacity:1;pointer-events:all}
+.ap-modal{background:var(--d1);border:.5px solid var(--bdr);border-radius:18px;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;position:relative;animation:fadeUp .25s ease both}
+.ap-modal::-webkit-scrollbar{width:4px}.ap-modal::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
 .ap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .ap-title{font-family:var(--display);font-size:20px;letter-spacing:.04em}
 .ap-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;transition:color .18s}
@@ -109,8 +114,31 @@ html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit
 .pr-row.total .pr-val{font-family:var(--display);font-size:26px;letter-spacing:.03em;color:var(--green)}
 .pr-val.neg{color:var(--pink)}
 .neg-msg{font-family:var(--mono);font-size:10px;color:var(--pink);margin-top:6px}
-@media(max-width:768px){.stat-row,.ap-grid{grid-template-columns:1fr 1fr}.pc-grid{grid-template-columns:1fr}.events-table th:nth-child(4),.events-table td:nth-child(4){display:none}.events-table th:nth-child(5),.events-table td:nth-child(5){display:none}}
-@media(max-width:480px){.stat-row,.ap-grid{grid-template-columns:1fr}}
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body>*:not(#pdf-doc){display:none!important}#pdf-doc{display:block!important}},.ap-grid{grid-template-columns:1fr 1fr}.pc-grid{grid-template-columns:1fr}.events-table th:nth-child(4),.events-table td:nth-child(4){display:none}.events-table th:nth-child(5),.events-table td:nth-child(5){display:none}#apStatsGrid{grid-template-columns:repeat(3,1fr) !important}}
+@media(max-width:480px){.stat-row,.ap-grid{grid-template-columns:1fr}#apStatsGrid{grid-template-columns:1fr 1fr !important}}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:.5px solid var(--bdr);margin-bottom:20px}
+.tab-btn{padding:10px 20px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .16s;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.tab-btn:hover{color:var(--dim)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-dot{width:6px;height:6px;border-radius:50%;background:var(--bdr);transition:all .16s}
+.tab-btn.active .tab-dot{background:var(--violet);box-shadow:0 0 7px var(--gold)}
+.tab-count{background:rgba(255,255,255,.08);border-radius:20px;padding:1px 7px;font-size:9px}
+.tab-btn.active .tab-count{background:rgba(255,209,102,.15);color:var(--gold)}
+
+/* ── STATUS BADGES ── */
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.status-new{background:rgba(153,153,176,.1);color:var(--dim);border:.5px solid rgba(153,153,176,.2)}
+.status-viewed{background:rgba(179,84,241,.1);color:var(--violet);border:.5px solid rgba(179,84,241,.25)}
+.status-hot{background:rgba(255,159,70,.12);color:var(--orange);border:.5px solid rgba(255,159,70,.25)}
+.status-converted{background:rgba(40,183,157,.1);color:var(--green);border:.5px solid rgba(40,183,157,.25)}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* TYPE BADGE */
+.type-badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:2px 8px;border-radius:5px}
+.type-event{background:rgba(179,84,241,.1);color:var(--violet);border:.5px solid rgba(179,84,241,.2)}
+.type-party{background:rgba(255,27,154,.1);color:var(--pink);border:.5px solid rgba(255,27,154,.2)}
 
 /* ── SELF QUOTE MODAL ── */
 .sq-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -147,68 +175,138 @@ html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit
 .chrome-green-btn:hover{box-shadow:0 10px 36px rgba(40,183,157,.65),inset 0 1px 0 rgba(255,255,255,.3);transform:translateY(-2px)}
 .chrome-green-btn:active{transform:scale(.98)}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/lucide.min.js"></script>
 </head>
 <body>
 <div class="topbar">
-  <div class="tb-logo">ULTIMATE<span style="color:#FFD166">·</span>XP<span style="display:inline-block;width:1px;height:14px;background:#2e2e38;margin:0 10px;vertical-align:middle"></span><span style="color:#B354F1">BBSD</span></div>
+  <div class="tb-logo">ULTIMATE<span class="g">·</span>XP<span style="display:inline-block;width:1px;height:14px;background:#2e2e38;margin:0 10px;vertical-align:middle"></span><span class="v">BBSD</span></div>
   <div class="tb-right">
-    <button class="tb-link" onclick="loadEvents()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button>
+    <button class="tb-link" onclick="loadAll()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button>
     <a href="./dashboard.html" class="tb-link"><i data-lucide="arrow-left" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Dashboard</a>
-    <button class="tb-btn btn-press" onclick="openSelfQuoteModal()"><i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>Create Self Quote</button>
+    <button class="tb-btn btn-press" onclick="openSelfQuoteModal()"><i data-lucide="plus" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:5px"></i>New Quote</button>
   </div>
 </div>
 <div class="main">
-  <!-- OVERVIEW STATS -->
-  <div class="stat-row" id="overviewStats">
-    <div class="stat"><div class="stat-lbl">Total events</div><div class="stat-val violet" id="statTotal">—</div><div class="stat-sub">active quote links</div></div>
-    <div class="stat"><div class="stat-lbl">Total views</div><div class="stat-val gold" id="statViews">—</div><div class="stat-sub">across all events</div></div>
-    <div class="stat"><div class="stat-lbl">Total shares</div><div class="stat-val green" id="statShares">—</div><div class="stat-sub">links copied</div></div>
-    <div class="stat"><div class="stat-lbl">Avg headset interest</div><div class="stat-val pink" id="statAvgHS">—</div><div class="stat-sub">avg hs across sessions</div></div>
+  <!-- PAGE HEADER -->
+  <div style="margin-bottom:20px;animation:fadeUp .25s ease both">
+    <div style="font-family:var(--display);font-size:clamp(28px,4vw,42px);letter-spacing:.03em;line-height:1;margin-bottom:4px">
+      <span style="color:var(--gold)">UE</span> <span style="color:var(--violet)">Quote</span> <span style="color:var(--pink)">Tracker</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">All event & party quotes · create · track · win</div>
   </div>
 
-  <!-- TABLE -->
+  <!-- OVERVIEW STATS -->
+  <div class="stat-row" id="overviewStats">
+    <div class="stat"><div class="stat-lbl">Total quotes</div><div class="stat-val violet" id="statTotal">—</div><div class="stat-sub">events + parties</div></div>
+    <div class="stat"><div class="stat-lbl">Total views</div><div class="stat-val gold" id="statViews">—</div><div class="stat-sub">funnel page views</div></div>
+    <div class="stat"><div class="stat-lbl">Hot leads</div><div class="stat-val" style="color:var(--orange)" id="statShares">—</div><div class="stat-sub">engaged with pricing</div></div>
+    <div class="stat"><div class="stat-lbl">Avg headsets</div><div class="stat-val pink" id="statAvgHS">—</div><div class="stat-sub">avg interest across quotes</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-events" onclick="switchTab('events')">
+      <div class="tab-dot"></div>Event Quotes<span class="tab-count" id="tabCountEvents">0</span>
+    </button>
+    <button class="tab-btn" id="tab-parties" onclick="switchTab('parties')">
+      <div class="tab-dot"></div>Party Quotes<span class="tab-count" id="tabCountParties">0</span>
+    </button>
+  </div>
+
+  <!-- TABLE HEADER -->
   <div class="table-header">
-    <div class="th-title">All Event Quotes</div>
-    <div class="th-actions"><button class="refresh-btn" onclick="loadEvents()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button></div>
+    <div class="th-title" id="tableTitle">Event Quotes</div>
+    <div class="th-actions"><button class="refresh-btn" onclick="loadAll()"><i data-lucide="rotate-cw" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px"></i>Refresh</button></div>
   </div>
   <div style="overflow-x:auto">
     <table class="events-table" id="eventsTable">
       <thead>
         <tr>
-          <th>Event</th>
+          <th>Quote</th>
+          <th>Type</th>
+          <th>Status</th>
           <th>Dates</th>
           <th>Views</th>
-          <th>Avg HS interest</th>
-          <th>Avg quote seen</th>
+          <th>Avg HS</th>
           <th>Created</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="eventsBody">
-        <tr><td colspan="7"><div class="empty-state"><div class="loading-spinner"></div>Loading events...</div></td></tr>
-      </tbody>
+      <tbody id="eventsBody"></tbody>
     </table>
   </div>
 
-  <!-- ANALYTICS PANEL (expands per event) -->
-  <div class="analytics-panel" id="analyticsPanel">
+  <!-- ANALYTICS MODAL -->
+  <div class="ap-overlay" id="analyticsPanel" onclick="if(event.target===this)closeAnalytics()">
+  <div class="ap-modal">
+    <div style="padding:24px 24px 0">
     <div class="ap-header">
       <div>
         <div class="ap-title" id="apTitle">—</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px" id="apMeta">—</div>
       </div>
-      <button class="ap-close" onclick="closeAnalytics()">✕</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="apLastSeen" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
+        <button class="ap-close" onclick="closeAnalytics()">✕</button>
+      </div>
     </div>
-    <div class="ap-grid">
-      <div class="ap-stat"><div class="aps-lbl">Total views</div><div class="aps-val" style="color:var(--violet)" id="apViews">—</div><div class="aps-sub">unique sessions</div></div>
+
+    <!-- PRIMARY STATS ROW -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px" id="apStatsGrid">
+      <div class="ap-stat"><div class="aps-lbl">Views</div><div class="aps-val" style="color:var(--violet)" id="apViews">—</div><div class="aps-sub">page opens</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Avg screen time</div><div class="aps-val" style="color:var(--gold)" id="apScreenTime">—</div><div class="aps-sub">mins per visit</div></div>
+      <div class="ap-stat"><div class="aps-lbl">P1 → P2 rate</div><div class="aps-val" style="color:var(--green)" id="apClickRate">—</div><div class="aps-sub">clicked through</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Avg headsets</div><div class="aps-val" style="color:var(--gold)" id="apAvgHS">—</div><div class="aps-sub">slider explored</div></div>
+      <div class="ap-stat"><div class="aps-lbl">Downloads</div><div class="aps-val" style="color:var(--pink)" id="apDownloads">—</div><div class="aps-sub">PDF saved</div></div>
       <div class="ap-stat"><div class="aps-lbl">Shares</div><div class="aps-val" style="color:var(--green)" id="apShares">—</div><div class="aps-sub">link copied</div></div>
-      <div class="ap-stat"><div class="aps-lbl">Avg headsets explored</div><div class="aps-val" style="color:var(--gold)" id="apAvgHS">—</div><div class="aps-sub">per session</div></div>
-      <div class="ap-stat"><div class="aps-lbl">Avg quote seen</div><div class="aps-val" style="color:var(--pink)" id="apAvgTotal">—</div><div class="aps-sub">at avg HS count</div></div>
     </div>
-    <div class="chart-box">
-      <div class="chart-lbl">Headset interest over time</div>
-      <div class="chart-h"><canvas id="apChart"></canvas></div>
+
+    <!-- CHARTS ROW -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="chart-box" style="margin-bottom:0">
+        <div class="chart-lbl">Headset interest — slider activity over time</div>
+        <div class="chart-h"><canvas id="apChart"></canvas></div>
+      </div>
+      <div class="chart-box" style="margin-bottom:0">
+        <div class="chart-lbl">Ticket price clicks</div>
+        <div class="chart-h"><canvas id="apPriceChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ENGAGEMENT DETAILS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <!-- Dates selected -->
+      <div style="background:var(--d2);border-radius:10px;padding:14px">
+        <div class="aps-lbl" style="margin-bottom:10px">Nights selected most</div>
+        <div id="apDatesBar"></div>
+      </div>
+      <!-- Engagement funnel -->
+      <div style="background:var(--d2);border-radius:10px;padding:14px">
+        <div class="aps-lbl" style="margin-bottom:10px">Engagement funnel</div>
+        <div id="apFunnel"></div>
+      </div>
+    </div>
+
+    <!-- AVG QUOTE VALUE -->
+    <div style="background:linear-gradient(135deg,rgba(255,209,102,.06),rgba(179,84,241,.04));border:.5px solid rgba(255,209,102,.15);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Avg quote value explored</div>
+        <div style="font-family:var(--display);font-size:36px;letter-spacing:.03em;color:var(--gold);line-height:1" id="apAvgTotal">—</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:3px" id="apAvgTotalSub">at avg headset count</div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="text-align:center">
+          <div style="font-family:var(--display);font-size:22px;color:var(--violet)" id="apAvgDays">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Avg nights</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--display);font-size:22px;color:var(--pink)" id="apAvgRate">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Avg rate/hs</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--display);font-size:22px;color:var(--green)" id="apConvScore">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Conv. score</div>
+        </div>
+      </div>
     </div>
 
     <!-- PROFIT CALCULATOR -->
@@ -242,8 +340,16 @@ html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit
         </div>
       </div>
     </div>
-  </div>
-</div>
+
+    </div><!-- /padding -->
+    <!-- Download PDF button -->
+    <div style="padding:0 24px 24px">
+      <button onclick="downloadAnalyticsPDF()" style="width:100%;padding:14px;background:linear-gradient(135deg,#B354F1,#FF1B9A);border:none;border-radius:11px;cursor:pointer;font-family:var(--display);font-size:19px;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);box-shadow:0 4px 18px rgba(179,84,241,.35);transition:all .18s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">↓ Download Analytics PDF</button>
+    </div>
+
+  </div><!-- /ap-modal -->
+  </div><!-- /ap-overlay -->
+</div><!-- /main -->
 
 <script>
 const fmt=n=>'$'+Math.abs(Math.round(n)).toLocaleString('en-AU');
@@ -251,61 +357,136 @@ const fmtN=n=>Math.round(n).toLocaleString('en-AU');
 function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
 
 let allEvents=[];
+let allParties=[];
 let activeEvent=null;
+let activeTab='events';
 let apChart=null;
+let apPriceChart=null;
 let extraCosts=[];
 
-async function loadEvents(){
-  const tbody=document.getElementById('eventsBody');
-  tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="loading-spinner"></div>Loading...</div></td></tr>';
-  try{
-    const r=await fetch('/api/events');
-    if(!r.ok) throw new Error();
-    allEvents=await r.json();
-  }catch(e){
-    // Demo data fallback
+/* ── Status logic ── */
+function getStatus(q){
+  const views=q.views||0;
+  const shares=q.shares||0;
+  const avgHS=q.analytics?.avgHS||0;
+  if(shares>0 || (views>3 && avgHS>500)) return {key:'converted', label:'Converted', cls:'status-converted'};
+  if(views>2 && avgHS>0) return {key:'hot', label:'Hot 🔥', cls:'status-hot'};
+  if(views>0) return {key:'viewed', label:'Viewed', cls:'status-viewed'};
+  return {key:'new', label:'New', cls:'status-new'};
+}
+
+/* ── Tabs ── */
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('tableTitle').textContent = tab==='events' ? 'Event Quotes' : 'Party Quotes';
+  renderTable();
+}
+
+/* ── Load all data ── */
+function seedDemoData(){
+  if(!allEvents.length){
     allEvents=[
-      {id:'demo1',name:'Woodford Folk Festival 2025',start:'2025-12-27',end:'2025-12-31',location:'Woodfordia, QLD',type:'Folk / Cultural Festival',createdAt:Date.now()-86400000*2,views:12,shares:3,analytics:{avgHS:1850,avgDays:3.2,avgTotal:66750,sessions:[{ts:Date.now()-3600*1000*5,hs:2000},{ts:Date.now()-3600*1000*8,hs:1500},{ts:Date.now()-86400000,hs:1000},{ts:Date.now()-86400000*2,hs:3000}]}},
-      {id:'demo2',name:'Splendour in the Grass 2025',start:'2025-07-18',end:'2025-07-20',location:'North Byron Parklands',type:'Music Festival',createdAt:Date.now()-86400000*5,views:28,shares:7,analytics:{avgHS:2400,avgDays:2.1,avgTotal:82800,sessions:[{ts:Date.now()-86400000*2,hs:2500},{ts:Date.now()-86400000*3,hs:2200}]}},
+      {id:'demo1',name:'Woodford Folk Festival 2026/27',start:'2026-12-27',end:'2027-01-01',location:'Woodfordia, QLD',type:'Folk / Cultural Festival',quoteType:'event',createdAt:Date.now()-86400000*2,views:12,shares:3,analytics:{
+        avgHS:1850,avgDays:3.2,avgTotal:66750,avgRate:15,avgScreenTime:247,p1p2Rate:.75,sliderRate:.82,downloads:2,
+        datesSelected:{'27 Dec':8,'28 Dec':9,'29 Dec':10,'30 Dec':7,'31 Dec':11,'1 Jan':6},
+        priceClicks:{'$15':2,'$20':4,'$25':9,'$30':6,'$40':8,'Custom':3},
+        sessions:[{ts:Date.now()-3600*1000*5,hs:2000},{ts:Date.now()-3600*1000*8,hs:1500},{ts:Date.now()-86400000,hs:1000},{ts:Date.now()-86400000*2,hs:2200},{ts:Date.now()-86400000*2+3600000,hs:1800}]
+      }},
+      {id:'demo2',name:'Splendour in the Grass 2026',start:'2026-07-18',end:'2026-07-20',location:'North Byron Parklands',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*5,views:4,shares:0,analytics:{
+        avgHS:2400,avgDays:2.1,avgTotal:82800,avgRate:18,avgScreenTime:183,p1p2Rate:.5,sliderRate:.6,downloads:0,
+        datesSelected:{'18 Jul':3,'19 Jul':4,'20 Jul':2},
+        priceClicks:{'$20':1,'$25':3,'$30':2,'$40':1},
+        sessions:[{ts:Date.now()-86400000*2,hs:2500},{ts:Date.now()-86400000*3,hs:2200}]
+      }},
+      {id:'demo3',name:'Byron Bay Bluesfest 2026',start:'2026-04-01',end:'2026-04-05',location:'Tyagarah Tea Tree Farm, NSW',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*10,views:0,shares:0,analytics:{}},
     ];
   }
-  renderTable();
-  renderOverviewStats();
+  if(!allParties.length){
+    allParties=[
+      {id:'party1',name:'Sarah\'s Hens Night',location:'Byron Bay',type:'Hens Party',quoteType:'party',createdAt:Date.now()-86400000*1,views:3,shares:1,headsets:25,analytics:{avgHS:25}},
+      {id:'party2',name:'Tom\'s 30th Birthday',location:'Gold Coast',type:'Birthday Party',quoteType:'party',createdAt:Date.now()-86400000*3,views:1,shares:0,headsets:40,analytics:{avgHS:40}},
+    ];
+  }
+
+}
+
+function loadAll(){
+  seedDemoData();
+  safeRender();
+  // Background API fetch — won't block or break the page
+  setTimeout(async()=>{
+    try{
+      const r=await fetch('/api/events');
+      if(r.ok){const t=await r.text();const d=JSON.parse(t);if(Array.isArray(d)&&d.length){allEvents=d;safeRender();}}
+    }catch(e){}
+    try{
+      const r=await fetch('/api/parties');
+      if(r.ok){const t=await r.text();const d=JSON.parse(t);if(Array.isArray(d)&&d.length){allParties=d;safeRender();}}
+    }catch(e){}
+  },0);
+}
+
+function safeRender(){
+  try{renderOverviewStats();}catch(e){console.warn('renderOverviewStats',e);}
+  try{updateTabCounts();}catch(e){console.warn('updateTabCounts',e);}
+  try{renderTable();}catch(e){console.warn('renderTable',e);}
+}
+
+function updateTabCounts(){
+  document.getElementById('tabCountEvents').textContent=allEvents.length;
+  document.getElementById('tabCountParties').textContent=allParties.length;
 }
 
 function renderOverviewStats(){
-  const total=allEvents.length;
-  const views=allEvents.reduce((a,e)=>a+(e.views||0),0);
-  const shares=allEvents.reduce((a,e)=>a+(e.shares||0),0);
-  const avgHS=allEvents.length?Math.round(allEvents.reduce((a,e)=>a+(e.analytics?.avgHS||0),0)/allEvents.length):0;
+  const all=[...allEvents,...allParties];
+  const total=all.length;
+  const views=all.reduce((a,e)=>a+(e.views||0),0);
+  const hot=all.filter(e=>{const s=getStatus(e);return s.key==='hot'||s.key==='converted';}).length;
+  const avgHS=all.length?Math.round(all.reduce((a,e)=>a+(e.analytics?.avgHS||0),0)/all.length):0;
   document.getElementById('statTotal').textContent=total;
   document.getElementById('statViews').textContent=views;
-  document.getElementById('statShares').textContent=shares;
+  document.getElementById('statShares').textContent=hot||'—';
   document.getElementById('statAvgHS').textContent=avgHS?fmtN(avgHS):'—';
 }
 
 function renderTable(){
   const tbody=document.getElementById('eventsBody');
-  if(!allEvents.length){
-    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state">No events yet — <a href="./event-builder.html">create your first event quote</a></div></td></tr>';
+  const data = activeTab==='events' ? allEvents : allParties;
+
+  if(!data.length){
+    const msg = activeTab==='events'
+      ? 'No event quotes yet — click <strong>New Quote</strong> → Event Self Quote'
+      : 'No party quotes yet — click <strong>New Quote</strong> → Party Self Quote';
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state" style="font-size:13px">${msg}</div></td></tr>`;
     return;
   }
-  tbody.innerHTML=allEvents.map(e=>{
+
+  tbody.innerHTML=data.map(e=>{
+    const status=getStatus(e);
     const avgHS=e.analytics?.avgHS||0;
     const avgTot=e.analytics?.avgTotal||0;
-    const link=`${window.location.origin}/quote-event.html?id=${e.id}`;
-    const dates=e.start&&e.end?new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' – '+new Date(e.end+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):e.start||'—';
+    const isEvent=activeTab==='events';
+    const link=`${window.location.origin}/${isEvent?'SelfQuote-Funnel-Page1.html?id='+e.id:'quote-party.html?id='+e.id}`;
+    const dates=e.start&&e.end
+      ? new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' – '+new Date(e.end+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'})
+      : e.start||'—';
+    const typeBadge=isEvent
+      ? `<span class="type-badge type-event">🎪 Event</span>`
+      : `<span class="type-badge type-party">🎉 Party</span>`;
     return `<tr>
       <td><div class="event-name">${e.name}</div><div class="event-meta">${e.type||''} ${e.location?'· '+e.location:''}</div></td>
+      <td>${typeBadge}</td>
+      <td><span class="status-badge ${status.cls}"><span class="status-dot"></span>${status.label}</span></td>
       <td class="mono">${dates}</td>
-      <td><span class="badge views">👁 ${e.views||0}</span> <span class="badge shares">↗ ${e.shares||0}</span></td>
+      <td><span class="badge views">👁 ${e.views||0}</span></td>
       <td><span class="avg-hs">${avgHS?fmtN(avgHS):'—'}</span></td>
-      <td class="mono">${avgTot?fmt(avgTot):'—'}</td>
       <td class="mono" style="color:var(--dim)">${timeAgo(e.createdAt)}</td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="tbl-btn analytics" onclick="openAnalytics('${e.id}')">📊 Analytics</button>
-          <button class="tbl-btn open" onclick="window.open('quote-event.html?id=${e.id}','_blank')">↗ Open</button>
+          <button class="tbl-btn open" onclick="window.open('${link}','_blank')">↗ Open</button>
           <button class="tbl-btn copy" onclick="copyLink('${link}',this)">📋 Copy</button>
         </div>
       </td>
@@ -316,32 +497,220 @@ function renderTable(){
 function copyLink(url,btn){navigator.clipboard.writeText(url).then(()=>{const o=btn.textContent;btn.textContent='✓ Copied';setTimeout(()=>btn.textContent=o,2000);});}
 
 function openAnalytics(id){
-  const e=allEvents.find(ev=>ev.id===id);
+  const all=[...allEvents,...allParties];
+  const e=all.find(ev=>ev.id===id);
   if(!e) return;
   activeEvent=e;
-  document.getElementById('analyticsPanel').classList.add('open');
-  document.getElementById('analyticsPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  const panel=document.getElementById('analyticsPanel');
+  panel.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Header
   document.getElementById('apTitle').textContent=e.name;
   document.getElementById('apMeta').textContent=(e.type||'')+' · '+(e.location||'')+(e.start?' · '+new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}):'');
+
+  const a=e.analytics||{};
+  const sessions=a.sessions||[];
+  const lastSeen=sessions.length?timeAgo(sessions[sessions.length-1].ts):'Never opened';
+  document.getElementById('apLastSeen').textContent='Last seen: '+lastSeen;
+
+  // Primary stats
   document.getElementById('apViews').textContent=e.views||0;
+  const avgTime=a.avgScreenTime||0;
+  document.getElementById('apScreenTime').textContent=avgTime?Math.round(avgTime/60)+'m '+(avgTime%60)+'s':'—';
+  const clickRate=a.p1p2Rate||0;
+  document.getElementById('apClickRate').textContent=clickRate?(Math.round(clickRate*100)+'%'):'—';
+  document.getElementById('apAvgHS').textContent=a.avgHS?fmtN(a.avgHS):'—';
+  document.getElementById('apDownloads').textContent=a.downloads||0;
   document.getElementById('apShares').textContent=e.shares||0;
-  document.getElementById('apAvgHS').textContent=e.analytics?.avgHS?fmtN(e.analytics.avgHS):'—';
-  document.getElementById('apAvgTotal').textContent=e.analytics?.avgTotal?fmt(e.analytics.avgTotal):'—';
-  // Pre-fill profit calc with analytics data
-  if(e.analytics?.avgHS){document.getElementById('pcHS').value=e.analytics.avgHS;}
-  if(e.analytics?.avgDays){document.getElementById('pcDays').value=Math.round(e.analytics.avgDays);}
+
+  // Avg quote value section
+  document.getElementById('apAvgTotal').textContent=a.avgTotal?fmt(a.avgTotal):'—';
+  document.getElementById('apAvgTotalSub').textContent=a.avgHS?('at '+fmtN(a.avgHS)+' headsets · avg '+Math.round(a.avgDays||1)+' night'+(Math.round(a.avgDays||1)!==1?'s':'')):'at avg headset count';
+  document.getElementById('apAvgDays').textContent=a.avgDays?Math.round(a.avgDays)+'n':'—';
+  document.getElementById('apAvgRate').textContent=a.avgRate?('$'+a.avgRate):'—';
+
+  // Conversion score (0-10)
+  const score=Math.min(10,Math.round(((e.views||0)*1.5+(e.shares||0)*3+(a.downloads||0)*4+(a.p1p2Rate||0)*3+(Math.min(a.avgHS||0,2000)/2000)*2)));
+  const scoreEl=document.getElementById('apConvScore');
+  scoreEl.textContent=score+'/10';
+  scoreEl.style.color=score>=7?'var(--green)':score>=4?'var(--gold)':'var(--pink)';
+
+  // Dates bar
+  const datesMap=a.datesSelected||{};
+  const dateKeys=Object.keys(datesMap).sort();
+  const maxDateCount=Math.max(1,...Object.values(datesMap));
+  document.getElementById('apDatesBar').innerHTML=dateKeys.length
+    ? dateKeys.map(d=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--dim);width:48px;flex-shrink:0">${d}</div>
+          <div style="flex:1;background:rgba(255,255,255,.06);border-radius:3px;height:8px;overflow:hidden">
+            <div style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--violet),var(--gold));width:${Math.round((datesMap[d]/maxDateCount)*100)}%;transition:width .4s"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;text-align:right">${datesMap[d]}</div>
+        </div>`).join('')
+    : '<div style="font-size:11px;color:var(--muted);padding:8px 0">No date selection data yet</div>';
+
+  // Funnel
+  const fViews=e.views||0;
+  const fClicks=Math.round(fViews*(a.p1p2Rate||0));
+  const fSlider=Math.round(fClicks*(a.sliderRate||0));
+  const fDownload=a.downloads||0;
+  const funnelSteps=[
+    {label:'P1 opens',val:fViews,col:'var(--violet)'},
+    {label:'Clicked to P2',val:fClicks,col:'var(--gold)'},
+    {label:'Used slider',val:fSlider,col:'var(--orange)'},
+    {label:'PDF download',val:fDownload,col:'var(--green)'},
+  ];
+  const maxF=Math.max(1,...funnelSteps.map(s=>s.val));
+  document.getElementById('apFunnel').innerHTML=funnelSteps.map(s=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="font-size:11px;color:var(--dim);width:80px;flex-shrink:0">${s.label}</div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border-radius:3px;height:8px;overflow:hidden">
+        <div style="height:100%;border-radius:3px;background:${s.col};width:${maxF?Math.round((s.val/maxF)*100):0}%;transition:width .4s .1s;opacity:.85"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;text-align:right">${s.val}</div>
+    </div>`).join('');
+
+  // Pre-fill profit calc
+  if(a.avgHS) document.getElementById('pcHS').value=a.avgHS;
+  if(a.avgDays) document.getElementById('pcDays').value=Math.round(a.avgDays);
+
   buildAPChart(e);
+  buildPriceChart(e);
   calcProfit();
 }
-function closeAnalytics(){document.getElementById('analyticsPanel').classList.remove('open');activeEvent=null;}
+
+function closeAnalytics(){document.getElementById('analyticsPanel').classList.remove('open');document.body.style.overflow='';activeEvent=null;}
+
+function downloadAnalyticsPDF(){
+  if(!activeEvent) return;
+  const e=activeEvent;
+  const a=e.analytics||{};
+  const now=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  const dateRange=e.start&&e.end
+    ? new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})+' – '+new Date(e.end+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})
+    : e.start||'—';
+  const score=Math.min(10,Math.round(((e.views||0)*1.5+(e.shares||0)*3+(a.downloads||0)*4+(a.p1p2Rate||0)*3+(Math.min(a.avgHS||0,2000)/2000)*2)));
+  const scoreColor=score>=7?'#3DFF8F':score>=4?'#FFD166':'#FF1B9A';
+  const avgTime=a.avgScreenTime||0;
+  const screenTimeStr=avgTime?Math.round(avgTime/60)+'m '+(avgTime%60)+'s':'—';
+  const clickRate=a.p1p2Rate?Math.round(a.p1p2Rate*100)+'%':'—';
+
+  // Price clicks rows
+  const pc=a.priceClicks||{};
+  const maxPC=Math.max(1,...Object.values(pc));
+  const priceRows=Object.entries(pc).map(([k,v])=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-family:monospace;font-size:11px;color:rgba(0,0,0,.5);width:48px">${k}</div>
+      <div style="flex:1;background:rgba(0,0,0,.08);border-radius:3px;height:7px;overflow:hidden">
+        <div style="height:100%;background:#B354F1;width:${Math.round((v/maxPC)*100)}%;border-radius:3px"></div>
+      </div>
+      <div style="font-family:monospace;font-size:10px;color:rgba(0,0,0,.45);width:14px;text-align:right">${v}</div>
+    </div>`).join('');
+
+  // Funnel
+  const fv=e.views||0,fc=Math.round(fv*(a.p1p2Rate||0)),fs=Math.round(fc*(a.sliderRate||0)),fd=a.downloads||0;
+  const maxF=Math.max(1,fv);
+  const funnelRows=[['P1 opens',fv,'#B354F1'],['Clicked to P2',fc,'#FFD166'],['Used slider',fs,'#FF9F46'],['PDF download',fd,'#28B79D']].map(([l,v,col])=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:11px;color:rgba(0,0,0,.5);width:82px">${l}</div>
+      <div style="flex:1;background:rgba(0,0,0,.07);border-radius:3px;height:7px;overflow:hidden">
+        <div style="height:100%;background:${col};width:${maxF?Math.round((v/maxF)*100):0}%;border-radius:3px"></div>
+      </div>
+      <div style="font-family:monospace;font-size:10px;color:rgba(0,0,0,.4);width:14px;text-align:right">${v}</div>
+    </div>`).join('');
+
+  const doc=document.getElementById('pdf-doc')||document.createElement('div');
+  if(!doc.id){doc.id='pdf-doc';document.body.appendChild(doc);}
+
+  doc.innerHTML=`
+  <div style="min-height:100vh;background:#f8f8f4;color:#0d0d10;padding:44px 52px;font-family:'DM Sans',sans-serif;max-width:780px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid rgba(0,0,0,.1)">
+      <div>
+        <div style="font-size:10px;letter-spacing:.16em;color:#b8820a;text-transform:uppercase;margin-bottom:6px;font-family:monospace">UE Quote Tracker · Analytics Report</div>
+        <div style="font-size:32px;font-weight:800;line-height:.9">
+          <span style="color:#b8820a">Quote</span> <span style="color:#6A14DB">Analytics</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Generated</div>
+        <div style="font-size:12px;color:rgba(0,0,0,.55);font-family:monospace">${now}</div>
+        <div style="margin-top:10px;background:${scoreColor}18;border:1px solid ${scoreColor}40;border-radius:8px;padding:6px 12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:${scoreColor}">${score}/10</div>
+          <div style="font-size:9px;color:rgba(0,0,0,.45);font-family:monospace;text-transform:uppercase;letter-spacing:.08em">Conv. Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:10px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.35);font-family:monospace;margin-bottom:8px">Quote</div>
+      <div style="font-size:20px;font-weight:800;color:#b8820a;margin-bottom:8px">${e.name}</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div><div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Dates</div><div style="font-size:12px">${dateRange}</div></div>
+        <div><div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Location</div><div style="font-size:12px">${e.location||'—'}</div></div>
+        <div><div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Type</div><div style="font-size:12px">${e.type||'—'}</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      ${[['Views',e.views||0,'#6A14DB'],['Avg screen time',screenTimeStr,'#b8820a'],['P1→P2 rate',clickRate,'#0a8050'],['Avg headsets',a.avgHS?fmtN(a.avgHS):'—','#6A14DB'],['PDF downloads',a.downloads||0,'#CC0077'],['Shares',e.shares||0,'#0a8050']].map(([l,v,col])=>`
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:${col};line-height:1">${v}</div>
+        <div style="font-size:9px;color:rgba(0,0,0,.4);font-family:monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:4px">${l}</div>
+      </div>`).join('')}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:14px 16px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.35);font-family:monospace;margin-bottom:10px">Ticket price clicks</div>
+        ${priceRows||'<div style="font-size:11px;color:rgba(0,0,0,.4)">No data</div>'}
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:14px 16px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.35);font-family:monospace;margin-bottom:10px">Engagement funnel</div>
+        ${funnelRows}
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:9px;color:rgba(0,0,0,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Avg quote value explored</div>
+        <div style="font-size:28px;font-weight:800;color:#b8820a">${a.avgTotal?fmt(a.avgTotal):'—'}</div>
+        <div style="font-size:10px;color:rgba(0,0,0,.4);font-family:monospace;margin-top:2px">${a.avgHS?fmtN(a.avgHS)+' headsets · '+Math.round(a.avgDays||1)+' nights avg':''}</div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#6A14DB">${a.avgDays?Math.round(a.avgDays)+'n':'—'}</div><div style="font-size:9px;color:rgba(0,0,0,.4);font-family:monospace;text-transform:uppercase">Avg nights</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#CC0077">${a.avgRate?'$'+a.avgRate:'—'}</div><div style="font-size:9px;color:rgba(0,0,0,.4);font-family:monospace;text-transform:uppercase">Avg rate</div></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding-top:16px;border-top:1px solid rgba(0,0,0,.08)">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:rgba(0,0,0,.3);text-transform:uppercase">Ultimate Experiences · Byron Bay Silent Disco · byronbaysilentdisco.com</div>
+    </div>
+  </div>`;
+
+  doc.style.display='block';
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ doc.style.display='none'; },500); },100);
+}
+
+
 
 function buildAPChart(e){
   if(apChart) apChart.destroy();
-  const sessions=e.analytics?.sessions||[];
+  const sessions=(e.analytics?.sessions||[]);
   if(!sessions.length) return;
   const pts=sessions.slice(-20).map(s=>({x:s.ts,y:s.hs}));
   const ctx=document.getElementById('apChart').getContext('2d');
   apChart=new Chart(ctx,{type:'scatter',data:{datasets:[{data:pts,borderColor:'#B354F1',backgroundColor:'rgba(179,84,241,.15)',pointRadius:5,pointHoverRadius:8,showLine:true,tension:.4,borderWidth:1.5}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'time',time:{unit:'hour'},ticks:{font:{size:9},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},y:{ticks:{callback:v=>fmtN(v),font:{size:9},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${fmtN(i.parsed.y)} headsets`},backgroundColor:'#1a1a2a',bodyColor:'#B354F1',padding:8,cornerRadius:6,displayColors:false}}}});
+}
+
+function buildPriceChart(e){
+  if(apPriceChart) apPriceChart.destroy();
+  const priceClicks=e.analytics?.priceClicks||{'$15':2,'$20':5,'$25':8,'$30':4,'$40':6,'Custom':3};
+  const labels=Object.keys(priceClicks);
+  const vals=Object.values(priceClicks);
+  const ctx=document.getElementById('apPriceChart').getContext('2d');
+  apPriceChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:labels.map((_,i)=>`hsla(${270+i*30},70%,65%,0.7)`),borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{font:{size:9},color:'rgba(255,255,255,.35)'},grid:{display:false},border:{display:false}},y:{ticks:{stepSize:1,font:{size:9},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.parsed.y} click${i.parsed.y!==1?'s':''}`},backgroundColor:'#1a1a2a',bodyColor:'#FFD166',padding:8,cornerRadius:6,displayColors:false}}}});
 }
 
 function calcProfit(){
@@ -379,12 +748,11 @@ function calcProfit(){
     {l:'Misc / contingency',v:'−'+fmt(misc),neg:true},
     {l:'Total costs',v:'−'+fmt(totalCost),neg:true,bold:true},
   ];
-  if(extraCosts.length){rows.push({l:'Extra costs',v:'−'+fmt(extraTotal),neg:true});}
   document.getElementById('profitResult').innerHTML=rows.map(r=>{
     if(r.divider) return '<div style="height:8px;border-bottom:.5px solid rgba(255,255,255,.06);margin-bottom:5px"></div>';
     return `<div class="pr-row${r.bold?' total':''}"><span class="pr-lbl">${r.l}</span><span class="pr-val${r.neg?' neg':''}">${r.v}</span></div>`;
   }).join('')+`
-  <div class="pr-row total"><span class="pr-lbl">Net profit (ex-GST)</span><span class="pr-val" style="color:${net>=0?'var(--green)':'var(--pink)'}${net>=0?'':'"'};font-family:var(--display);font-size:26px;letter-spacing:.03em">${net>=0?fmt(net):'−'+fmt(-net)}</span></div>
+  <div class="pr-row total"><span class="pr-lbl">Net profit (ex-GST)</span><span class="pr-val" style="color:${net>=0?'var(--green)':'var(--pink)'};font-family:var(--display);font-size:26px;letter-spacing:.03em">${net>=0?fmt(net):'−'+fmt(-net)}</span></div>
   <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px">Margin: ${margin}% · Floor: ${fmt(totalCost)} · Room to move: ${fmt(Math.max(0,revenue-totalCost))}</div>
   `;
 }
@@ -400,9 +768,21 @@ function addCostRow(){
   document.getElementById('costRows').appendChild(div);
 }
 
-loadEvents();
-</script>
-<script>document.addEventListener("DOMContentLoaded",()=>lucide.createIcons());</script>
+// Backwards compat alias
+function loadEvents(){ loadAll(); }
+
+seedDemoData();
+renderOverviewStats();
+updateTabCounts();
+renderTable();
+window.addEventListener('load', function(){
+  try{ lucide.createIcons(); }catch(e){}
+  setTimeout(function(){
+    fetch('/api/events').then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(d&&Array.isArray(d)&&d.length){allEvents=d;safeRender();}
+    }).catch(function(){});
+  }, 300);
+});
 
 <!-- SELF QUOTE MODAL -->
 <div class="sq-overlay" id="sqOverlay" onclick="closeSQOutside(event)">
@@ -438,5 +818,6 @@ function goPartyQuote(){ closeSelfQuoteModal(); window.location.href='./quote-pa
 function goEventQuote(){ closeSelfQuoteModal(); window.location.href='./event-builder.html'; }
 </script>
 
+<div id="pdf-doc" style="display:none"></div>
 </body>
 </html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InB1bHNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmZjFhNmUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiNmZmVjMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmY0ZmQ4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzBhMGExYSIvPgogIDx0ZXh0IHg9IjYwIiB5PSI3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iNTgiIGZpbGw9IndoaXRlIiBsZXR0ZXItc3BhY2luZz0iLTMiPlhQPC90ZXh0PgogIDxyZWN0IHg9IjE4IiB5PSI4MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjciIHJ4PSIzLjUiIGZpbGw9InVybCgjcHVsc2UpIj4KICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9IndpZHRoIiB2YWx1ZXM9Ijg0Ozk2Ozg0IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4IiB2YWx1ZXM9IjE4OzEyOzE4IiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjE7MC44NTsxIiBkdXI9IjEuNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgPC9yZWN0Pgo8L3N2Zz4K">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Song Request</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--pc,.3)}50%{box-shadow:0 0 0 6px transparent}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes scaleIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes ringExpand{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#FFD166;--gold-dim:#c9952a;--violet:#B354F1;--orchid:#6A14DB;--pink:#FF1B9A;--orange:#FF9F46;--green:#28B79D;
+  --d0:#07070a;--d1:#0d0d10;--d2:#141418;--d3:#1c1c22;--d4:#26262e;
+  --bdr:#2e2e38;--subtle:#3a3a4a;--muted:#6b6b80;--dim:#9999b0;
+  --font:"Plus Jakarta Sans",sans-serif;--mono:"JetBrains Mono",monospace;--hd:"Bebas Neue",sans-serif;
+}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#07070a}::-webkit-scrollbar-thumb{background:#2e2e38;border-radius:2px}
+html,body{background:#07070a;color:#fff;font-family:"Plus Jakarta Sans",sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:480px;margin:0 auto;padding:0 0 48px}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,7,10,.95);backdrop-filter:blur(12px);border-bottom:.5px solid var(--bdr);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.tb-logo{font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em;line-height:1}
+.tb-logo .dot{color:#FFD166}
+.ch-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:50px;border:1px solid;font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:700;letter-spacing:.07em}
+.ch-accent{height:2px;position:absolute;bottom:0;left:0;right:0}
+/* HERO */
+.hero{text-align:center;padding:24px 16px 18px}
+.hero h1{font-family:"Bebas Neue",sans-serif;font-size:clamp(44px,14vw,72px);letter-spacing:.04em;line-height:.88;margin-bottom:8px}
+.hero-sub{font-size:12px;color:#9999b0;letter-spacing:.4px}
+.request-counter{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:7px 14px;border-radius:50px;background:rgba(10,10,14,.7);border:1px solid #2e2e38}
+/* SEARCH */
+.search-wrap{padding:0 16px;margin-bottom:20px}
+.search-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80;margin-bottom:8px;display:block}
+.search-inner{border-radius:13px;padding:1.5px;animation:spin-border 2.5s linear infinite}
+.search-box{background:rgba(10,14,10,.95);border-radius:11px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+.search-inp{flex:1;background:rgba(8,12,8,.9);border:none;border-radius:8px;padding:10px 12px;font-family:"Plus Jakarta Sans",sans-serif;font-size:13px;color:#fff;outline:none}
+.search-inp::placeholder{color:rgba(255,255,255,.25);font-style:italic}
+.search-btn{padding:9px 16px;border-radius:10px;font-size:12px;font-weight:800;color:#fff;border:none;cursor:pointer;flex-shrink:0;font-family:"Plus Jakarta Sans",sans-serif;transition:all .18s}
+.search-btn:active{transform:scale(.95)}
+/* RESULTS */
+.results{padding:0 16px;margin-bottom:16px}
+.result-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(13,13,16,.85);border:1px solid #2e2e38;border-radius:12px;margin-bottom:7px;cursor:pointer;transition:all .18s;animation:fadeUp .2s ease both}
+.result-row:hover{border-color:var(--ch-color,#22c55e);background:rgba(20,20,24,.9)}
+.result-row:active{transform:scale(.98)}
+.result-art{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.result-art-ph{width:42px;height:42px;border-radius:8px;background:rgba(20,20,24,.9);border:1px solid #2e2e38;display:flex;align-items:center;justify-content:center;font-size:16px;color:#6b6b80;flex-shrink:0}
+.result-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result-artist{font-size:11px;color:#9999b0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result-album{font-size:9px;color:#6b6b80;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.explicit-badge{font-size:8px;font-weight:900;padding:1px 5px;border-radius:3px;background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);flex-shrink:0}
+/* ADD BTN */
+.add-btn{padding:7px 14px;border-radius:9px;font-size:11px;font-weight:800;color:#fff;border:none;cursor:pointer;flex-shrink:0;font-family:"Plus Jakarta Sans",sans-serif;transition:all .18s}
+.add-btn:active{transform:scale(.95)}
+/* QUEUE */
+.queue-section{padding:0 16px}
+.queue-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.queue-title{font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:2px;color:#9999b0}
+.queue-row{display:flex;align-items:center;gap:8px;padding:10px 11px;border:1px solid;border-radius:11px;margin-bottom:6px;position:relative;animation:fadeUp .2s ease both}
+.queue-num{font-family:"Bebas Neue",sans-serif;font-size:18px;width:18px;text-align:center;flex-shrink:0}
+.queue-name{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.queue-artist{font-size:9px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mine-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:11px 0 0 11px}
+.mine-label{font-size:7px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+/* SUCCESS */
+.success-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeUp .2s ease}
+.success-card{background:#0d0d10;border-radius:22px;border:1px solid #2e2e38;padding:28px 24px;text-align:center;max-width:320px;width:100%;position:relative;overflow:hidden}
+.success-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px;animation:scaleIn .4s cubic-bezier(.34,1.56,.64,1) both;position:relative}
+.success-icon::after{content:"";position:absolute;inset:-10px;border-radius:50%;border:2px solid;animation:ringExpand 1.5s ease infinite;pointer-events:none}
+.success-title{font-family:"Bebas Neue",sans-serif;font-size:28px;letter-spacing:.04em;margin-bottom:6px}
+.success-sub{font-size:12px;color:#9999b0;line-height:1.6}
+/* EMPTY */
+.empty{text-align:center;padding:24px 14px;background:rgba(10,10,14,.6);border:1px dashed #2e2e38;border-radius:12px;color:#6b6b80;font-size:11px}
+.empty-icon{font-size:22px;margin-bottom:7px;opacity:.4}
+/* LOADING */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:300;padding:11px 20px;border-radius:50px;font-size:12px;font-weight:700;backdrop-filter:blur(12px);border:1px solid;animation:fadeUp .25s ease;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <div class="tb-logo">ULTIMATE<span class="dot">·</span>XP<span style="display:inline-block;width:1px;height:12px;background:#2e2e38;margin:0 8px;vertical-align:middle"></span><span id="tbBbsd" style="color:#B354F1">BBSD</span></div>
+  <div class="ch-pill" id="chPill">
+    <span id="chDot" style="width:6px;height:6px;border-radius:50%;display:inline-block;animation:blink 2s infinite"></span>
+    <span id="chPillLabel">Loading...</span>
+  </div>
+  <div class="ch-accent" id="chAccent"></div>
+</div>
+
+<div class="page">
+  <!-- HERO -->
+  <div class="hero">
+    <h1 id="heroTitle"><span id="heroGrad">SONG </span><span>REQUEST</span></h1>
+    <p class="hero-sub" id="heroSub">Loading channel...</p>
+    <div class="request-counter" id="requestCounter" style="display:none">
+      <span style="font-size:10px;color:#6b6b80;font-weight:600">Your requests:</span>
+      <div id="counterDots" style="display:flex;gap:4px"></div>
+      <span id="counterLabel" style="font-size:10px;font-weight:700">0/3</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="search-label">Find a Song</span>
+    <div class="search-inner" id="searchInner">
+      <div class="search-box">
+        <input class="search-inp" id="searchInp" placeholder="Artist or song title…" autocomplete="off"
+          onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="search-btn" id="searchBtn" onclick="doSearch()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results" style="display:none"></div>
+
+  <!-- QUEUE -->
+  <div class="queue-section">
+    <div class="queue-header">
+      <div class="queue-title">UP NEXT</div>
+      <span id="queueCount" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid"></span>
+    </div>
+    <div id="queueList">
+      <div class="empty"><div class="empty-icon">🎵</div>Queue is empty</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay" style="display:none">
+  <div class="success-card" id="successCard"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ── Channel detection from path ──
+const pathMap = {'green':1,'red':2,'blue':3};
+const slug = window.location.pathname.split('/').pop() || 'green';
+const CHANNELS = [
+  {id:1,slug:'green',label:'CH 1',name:'GREEN',genre:'Disco & 80s',  color:'#22c55e',dim:'#15803d',faint:'rgba(34,197,94,.08)'},
+  {id:2,slug:'red',  label:'CH 2',name:'RED',  genre:'Pop Hits',     color:'#ef4444',dim:'#b91c1c',faint:'rgba(239,68,68,.08)'},
+  {id:3,slug:'blue', label:'CH 3',name:'BLUE', genre:'Electronic',   color:'#3b82f6',dim:'#1d4ed8',faint:'rgba(59,130,246,.08)'},
+];
+const ch = CHANNELS.find(c=>c.slug===slug) || CHANNELS[0];
+
+// ── Device ID ──
+const deviceId = (() => {
+  let id = localStorage.getItem('udj_device_id');
+  if(!id){ id = 'dev_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); localStorage.setItem('udj_device_id',id); }
+  return id;
+})();
+
+let queueData = {requests:[],history:[],maxPerDevice:3,blockedGenres:[],allowExplicit:true};
+let myRequestCount = 0;
+const API = '/api/udj';
+
+// ── Apply channel theme ──
+document.documentElement.style.setProperty('--ch-color', ch.color);
+document.getElementById('chPill').style.borderColor = ch.color+'40';
+document.getElementById('chPill').style.background  = ch.faint;
+document.getElementById('chDot').style.background = ch.color;
+document.getElementById('chDot').style.boxShadow = `0 0 6px ${ch.color}`;
+document.getElementById('chPillLabel').style.color = ch.color;
+document.getElementById('chPillLabel').textContent = `${ch.label} · ${ch.name}`;
+document.getElementById('chAccent').style.background = `linear-gradient(90deg,${ch.dim},${ch.color},transparent)`;
+document.getElementById('heroGrad').style.background = `linear-gradient(135deg,${ch.dim},${ch.color})`;
+document.getElementById('heroGrad').style.webkitBackgroundClip = 'text';
+document.getElementById('heroGrad').style.webkitTextFillColor = 'transparent';
+document.getElementById('heroSub').textContent = `${ch.label} · ${ch.genre}`;
+document.getElementById('searchInner').style.background = `conic-gradient(from var(--angle,0deg),${ch.color},${ch.dim},${ch.color}88,${ch.color} 40%,${ch.dim} 60%,${ch.color})`;
+document.getElementById('searchBtn').style.background = `linear-gradient(135deg,${ch.dim},${ch.color})`;
+document.title = `Song Request · ${ch.name} · BBSD`;
+
+// ── Load queue ──
+async function loadQueue() {
+  try {
+    const r = await fetch(`${API}?ch=${slug}`);
+    queueData = await r.json();
+  } catch(e) {
+    const stored = localStorage.getItem(`udj:${slug}`);
+    if(stored) queueData = JSON.parse(stored);
+  }
+  myRequestCount = queueData.requests.filter(r=>r.deviceId===deviceId&&r.status==='pending').length;
+  renderCounter();
+  renderQueue();
+}
+
+function renderCounter() {
+  const max = queueData.maxPerDevice||3;
+  document.getElementById('requestCounter').style.display='inline-flex';
+  document.getElementById('counterLabel').textContent = `${myRequestCount}/${max}`;
+  document.getElementById('counterLabel').style.color = myRequestCount>=max?'#ef4444':ch.color;
+  document.getElementById('counterDots').innerHTML = Array.from({length:Math.min(max,8)}).map((_,i)=>
+    `<div style="width:8px;height:8px;border-radius:50%;background:${i<myRequestCount?ch.color:'rgba(46,46,56,.8)'};box-shadow:${i<myRequestCount?`0 0 5px ${ch.color}`:'none'};transition:all .3s"></div>`
+  ).join('');
+}
+
+function renderQueue() {
+  const pending = queueData.requests.filter(r=>r.status==='pending');
+  const countEl = document.getElementById('queueCount');
+  countEl.textContent = `${pending.length} in queue`;
+  countEl.style.color = ch.color;
+  countEl.style.borderColor = ch.color+'40';
+  countEl.style.background = ch.faint;
+
+  if(!pending.length) {
+    document.getElementById('queueList').innerHTML = `<div class="empty"><div class="empty-icon">🎵</div>Queue is empty — be the first to request!</div>`;
+    return;
+  }
+
+  document.getElementById('queueList').innerHTML = pending.map((r,i)=>{
+    const isMine = r.deviceId===deviceId;
+    return `<div class="queue-row" style="background:${isMine?`linear-gradient(135deg,${ch.color}12,${ch.color}05)`:'rgba(10,10,14,.75)'};border-color:${isMine?ch.color+'50':'#2e2e38'}">
+      ${isMine?`<div class="mine-bar" style="background:linear-gradient(180deg,${ch.color},${ch.dim})"></div>`:''}
+      <div class="queue-num" style="color:${isMine?ch.color:'#2e2e38'};${isMine?'margin-left:6px':''}">${i+1}</div>
+      ${r.artwork?`<img src="${r.artwork}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0">` : `<div style="width:34px;height:34px;border-radius:6px;background:rgba(20,20,24,.8);border:1px solid #2e2e38;display:flex;align-items:center;justify-content:center;font-size:13px;color:#6b6b80;flex-shrink:0">♪</div>`}
+      <div style="flex:1;min-width:0">
+        <div class="queue-name" style="font-weight:${isMine?800:600}">${r.name}</div>
+        <div class="queue-artist" style="color:${isMine?ch.color+'80':'#9999b0'}">${r.artist}</div>
+        ${isMine?`<div class="mine-label" style="color:${ch.color}">Your request ★</div>`:''}
+      </div>
+      ${isMine?`<span style="font-size:8px;font-weight:900;color:${ch.color};border:1px solid ${ch.color}40;background:${ch.faint};border-radius:20px;padding:2px 7px;flex-shrink:0">YOURS ★</span>`:`<span style="font-size:8px;font-weight:700;color:${ch.color};border:1px solid ${ch.color}30;background:${ch.faint};border-radius:20px;padding:2px 7px;flex-shrink:0">${ch.label}</span>`}
+    </div>`;
+  }).join('');
+}
+
+// ── Search (iTunes API) ──
+let searchTimer;
+async function doSearch() {
+  const q = document.getElementById('searchInp').value.trim();
+  if(!q||q.length<2) return;
+  const btn = document.getElementById('searchBtn');
+  btn.innerHTML = `<span class="spinner" style="color:${ch.color}"></span>`;
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=8&media=music`);
+    const data = await r.json();
+    renderResults(data.results||[]);
+  } catch(e) {
+    showToast('Search unavailable — try again', 'error');
+  }
+
+  btn.innerHTML = 'Search'; btn.disabled = false;
+}
+
+function renderResults(tracks) {
+  const resultsEl = document.getElementById('results');
+  if(!tracks.length) {
+    resultsEl.style.display='block';
+    resultsEl.innerHTML='<div class="empty"><div class="empty-icon">🔍</div>No results — try a different search</div>';
+    return;
+  }
+
+  const atLimit = myRequestCount >= (queueData.maxPerDevice||3);
+  const alreadyRequested = new Set(queueData.requests.filter(r=>r.deviceId===deviceId&&r.status==='pending').map(r=>r.name+'|'+r.artist));
+
+  resultsEl.style.display='block';
+  resultsEl.innerHTML = `<div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6b6b80;margin-bottom:8px">${tracks.length} Results</div>` +
+    tracks.map((t,i)=>{
+      const isExplicit = t.trackExplicitness==='explicit';
+      if(isExplicit && !queueData.allowExplicit) return '';
+      const genre = t.primaryGenreName||'';
+      if(queueData.blockedGenres?.includes(genre)) return '';
+      const alreadyIn = alreadyRequested.has(t.trackName+'|'+t.artistName);
+      return `<div class="result-row" style="animation-delay:${i*.04}s" onclick="${alreadyIn||atLimit?'':''}"  >
+        ${t.artworkUrl60?`<img src="${t.artworkUrl60.replace('60x60','100x100')}" class="result-art">`:`<div class="result-art-ph">♪</div>`}
+        <div style="flex:1;min-width:0">
+          <div class="result-name">${t.trackName}</div>
+          <div class="result-artist">${t.artistName}</div>
+          <div class="result-album">${t.collectionName||''} ${isExplicit?'<span style="font-size:8px;font-weight:900;color:#ef4444;background:rgba(239,68,68,.1);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,.2)">E</span>':''}</div>
+        </div>
+        ${alreadyIn
+          ? `<span style="font-size:9px;font-weight:800;color:${ch.color};border:1px solid ${ch.color}30;border-radius:20px;padding:3px 9px;flex-shrink:0">In Queue</span>`
+          : atLimit
+          ? `<span style="font-size:9px;color:#6b6b80;border:1px solid #2e2e38;border-radius:20px;padding:3px 9px;flex-shrink:0">Limit</span>`
+          : `<button class="add-btn" style="background:${ch.color}20;border:1px solid ${ch.color}50;color:${ch.color}" onclick="submitRequest(event,${JSON.stringify({name:t.trackName,artist:t.artistName,album:t.collectionName,artwork:t.artworkUrl60?t.artworkUrl60.replace('60x60','100x100'):null,genre:t.primaryGenreName||'',explicit:isExplicit}).replace(/"/g,'&quot;')})">+ Add</button>`
+        }
+      </div>`;
+    }).join('');
+}
+
+async function submitRequest(e, track) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner" style="color:${ch.color}"></span>`;
+
+  try {
+    const r = await fetch(`${API}?ch=${slug}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({...track, deviceId})
+    });
+    const data = await r.json();
+
+    if(data.error==='limit_reached') {
+      showToast(`Limit reached — max ${data.max} requests`, 'error');
+      btn.disabled=false; btn.innerHTML='+ Add'; return;
+    }
+    if(data.error==='genre_blocked'||data.error==='explicit_blocked') {
+      showToast('This song is not allowed on this channel', 'error');
+      btn.disabled=false; btn.innerHTML='+ Add'; return;
+    }
+
+    showSuccess(track);
+    await loadQueue();
+  } catch(err) {
+    // Local fallback
+    const stored = localStorage.getItem(`udj:${slug}`);
+    const qdata = stored ? JSON.parse(stored) : {requests:[],history:[],maxPerDevice:3,blockedGenres:[],allowExplicit:true,nextId:1};
+    qdata.requests.push({id:qdata.nextId++,deviceId,...track,ts:new Date().toISOString(),status:'pending'});
+    localStorage.setItem(`udj:${slug}`, JSON.stringify(qdata));
+    showSuccess(track);
+    await loadQueue();
+  }
+}
+
+function showSuccess(track) {
+  document.getElementById('successCard').innerHTML = `
+    <div class="success-icon" style="background:linear-gradient(135deg,${ch.dim},${ch.color});border:2px solid ${ch.color}">
+      🎵
+      <span style="position:absolute;inset:-10px;border-radius:50%;border:2px solid ${ch.color};animation:ringExpand 1.5s ease infinite;pointer-events:none"></span>
+    </div>
+    <div class="success-title" style="color:${ch.color}">Request Sent! 🎉</div>
+    <div style="font-size:12px;color:#9999b0;margin-bottom:4px;line-height:1.6">
+      <strong style="color:#fff">${track.name}</strong><br>${track.artist}
+    </div>
+    <div style="font-size:11px;color:#6b6b80;margin-top:8px;margin-bottom:20px">Your request has been added to the queue. The DJ will review it shortly.</div>
+    <button onclick="document.getElementById('successOverlay').style.display='none'"
+      style="padding:11px 28px;border-radius:50px;background:linear-gradient(135deg,${ch.dim},${ch.color});border:none;color:#fff;font-weight:800;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+      Back to Queue
+    </button>`;
+  document.getElementById('successOverlay').style.display='flex';
+  setTimeout(()=>document.getElementById('successOverlay').style.display='none', 4000);
+}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error'?'rgba(239,68,68,.15)':'rgba(40,183,157,.15)';
+  t.style.color = type==='error'?'#ef4444':ch.color;
+  t.style.borderColor = type==='error'?'rgba(239,68,68,.3)':`${ch.color}30`;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none', 3000);
+}
+
+// ── Search on Enter ──
+document.getElementById('searchInp').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  if(this.value.length >= 2) searchTimer = setTimeout(doSearch, 600);
+  else document.getElementById('results').style.display='none';
+});
+
+// ── Init ──
+loadQueue();
+setInterval(loadQueue, 4000);
+</script>
+</body>
+</html>
