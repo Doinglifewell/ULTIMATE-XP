@@ -23,17 +23,37 @@ export default async function handler(req) {
   const { eventName } = await req.json().catch(() => ({}));
   if (!eventName) return new Response(JSON.stringify({ error: 'eventName required' }), { status: 400, headers: corsHeaders });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured in Vercel env vars' }), { status: 500, headers: corsHeaders });
+  const CF_ACCOUNT_ID  = '0bcfd9f1d0cd563eece8498038754fcd';
+  const CF_GATEWAY_ID  = process.env.CF_AI_GATEWAY_ID;
+  const CF_GATEWAY_KEY = process.env.CF_AI_GATEWAY_KEY;
+  const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY;
+
+  let endpoint, headers;
+
+  if (CF_GATEWAY_ID && CF_GATEWAY_KEY) {
+    // Route through Cloudflare AI Gateway
+    endpoint = `https://gateway.ai.cloudflare.com/v1/${CF_ACCOUNT_ID}/${CF_GATEWAY_ID}/anthropic/v1/messages`;
+    headers = {
+      'Content-Type': 'application/json',
+      'cf-aig-authorization': `Bearer ${CF_GATEWAY_KEY}`,
+      'anthropic-version': '2023-06-01',
+    };
+  } else if (ANTHROPIC_KEY) {
+    // Direct Anthropic fallback
+    endpoint = 'https://api.anthropic.com/v1/messages';
+    headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01',
+    };
+  } else {
+    return new Response(JSON.stringify({ error: 'No AI credentials configured. Add CF_AI_GATEWAY_ID + CF_AI_GATEWAY_KEY or ANTHROPIC_API_KEY to Vercel env vars.' }), { status: 500, headers: corsHeaders });
+  }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers,
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
@@ -48,7 +68,7 @@ export default async function handler(req) {
   "summary": "One sentence describing the event",
   "confidence": "high|medium|low"
 }
-Use your training knowledge. Return ONLY the JSON object.`,
+Return ONLY the JSON object.`,
         messages: [{ role: 'user', content: `Find details for this event: ${eventName}` }]
       })
     });
