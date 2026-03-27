@@ -550,7 +550,7 @@ textarea { min-height: 70px; resize: vertical; line-height: 1.6; }
           </div>
           <div>
             <label>Venue / Location</label>
-            <input type="text" id="venue" value="Woodford, QLD" oninput="recalc()">
+            <input type="text" id="venue" data-places value="Woodford, QLD" oninput="recalc()">
           </div>
         </div>
         <div class="field-grid fg-3" style="margin-bottom:14px;">
@@ -1227,6 +1227,73 @@ function generateClientQuote() {
 renderStaff();
 renderVans();
 recalc();
+</script>
+<script>
+/* ── Google Places Autocomplete (shared) ── */
+let _placesLoaded = false;
+let _placesLoading = false;
+let _placesQueue = [];
+
+async function loadPlacesAPI() {
+  if (_placesLoaded) return true;
+  if (_placesLoading) return new Promise(r => _placesQueue.push(r));
+  _placesLoading = true;
+  try {
+    const res = await fetch("/api/places-key");
+    const { key } = await res.json();
+    if (!key) return false;
+    await new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+      s.async = true;
+      s.onload = () => { _placesLoaded = true; _placesLoading = false; _placesQueue.forEach(r=>r(true)); _placesQueue=[]; resolve(); };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    // Dark theme styles
+    const style = document.createElement("style");
+    style.textContent = `.pac-container{background:#1c1c22!important;border:1px solid #3a3a4a!important;border-radius:10px!important;margin-top:4px!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important;font-family:"Plus Jakarta Sans",sans-serif!important;z-index:99999!important}.pac-item{padding:8px 14px!important;color:#9999b0!important;font-size:13px!important;cursor:pointer!important;border-top:1px solid #2e2e38!important}.pac-item:hover,.pac-item-selected{background:rgba(179,84,241,.12)!important}.pac-item-query{color:#fff!important;font-weight:600!important}.pac-icon{display:none!important}.pac-matched{color:#B354F1!important}`;
+    document.head.appendChild(style);
+    return true;
+  } catch(e) { console.warn("Places unavailable", e); return false; }
+}
+
+async function initPlacesAutocomplete(inputId, onSelect) {
+  const ok = await loadPlacesAPI();
+  if (!ok) return;
+  const inp = document.getElementById(inputId);
+  if (!inp || inp._placesInit) return;
+  inp._placesInit = true;
+  const ac = new google.maps.places.Autocomplete(inp, {
+    fields: ["formatted_address", "name", "geometry"]
+  });
+  ac.addListener("place_changed", () => {
+    const p = ac.getPlace();
+    const val = p.name ? p.name + ", " + p.formatted_address : p.formatted_address;
+    inp.value = val;
+    if (onSelect) onSelect(val, p);
+  });
+}
+
+async function initAllPlaces() {
+  const fields = document.querySelectorAll("[data-places]");
+  if (!fields.length) return;
+  await loadPlacesAPI();
+  fields.forEach(inp => {
+    if (inp._placesInit) return;
+    inp._placesInit = true;
+    const ac = new google.maps.places.Autocomplete(inp, {
+      fields: ["formatted_address", "name", "geometry"]
+    });
+    ac.addListener("place_changed", () => {
+      const p = ac.getPlace();
+      inp.value = p.name ? p.name + ", " + p.formatted_address : p.formatted_address;
+    });
+  });
+}
+window.addEventListener("load", initAllPlaces);
+
+window.addEventListener("load", () => initPlacesAutocomplete("venue"));
 </script>
 </body>
 </html>
