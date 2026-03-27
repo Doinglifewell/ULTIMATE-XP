@@ -1025,5 +1025,40 @@ fetch('/api/maps-key').then(r=>r.text()).then(eval).catch(function(){
   console.warn('Google Places not configured — location fields work as plain text');
 });
 </script>
+
+<script>
+async function initGooglePlaces() {
+  try {
+    const r = await fetch("/api/maps-key");
+    if (!r.ok) return;
+    const { key } = await r.json();
+    if (!key) return;
+    await new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_gmapsReady`;
+      s.onerror = rej;
+      window._gmapsReady = res;
+      document.head.appendChild(s);
+    });
+    document.querySelectorAll("[data-places]").forEach(inp => {
+      const ac = new google.maps.places.Autocomplete(inp, {
+        componentRestrictions: { country: "au" },
+        fields: ["formatted_address", "name", "geometry"],
+        types: ["establishment", "geocode"]
+      });
+      ac.addListener("place_changed", () => {
+        const p = ac.getPlace();
+        const val = p.name && p.formatted_address ? `${p.name}, ${p.formatted_address}` : (p.formatted_address || p.name || "");
+        inp.value = val;
+        inp.dispatchEvent(new Event("input", { bubbles: true }));
+        inp.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      inp.setAttribute("autocomplete", "off");
+    });
+  } catch(e) { console.warn("Google Places:", e.message); }
+}
+document.addEventListener("DOMContentLoaded", initGooglePlaces);
+</script>
+
 </body>
 </html>
