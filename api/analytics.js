@@ -4,7 +4,7 @@ export const config = { runtime: 'edge' };
 
 const CF_ACCOUNT = '0bcfd9f1d0cd563eece8498038754fcd';
 const KV_NS      = '5767f34f4c184cb4b5479806f177c808';
-const CF_TOKEN   = () => process.env.CF_API_TOKEN;
+const CF_TOKEN   = () => process.env.CF_API_TOKEN || process.env.BBSD_CF_TOKEN;
 
 export default async function handler(req) {
   const cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
