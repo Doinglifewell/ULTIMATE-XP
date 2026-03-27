@@ -878,6 +878,7 @@ function onSlider(){
   headsets = parseInt(document.getElementById('hsSlider').value);
   document.getElementById('hsDisplay').textContent = headsets.toLocaleString('en-AU');
   calc();
+  if(window._track) window._track.slider(headsets);
 }
 
 // ── Chart ──
@@ -1118,6 +1119,7 @@ function buildExpertInputs(){
 }
 
 function selectTicket(price, el){
+  if(window._track) window._track.price('$'+price);
   document.querySelectorAll('.ticket-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   const cw = document.getElementById('customWrap');
@@ -1216,8 +1218,40 @@ window.addEventListener('load', ()=>{
   buildChart();
   updateDatesLabel();
   calc();
-  if(window._track)window._track.date(d);
 });
 </script>
+<script>
+// ── Analytics tracking ──
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  const qid = p.get('qid') || (p.get('n') && p.get('n').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20));
+  if(!qid) return;
+  window._quoteId = qid;
+
+  function fire(event, data){
+    fetch('/api/track', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ event, quoteId: qid, data: data||{} })
+    }).catch(()=>{});
+  }
+
+  // view_p2 on load
+  fire('view_p2');
+
+  // Expose tracker
+  let _sliderTimer;
+  window._track = {
+    slider: function(hs){
+      clearTimeout(_sliderTimer);
+      _sliderTimer = setTimeout(()=>{ fire('slider', {hs}); }, 800);
+    },
+    date: function(date){ fire('date_select', {date}); },
+    price: function(price){ fire('price_click', {price}); },
+    download: function(){ fire('pdf_download'); },
+    share: function(){ fire('share'); }
+  };
+})();
+</script>
+
 </body>
 </html>
