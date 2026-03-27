@@ -1,9 +1,7 @@
 {
   "version": 2,
-  "redirects": [
-    { "source": "/", "destination": "/dashboard.html", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/q/:slug", "destination": "/api/q?s=:slug" }
+  "routes": [
+    { "src": "/q/(?<slug>[^/]+)", "dest": "/api/q?s=$slug" },
+    { "src": "^/$", "dest": "/dashboard.html", "status": 302 }
   ]
 }
