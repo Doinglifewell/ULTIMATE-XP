@@ -398,6 +398,7 @@ async function generateQuote() {
     t: p.type, c: p.contact,
     p100: p.pricing.p100, p500: p.pricing.p500,
     p1000: p.pricing.p1000, p2000: p.pricing.p2000,
+    qid: p.name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20),
     dr_dj, dr_staff, dr_mgr,
   });
   const url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();

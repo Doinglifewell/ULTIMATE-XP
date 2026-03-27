@@ -398,5 +398,21 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 })();
 </script>
 
+
+<script>
+// ── Analytics tracking ──
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  const qid = p.get('qid') || p.get('n') && p.get('n').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20);
+  if(!qid) return;
+  window._quoteId = qid;
+  // Fire view_p1
+  fetch('/api/track', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ event:'view_p1', quoteId:qid, data:{} })
+  }).catch(()=>{});
+})();
+</script>
+
 </body>
 </html>

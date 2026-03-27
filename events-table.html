@@ -536,6 +536,29 @@ function openAnalytics(id){
   panel.classList.add('open');
   document.body.style.overflow='hidden';
 
+  // Try to load live analytics from KV
+  const qid = (e.name||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20);
+  if(qid) {
+    fetch('/api/analytics?id='+qid).then(r=>r.ok?r.json():null).then(live=>{
+      if(live && (live.views||0) > 0) {
+        // Merge live data into the event object
+        e.views = live.views || e.views;
+        e.shares = live.shares || e.shares;
+        e.analytics = {
+          ...e.analytics,
+          avgHS: live.avgHS || e.analytics?.avgHS,
+          avgDays: live.avgDays || e.analytics?.avgDays,
+          p1p2Rate: live.p1p2Rate || e.analytics?.p1p2Rate,
+          downloads: live.downloads || e.analytics?.downloads,
+          datesSelected: live.datesSelected || e.analytics?.datesSelected,
+          sessions: live.sessions || e.analytics?.sessions,
+        };
+        // Re-render with live data
+        openAnalytics(e.id);
+      }
+    }).catch(()=>{});
+  }
+
   // Header
   document.getElementById('apTitle').textContent=e.name;
   document.getElementById('apMeta').textContent=(e.type||'')+' · '+(e.location||'')+(e.start?' · '+new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}):'');
