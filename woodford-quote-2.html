@@ -733,24 +733,21 @@ function doPrint(theme){
   </div>`;
 
   const doc = document.getElementById('pdf-doc');
-  // Open in new window — window.print() blocked in iframes
-  const w = (window.top || window).open('', '_blank', 'width=900,height=750');
-  if (!w) {
-    // Popup blocked fallback — print in current window
-    doc.style.display = 'block';
-    setTimeout(()=>{ window.print(); setTimeout(()=>{ doc.style.display='none'; }, 800); }, 100);
-    return;
-  }
-  w.document.write('<!DOCTYPE html><html><head><title>Silent Disco Quote</title><style>');
-  w.document.write('*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f4}');
-  w.document.write('@media print{.no-print{display:none!important}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}');
-  w.document.write('</style></head><body>');
-  w.document.write('<div class="no-print" style="padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:12px">');
-  w.document.write('<button onclick="window.print()" style="padding:9px 22px;background:#B354F1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">⬇ Save as PDF</button>');
-  w.document.write('<span style="font-size:12px;color:#666">Click Save as PDF → choose Save as PDF from the printer dropdown</span></div>');
-  w.document.write(doc.innerHTML);
-  w.document.write('</body></html>');
-  w.document.close();
+  // Build full HTML as a string
+  const printCSS = `*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f4}@media print{.no-print{display:none!important}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}`;
+  const toolbar = `<div class="no-print" style="padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:12px"><button onclick="window.print()" style="padding:9px 22px;background:#B354F1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">⬇ Save as PDF</button><span style="font-size:12px;color:#666">File → Print → Save as PDF</span></div>`;
+  const html = `<!DOCTYPE html><html><head><title>Silent Disco Quote</title><style>${printCSS}</style></head><body>${toolbar}${doc.innerHTML}</body></html>`;
+
+  // Use blob URL — bypasses popup blocker completely
+  const blob = new Blob([html], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(blobUrl); }, 1000);
 }
 
 }

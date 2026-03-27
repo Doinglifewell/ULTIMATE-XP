@@ -242,7 +242,7 @@ hr{border:none;border-top:.5px solid var(--bdr);margin:28px 0}
 
       <div style="background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:10px;padding:12px 14px">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Event Manager</div>
-        <div style="font-family:var(--display);font-size:13px;color:var(--gold);margin-bottom:8px">1 Manager</div>
+        <div style="font-family:var(--display);font-size:13px;color:var(--gold);margin-bottom:8px">2 Managers</div>
         <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:7px 10px">
           <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">$</span>
           <input type="number" id="rate_mgr" value="450" oninput="updateStaffCalc()"
@@ -463,17 +463,17 @@ function updateStaffCalc() {
   if(djEl)    djEl.textContent    = '3 DJs';
   if(staffEl) staffEl.textContent = sc + ' Staff';
   if(djTot)   djTot.textContent   = '= $' + (3 * djRate).toLocaleString('en-AU') + ' / night';
-  if(mgrTot)  mgrTot.textContent  = '= $' + mgrRate.toLocaleString('en-AU') + ' / night';
+  if(mgrTot)  mgrTot.textContent  = '= $' + (2*mgrRate).toLocaleString('en-AU') + ' / night';
   if(staffTot)staffTot.textContent= '= $' + (sc * staffRate).toLocaleString('en-AU') + ' / night';
 
-  const totalNight = 3*djRate + mgrRate + sc*staffRate;
+  const totalNight = 3*djRate + 2*mgrRate + sc*staffRate;
   if(summary) summary.textContent =
     `${hsVal.toLocaleString()} headsets → ${sc} floor staff + 1 manager + 3 DJs · $${totalNight.toLocaleString('en-AU')} total staff cost / night`;
 
   // Keep window._roles in sync for URL params
   window._roles = [
     { role: 'DJ (×3)',       rate: djRate    },
-    { role: 'Event Manager', rate: mgrRate   },
+    { role: 'Event Manager (×2)', rate: mgrRate   },
     { role: 'Event Staff',   rate: staffRate },
   ];
 }
