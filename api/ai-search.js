@@ -23,37 +23,20 @@ export default async function handler(req) {
   const { eventName } = await req.json().catch(() => ({}));
   if (!eventName) return new Response(JSON.stringify({ error: 'eventName required' }), { status: 400, headers: corsHeaders });
 
-  const CF_ACCOUNT_ID  = '0bcfd9f1d0cd563eece8498038754fcd';
-  const CF_GATEWAY_ID  = process.env.CF_AI_GATEWAY_ID;
-  const CF_GATEWAY_KEY = process.env.CF_AI_GATEWAY_KEY;
-  const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY;
+  const gatewayKey = process.env.CF_AI_GATEWAY_KEY;
+  if (!gatewayKey) return new Response(JSON.stringify({ error: 'CF_AI_GATEWAY_KEY not set in Vercel env vars' }), { status: 500, headers: corsHeaders });
 
-  let endpoint, headers;
-
-  if (CF_GATEWAY_ID && CF_GATEWAY_KEY) {
-    // Route through Cloudflare AI Gateway
-    endpoint = `https://gateway.ai.cloudflare.com/v1/${CF_ACCOUNT_ID}/${CF_GATEWAY_ID}/anthropic/v1/messages`;
-    headers = {
-      'Content-Type': 'application/json',
-      'cf-aig-authorization': `Bearer ${CF_GATEWAY_KEY}`,
-      'anthropic-version': '2023-06-01',
-    };
-  } else if (ANTHROPIC_KEY) {
-    // Direct Anthropic fallback
-    endpoint = 'https://api.anthropic.com/v1/messages';
-    headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01',
-    };
-  } else {
-    return new Response(JSON.stringify({ error: 'No AI credentials configured. Add CF_AI_GATEWAY_ID + CF_AI_GATEWAY_KEY or ANTHROPIC_API_KEY to Vercel env vars.' }), { status: 500, headers: corsHeaders });
-  }
+  // CF AI Gateway — compat endpoint (OpenAI-compatible, supports Anthropic + xAI etc)
+  const endpoint = `https://gateway.ai.cloudflare.com/v1/0aea812fa2cca191c0468f51f30955c1/default/anthropic/v1/messages`;
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'cf-aig-authorization': `Bearer ${gatewayKey}`,
+        'anthropic-version': '2023-06-01',
+      },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
