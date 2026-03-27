@@ -382,12 +382,12 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   if(h1 && name) {
     // Extract a short venue/event label for the title
     // e.g. "Woodford Folk Festival" -> "Woodford", "Splendour in the Grass" -> "Splendour"
-    const stopWords = ['in','the','at','of','and','by','a','an','for','&'];
-    const firstSignificant = name.split(' ').find(w => !stopWords.includes(w.toLowerCase()) && w.length > 2) || name.split(' ')[0];
-    // Use location for venue if available, else first word of event name
-    const venue = loc ? loc.split(',')[0].trim() : firstSignificant;
-    h1.innerHTML = `<span class="h1g">${venue}</span><br><span class="h1v">Silent</span> <span class="h1p">Disco</span>`;
-    document.title = venue + ' Silent Disco — Quote';
+    // Always use first significant word of EVENT NAME for title
+    // e.g. "Woodford Folk Festival" → "Woodford", "Splendour in the Grass" → "Splendour"
+    const stopWords = new Set(['in','the','at','of','and','by','a','an','for','&','folk','festival','grass','coast','bay']);
+    const firstSignificant = name.split(' ').find(w => w.length > 2 && !stopWords.has(w.toLowerCase())) || name.split(' ')[0];
+    h1.innerHTML = `<span class="h1g">${firstSignificant}</span><br><span class="h1v">Silent</span> <span class="h1p">Disco</span>`;
+    document.title = firstSignificant + ' Silent Disco — Quote';
   }
 
   // Pass params through to the conic button link (P2)
