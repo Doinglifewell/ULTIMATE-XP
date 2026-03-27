@@ -217,7 +217,15 @@ hr{border:none;border-top:.5px solid var(--bdr);margin:28px 0}
 
   <!-- Staff Roles (internal only) -->
   <div class="field" style="margin-bottom:0">
-    <label>Staff day rates <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;font-family:var(--mono)">Internal only · headcount auto-scales with headsets</span></label>
+    <label style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>Staff day rates <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;font-family:var(--mono)">Internal only</span></span>
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:8px;padding:6px 12px">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Expected headsets</span>
+        <input type="number" id="expectedHS" value="500" min="50" max="5000" step="50" oninput="updateStaffCalc()"
+          style="width:70px;background:none;border:none;font-family:var(--mono);font-size:14px;color:var(--violet);outline:none;text-align:right">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">hs</span>
+      </div>
+    </label>
     <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="rolesGrid">
 
       <div style="background:rgba(255,255,255,.04);border:.5px solid var(--bdr);border-radius:10px;padding:12px 14px">
@@ -302,8 +310,28 @@ async function aiSearch() {
     const raw = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
     const evt = JSON.parse(raw.replace(/```json|```/g,"").trim());
     if (evt.name)     document.getElementById("evtName").value = evt.name;
-    if (evt.start)    document.getElementById("evtStart").value = evt.start;
-    if (evt.end)      document.getElementById("evtEnd").value = evt.end;
+    // Normalize dates to YYYY-MM-DD for HTML date inputs
+    function toDateInput(d) {
+      if (!d) return null;
+      // Already YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+      // Try parsing and converting
+      const parsed = new Date(d);
+      if (!isNaN(parsed)) return parsed.toISOString().split("T")[0];
+      return null;
+    }
+    const startVal = toDateInput(evt.start);
+    const endVal   = toDateInput(evt.end);
+    if (startVal) {
+      const el = document.getElementById("evtStart");
+      el.value = startVal;
+      el.dispatchEvent(new Event("change"));
+    }
+    if (endVal) {
+      const el = document.getElementById("evtEnd");
+      el.value = endVal;
+      el.dispatchEvent(new Event("change"));
+    }
     if (evt.location) document.getElementById("evtLocation").value = evt.location;
     if (evt.contact)  document.getElementById("evtContact").value = evt.contact;
     if (evt.type) {
@@ -417,9 +445,9 @@ function staffCount(hs) {
 }
 
 function updateStaffCalc() {
-  const hs = parseInt(document.getElementById('p500')?.value) || 500;
-  // Use the headset slider value if available, else fall back to 500
-  const hsVal = window._lastHS || hs;
+  // Use dedicated expected HS count field if present, else default to 500
+  const hsEl = document.getElementById('expectedHS');
+  const hsVal = hsEl ? (parseInt(hsEl.value) || 500) : (window._lastHS || 500);
   const djRate    = parseInt(document.getElementById('rate_dj')?.value)    || 500;
   const mgrRate   = parseInt(document.getElementById('rate_mgr')?.value)   || 450;
   const staffRate = parseInt(document.getElementById('rate_staff')?.value) || 250;
