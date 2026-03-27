@@ -18,11 +18,17 @@ async function kvGet(key) {
 }
 
 async function kvSet(key, value) {
-  await fetch(KV_URL(key), {
+  const r = await fetch(KV_URL(key), {
     method: 'PUT',
     headers: { Authorization: `Bearer ${CF_TOKEN()}`, 'Content-Type': 'text/plain' },
     body: JSON.stringify(value)
   });
+  if (!r.ok) {
+    const body = await r.text().catch(()=>'');
+    console.error(`KV write failed ${r.status} for key "${key}": ${body.slice(0,200)}`);
+    return false;
+  }
+  return true;
 }
 
 export default async function handler(req) {
@@ -46,6 +52,10 @@ export default async function handler(req) {
     sessions: [], datesSelected: {}, priceClicks: {},
     hsReadings: [], lastSeen: null, createdAt: now
   };
+
+  if(!CF_TOKEN()) {
+    console.error('CF_API_TOKEN not set — KV writes will fail');
+  }
 
   switch(event) {
     case 'view_p1':
