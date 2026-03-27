@@ -5,8 +5,5 @@
   ],
   "rewrites": [
     { "source": "/q/:slug", "destination": "/api/q?s=:slug" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }
