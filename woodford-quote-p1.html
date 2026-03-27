@@ -371,7 +371,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   // Personalise description
   const desc = document.getElementById('heroDesc');
   if(desc && name) {
-    const venueName = loc ? loc.split(',')[0].trim() : name.split(' ')[0];
+    const skip2 = new Set(['in','the','at','of','and','by','a','an','for','&','festival','folk','grass','music','event','2026','2027','2025']);
+    const venueName = name.split(/[\s\/]+/).find(w => w.length > 2 && !skip2.has(w.toLowerCase())) || name.split(' ')[0];
     desc.innerHTML = `Byron Bay Silent Disco charges a <strong>flat fee per headset per day</strong> — for a white-labelled silent disco experience at <strong>${name}</strong>, covering mobilisation, demobilisation, staffing, DJs and full equipment management.<br><br>
     Headsets can be offered <strong>complimentary</strong> to patrons as part of the ${venueName} experience, or <strong>charged to patrons</strong> with the profit going directly to ${venueName}. Silent disco is <strong>perfect for all ages</strong> — dance and celebrate while others sleep, with no noise complaints and no curfew battles.`;
   }
