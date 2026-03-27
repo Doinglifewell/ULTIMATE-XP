@@ -241,7 +241,7 @@ body>*:not(#stars){position:relative;z-index:1}
     <label class="lbl">Venue or address</label>
     <div class="loc-wrap">
       <span class="loc-pin">📍</span>
-      <input class="inp loc-inp" id="locationInput" placeholder="Search venue, suburb or address..." autocomplete="off">
+      <input class="inp loc-inp" id="locationInput" data-places placeholder="Search venue, suburb or address..." data-places autocomplete="off">
     </div>
     <div class="loc-result" id="locationResult"></div>
   </div>
@@ -571,6 +571,32 @@ window.addEventListener('resize',init);init();draw();})();
 
 document.getElementById('partyDate').value=new Date().toISOString().split('T')[0];
 buildChart();updateHSDisplay();updateTotal();
+</script>
+
+<!-- Google Places Autocomplete -->
+<script>
+function initPlacesAutocomplete() {
+  document.querySelectorAll('[data-places]').forEach(function(inp) {
+    const ac = new google.maps.places.Autocomplete(inp, {
+      types: ['establishment', 'geocode'],
+      componentRestrictions: { country: ['au', 'nz'] },
+      fields: ['formatted_address', 'name', 'geometry']
+    });
+    ac.addListener('place_changed', function() {
+      const place = ac.getPlace();
+      const val = place.name
+        ? place.name + (place.formatted_address ? ', ' + place.formatted_address : '')
+        : place.formatted_address || inp.value;
+      inp.value = val;
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      inp.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
+// Load Maps API key from server (keeps key out of client HTML)
+fetch('/api/maps-key').then(r=>r.text()).then(eval).catch(function(){
+  console.warn('Google Places not configured — location fields work as plain text');
+});
 </script>
 </body>
 </html>

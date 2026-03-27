@@ -476,7 +476,7 @@ body>*:not(#stars):not(#confetti){position:relative;z-index:1}
       <div id="dateVibes" style="display:none;margin:8px 0;background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.16);border-radius:50px;padding:9px 16px;font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.04em"></div>
 
       <label class="lbl" style="margin-top:4px">Party location</label>
-      <input class="inp" id="partyLocation" type="text" placeholder="e.g. 42 Beach Rd, Byron Bay" autocomplete="street-address" style="margin-bottom:6px" oninput="onLocationInput(this.value)">
+      <input class="inp" id="partyLocation" data-places type="text" placeholder="e.g. 42 Beach Rd, Byron Bay" autocomplete="street-address" style="margin-bottom:6px" oninput="onLocationInput(this.value)">
 
       <button class="send-btn" id="sendBtn" onclick="send()">
         <span class="send-txt">✉ Send Me My Quote</span>
@@ -998,6 +998,32 @@ updateUI(false);
 // Build chart after DOM ready
 setTimeout(buildChart, 50);
 
+</script>
+
+<!-- Google Places Autocomplete -->
+<script>
+function initPlacesAutocomplete() {
+  document.querySelectorAll('[data-places]').forEach(function(inp) {
+    const ac = new google.maps.places.Autocomplete(inp, {
+      types: ['establishment', 'geocode'],
+      componentRestrictions: { country: ['au', 'nz'] },
+      fields: ['formatted_address', 'name', 'geometry']
+    });
+    ac.addListener('place_changed', function() {
+      const place = ac.getPlace();
+      const val = place.name
+        ? place.name + (place.formatted_address ? ', ' + place.formatted_address : '')
+        : place.formatted_address || inp.value;
+      inp.value = val;
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      inp.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
+// Load Maps API key from server (keeps key out of client HTML)
+fetch('/api/maps-key').then(r=>r.text()).then(eval).catch(function(){
+  console.warn('Google Places not configured — location fields work as plain text');
+});
 </script>
 </body>
 </html>

@@ -157,7 +157,7 @@ hr{border:none;border-top:.5px solid var(--bdr);margin:28px 0}
   <div class="cols">
     <div class="field">
       <label>Location</label>
-      <input id="evtLocation" placeholder="e.g. Woodfordia, QLD">
+      <input id="evtLocation" data-places placeholder="Search venue or suburb...">
     </div>
     <div class="field">
       <label>Event type</label>
@@ -331,6 +331,32 @@ function openUrl() { window.open(url, "_blank"); }
 document.getElementById("evtStart").value = new Date().toISOString().split("T")[0];
 const d = new Date(); d.setDate(d.getDate() + 4);
 document.getElementById("evtEnd").value = d.toISOString().split("T")[0];
+</script>
+
+<!-- Google Places Autocomplete -->
+<script>
+function initPlacesAutocomplete() {
+  document.querySelectorAll('[data-places]').forEach(function(inp) {
+    const ac = new google.maps.places.Autocomplete(inp, {
+      types: ['establishment', 'geocode'],
+      componentRestrictions: { country: ['au', 'nz'] },
+      fields: ['formatted_address', 'name', 'geometry']
+    });
+    ac.addListener('place_changed', function() {
+      const place = ac.getPlace();
+      const val = place.name
+        ? place.name + (place.formatted_address ? ', ' + place.formatted_address : '')
+        : place.formatted_address || inp.value;
+      inp.value = val;
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      inp.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
+// Load Maps API key from server (keeps key out of client HTML)
+fetch('/api/maps-key').then(r=>r.text()).then(eval).catch(function(){
+  console.warn('Google Places not configured — location fields work as plain text');
+});
 </script>
 </body>
 </html>
