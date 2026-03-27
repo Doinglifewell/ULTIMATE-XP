@@ -24,14 +24,14 @@ body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;fo
 @keyframes twinkle{0%{opacity:var(--lo)}100%{opacity:var(--hi)}}
 
 /* ── HERO ── */
-.hero{position:relative;z-index:1;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:60px 24px 80px}
+.hero{position:relative;z-index:1;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 40px;gap:0}
 .festival-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,209,102,.1);border:.5px solid rgba(255,209,102,.3);border-radius:20px;padding:5px 16px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
 .festival-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,209,102,.6)}50%{box-shadow:0 0 0 6px rgba(255,209,102,0)}}
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,110px);letter-spacing:.02em;line-height:.88;margin-bottom:10px}
 .h1g{color:var(--gold)}.h1v{color:var(--violet)}.h1p{color:var(--pink)}
-.hero-byline{font-size:clamp(13px,2vw,18px);letter-spacing:.22em;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:44px}
-.hero-desc{max-width:620px;font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.72);line-height:1.75;margin-bottom:56px;font-weight:300}
+.hero-byline{font-size:clamp(11px,1.5vw,14px);letter-spacing:.22em;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:24px}
+.hero-desc{max-width:600px;font-size:clamp(13px,1.6vw,16px);color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:0;font-weight:300}
 .hero-desc strong{color:#fff;font-weight:500}
 .scroll-cta{display:inline-flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-family:'DM Mono',monospace;text-decoration:none;transition:color .2s}
 .scroll-cta:hover{color:var(--gold)}
@@ -43,8 +43,8 @@ body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;fo
 .glow-p{bottom:-80px;left:-60px;width:300px;height:300px;background:var(--pink)}
 .glow-g{top:40%;left:30%;width:200px;height:200px;background:var(--gold);opacity:.08}
 
-.hero-main{display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
-.hero-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding-bottom:20px}
+.hero-main{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;justify-content:center}
+.hero-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:48px}
 .scroll-hint{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace}
 
 /* ── VIDEO INTRO ── */
@@ -284,14 +284,13 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     </div>
 
     <h1 id="heroTitle">
-      <span class="h1g">Silent</span> <span class="h1v">Disco</span> <span class="h1p">Quote</span>
+      <span class="h1g" id="heroEventName">Silent</span><br><span class="h1v">Disco</span>
     </h1>
     <div class="hero-byline">by Byron Bay Silent Disco</div>
 
-    <p class="hero-desc">
+    <p class="hero-desc" id="heroDesc">
       Byron Bay Silent Disco charges a <strong>flat fee per headset per day</strong> — for a white-labelled silent disco experience, an all-inclusive rate covering mobilisation, demobilisation, staffing, DJs and full equipment management and logistics for a solid disco experience at your festival.<br><br>
-      Headsets can be offered <strong>complimentary</strong> to patrons as part of the festival experience, or <strong>charged to patrons</strong> with the profit going directly to the festival organisation.<br><br>
-      Silent disco is <strong>perfect for all ages</strong> and allows party-goers to dance and celebrate while others are sleeping — no noise complaints, no curfew battles.
+      Headsets can be offered <strong>complimentary</strong> to patrons as part of the festival experience, or <strong>charged to patrons</strong> with the profit going directly to the festival organisation. Silent disco is <strong>perfect for all ages</strong> and allows party-goers to dance and celebrate while others are sleeping — no noise complaints, no curfew battles.
     </p>
   </div>
 
@@ -369,13 +368,25 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   const tag = document.querySelector('.festival-tag');
   if(tag) tag.innerHTML = '<div class="festival-dot"></div>' + (name || 'Silent Disco') + ' — Quote';
 
-  // Update hero h1 with event name
+  // Personalise description
+  const desc = document.getElementById('heroDesc');
+  if(desc && name) {
+    const venueName = loc ? loc.split(',')[0].trim() : name.split(' ')[0];
+    desc.innerHTML = `Byron Bay Silent Disco charges a <strong>flat fee per headset per day</strong> — for a white-labelled silent disco experience at <strong>${name}</strong>, covering mobilisation, demobilisation, staffing, DJs and full equipment management.<br><br>
+    Headsets can be offered <strong>complimentary</strong> to patrons as part of the ${venueName} experience, or <strong>charged to patrons</strong> with the profit going directly to ${venueName}. Silent disco is <strong>perfect for all ages</strong> — dance and celebrate while others sleep, with no noise complaints and no curfew battles.`;
+  }
+
+  // Build personalised title: "EVENT Silent Disco" or "Woodfordia Silent Disco"
   const h1 = document.getElementById('heroTitle');
   if(h1 && name) {
-    // Split name into up to 3 words for coloured spans
-    const words = name.split(' ');
-    const cols = ['h1g','h1v','h1p'];
-    h1.innerHTML = words.map((w,i) => `<span class="${cols[i%3]}">${w}</span>`).join(' ');
+    // Extract a short venue/event label for the title
+    // e.g. "Woodford Folk Festival" -> "Woodford", "Splendour in the Grass" -> "Splendour"
+    const stopWords = ['in','the','at','of','and','by','a','an','for','&'];
+    const firstSignificant = name.split(' ').find(w => !stopWords.includes(w.toLowerCase()) && w.length > 2) || name.split(' ')[0];
+    // Use location for venue if available, else first word of event name
+    const venue = loc ? loc.split(',')[0].trim() : firstSignificant;
+    h1.innerHTML = `<span class="h1g">${venue}</span><br><span class="h1v">Silent</span> <span class="h1p">Disco</span>`;
+    document.title = venue + ' Silent Disco — Quote';
   }
 
   // Pass params through to the conic button link (P2)
