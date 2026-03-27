@@ -24,14 +24,14 @@ body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;fo
 @keyframes twinkle{0%{opacity:var(--lo)}100%{opacity:var(--hi)}}
 
 /* ── HERO ── */
-.hero{position:relative;z-index:1;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:60px 24px 52px}
+.hero{position:relative;z-index:1;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:60px 24px 80px}
 .festival-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,209,102,.1);border:.5px solid rgba(255,209,102,.3);border-radius:20px;padding:5px 16px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
 .festival-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,209,102,.6)}50%{box-shadow:0 0 0 6px rgba(255,209,102,0)}}
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,110px);letter-spacing:.02em;line-height:.88;margin-bottom:10px}
 .h1g{color:var(--gold)}.h1v{color:var(--violet)}.h1p{color:var(--pink)}
 .hero-byline{font-size:clamp(13px,2vw,18px);letter-spacing:.22em;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:44px}
-.hero-desc{max-width:620px;font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.72);line-height:1.75;margin-bottom:48px;font-weight:300}
+.hero-desc{max-width:620px;font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.72);line-height:1.75;margin-bottom:56px;font-weight:300}
 .hero-desc strong{color:#fff;font-weight:500}
 .scroll-cta{display:inline-flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-family:'DM Mono',monospace;text-decoration:none;transition:color .2s}
 .scroll-cta:hover{color:var(--gold)}
@@ -44,7 +44,7 @@ body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;fo
 .glow-g{top:40%;left:30%;width:200px;height:200px;background:var(--gold);opacity:.08}
 
 .hero-main{display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
-.hero-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding-bottom:4px}
+.hero-cta-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding-bottom:20px}
 .scroll-hint{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace}
 
 /* ── VIDEO INTRO ── */
@@ -312,18 +312,18 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 <script>
 // ── Video Intro ──
 (function(){
-  const DURATION = 10; // seconds before auto-skip
+  const DURATION = 10;
   let elapsed = 0;
   let done = false;
+  const KEY = 'bbsd_video_seen_' + window.location.pathname;
 
   function revealHero(){
     if(done) return;
     done = true;
+    sessionStorage.setItem(KEY, '1');
     const intro = document.getElementById('video-intro');
     const hero  = document.getElementById('heroSection');
-    // Fade out video
     intro.classList.add('fading');
-    // After fade completes, remove overlay and show hero
     setTimeout(()=>{
       intro.remove();
       hero.classList.remove('hero-hidden');
@@ -334,18 +334,24 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   function skipIntro(){ revealHero(); }
   window.skipIntro = skipIntro;
 
-  // Countdown + progress bar
-  const timer  = document.getElementById('skip-timer');
-  const bar    = document.getElementById('video-progress-bar');
-  const tick   = setInterval(()=>{
+  // If already seen this session, skip immediately
+  if(sessionStorage.getItem(KEY)){
+    const intro = document.getElementById('video-intro');
+    const hero  = document.getElementById('heroSection');
+    if(intro) intro.remove();
+    if(hero){ hero.classList.remove('hero-hidden'); hero.classList.add('hero-visible'); }
+    done = true;
+    return;
+  }
+
+  const timer = document.getElementById('skip-timer');
+  const bar   = document.getElementById('video-progress-bar');
+  const tick  = setInterval(()=>{
     elapsed++;
     const remaining = Math.max(0, DURATION - elapsed);
     if(timer) timer.textContent = remaining;
     if(bar)   bar.style.width   = ((elapsed / DURATION) * 100) + '%';
-    if(elapsed >= DURATION){
-      clearInterval(tick);
-      revealHero();
-    }
+    if(elapsed >= DURATION){ clearInterval(tick); revealHero(); }
   }, 1000);
 })();
 

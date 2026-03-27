@@ -809,12 +809,10 @@ let chart;
     cur.setDate(cur.getDate() + 1);
   }
 
-  // Auto-select all dates
-  const tiles = container.querySelectorAll('.date-tile');
-  tiles.forEach(t => {
-    t.classList.add('active');
-    selectedDates.push(t.dataset.date);
-  });
+  // No dates pre-selected — client chooses
+  // Show helper prompt
+  const hint = document.getElementById('datesSelected');
+  if(hint) hint.textContent = 'Select the nights you need above';
 })();
 
 // ── Date tiles click ──
