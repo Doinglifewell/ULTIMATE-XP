@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#07070a"/>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B354F1"/>
+      <stop offset="50%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#FF1B9A"/>
+    </linearGradient>
+  </defs>
+  <!-- Headphones shape -->
+  <path d="M32 16 C20 16 12 24 12 34 L12 42 C12 44 14 46 16 46 L20 46 C22 46 24 44 24 42 L24 36 C24 34 22 32 20 32 C20 26 25.4 21 32 21 C38.6 21 44 26 44 32 C42 32 40 34 40 36 L40 42 C40 44 42 46 44 46 L48 46 C50 46 52 44 52 42 L52 34 C52 24 44 16 32 16Z" fill="url(#g)"/>
+  <!-- Bar indicator -->
+  <rect x="18" y="52" width="28" height="4" rx="2" fill="url(#g)"/>
+</svg>
