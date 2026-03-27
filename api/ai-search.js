@@ -23,30 +23,19 @@ export default async function handler(req) {
   const { eventName } = await req.json().catch(() => ({}));
   if (!eventName) return new Response(JSON.stringify({ error: 'eventName required' }), { status: 400, headers: corsHeaders });
 
-  // Supports both env var spellings + CF gateway key
-  const anthropicKey = process.env.Antropic_API || process.env.ANTHROPIC_API_KEY;
-  const gatewayKey   = process.env.CF_AI_GATEWAY_KEY;
+  const gatewayKey = process.env.AI_Gateway_XP;
+  if (!gatewayKey) return new Response(JSON.stringify({ error: 'AI_Gateway_XP not configured' }), { status: 500, headers: corsHeaders });
 
-  if (!anthropicKey && !gatewayKey) {
-    return new Response(JSON.stringify({ error: 'No API key configured — add Antropic_API to Vercel env vars' }), { status: 500, headers: corsHeaders });
-  }
-
-  // Use CF AI Gateway if gateway key present, else direct Anthropic
-  const endpoint = gatewayKey
-    ? 'https://gateway.ai.cloudflare.com/v1/0aea812fa2cca191c0468f51f30955c1/default/anthropic/v1/messages'
-    : 'https://api.anthropic.com/v1/messages';
-
-  const reqHeaders = {
-    'Content-Type': 'application/json',
-    'anthropic-version': '2023-06-01',
-  };
-  if (gatewayKey) reqHeaders['cf-aig-authorization'] = `Bearer ${gatewayKey}`;
-  if (anthropicKey) reqHeaders['x-api-key'] = anthropicKey;
+  const endpoint = `https://gateway.ai.cloudflare.com/v1/0aea812fa2cca191c0468f51f30955c1/default/anthropic/v1/messages`;
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: reqHeaders,
+      headers: {
+        'Content-Type': 'application/json',
+        'cf-aig-authorization': `Bearer ${gatewayKey}`,
+        'anthropic-version': '2023-06-01',
+      },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
