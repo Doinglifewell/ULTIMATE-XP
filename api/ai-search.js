@@ -48,8 +48,8 @@ export default async function handler(req) {
   const { eventName } = await req.json().catch(() => ({}));
   if (!eventName) return new Response(JSON.stringify({ error: 'eventName required' }), { status: 400, headers: corsHeaders });
 
-  const gatewayKey   = process.env.CF_AI_GATEWAY_KEY;
-  const anthropicKey = process.env.ANTHROPIC_API_KEY || process.env.Antropic_API || process.env.ANTHROPIC_API;
+  const gatewayKey   = process.env.CF_AI_GATEWAY_KEY || process.env.AI_Gateway_XP || process.env.AI_GATEWAY_KEY;
+  const anthropicKey = process.env.Antropic_API || process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API;
 
   // ── Try 1: CF AI Gateway ──
   if (gatewayKey) {
