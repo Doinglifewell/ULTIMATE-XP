@@ -68,6 +68,10 @@ html,body{background:var(--d0);color:var(--text);font-family:var(--font);-webkit
 .events-table td{padding:12px 12px;border-bottom:.5px solid rgba(255,255,255,.04);font-size:13px;vertical-align:middle}
 .events-table tr:hover td{background:rgba(255,255,255,.02)}
 .event-name{font-weight:500;color:var(--text);margin-bottom:2px}
+.nickname{font-family:var(--mono);font-size:10px;color:var(--gold);margin-bottom:2px;display:flex;align-items:center;gap:5px}
+.nickname-input{background:none;border:none;border-bottom:1px dashed rgba(255,209,102,.3);color:var(--gold);font-family:var(--mono);font-size:10px;outline:none;width:120px;padding:1px 3px;transition:border-color .18s}
+.nickname-input:focus{border-bottom-color:var(--gold)}
+.nickname-input::placeholder{color:rgba(255,209,102,.3)}
 .event-meta{font-family:var(--mono);font-size:10px;color:var(--muted)}
 .badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
 .badge.views{background:rgba(179,84,241,.1);color:var(--violet);border:.5px solid rgba(179,84,241,.2)}
@@ -507,7 +511,16 @@ function renderTable(){
       ? `<span class="type-badge type-event">🎪 Event</span>`
       : `<span class="type-badge type-party">🎉 Party</span>`;
     return `<tr>
-      <td><div class="event-name">${e.name}</div><div class="event-meta">${e.type||''} ${e.location?'· '+e.location:''}</div></td>
+      <td>
+        <div class="nickname" id="nn_${e.id}">
+          <input class="nickname-input" placeholder="+ nickname" value="${getNickname(e.id)}"
+            oninput="saveNickname('${e.id}', this.value)"
+            onclick="event.stopPropagation()"
+            title="Internal nickname — not shown to client">
+        </div>
+        <div class="event-name">${e.name}</div>
+        <div class="event-meta">${e.type||''} ${e.location?'· '+e.location:''}</div>
+      </td>
       <td>${typeBadge}</td>
       <td><span class="status-badge ${status.cls}"><span class="status-dot"></span>${status.label}</span></td>
       <td class="mono">${dates}</td>
@@ -912,6 +925,18 @@ function safeOpen(url) {
     // Fallback
     (window.top || window).location.href = url;
   }
+}
+
+// ── Nicknames (stored in localStorage) ──
+function getNickname(id){
+  try{ return JSON.parse(localStorage.getItem('bbsd_nicknames')||'{}')[id]||''; }catch(e){ return ''; }
+}
+function saveNickname(id, val){
+  try{
+    const nns = JSON.parse(localStorage.getItem('bbsd_nicknames')||'{}');
+    if(val.trim()) nns[id]=val.trim(); else delete nns[id];
+    localStorage.setItem('bbsd_nicknames', JSON.stringify(nns));
+  }catch(e){}
 }
 
 // Boot: seed demos, load real quotes from localStorage, render
