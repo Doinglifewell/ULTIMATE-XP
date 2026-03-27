@@ -306,7 +306,7 @@ async function generateQuote() {
     const params = new URLSearchParams({ n:p.name, s:p.start, e:p.end, l:p.location, t:p.type, c:p.contact, p100:p.pricing.p100, p500:p.pricing.p500, p1000:p.pricing.p1000, p2000:p.pricing.p2000 });
   // Always generate quote links on quotes.byronbaysilentdisco.com
   const QUOTES_BASE = 'https://quotes.byronbaysilentdisco.com';
-  const params = new URLSearchParams({ n:p.name, s:p.start, e:p.end, l:p.location, t:p.type, c:p.contact, p100:p.pricing.p100, p500:p.pricing.p500, p1000:p.pricing.p1000, p2000:p.pricing.p2000 });
+  params = new URLSearchParams({ n:p.name, s:p.start, e:p.end, l:p.location, t:p.type, c:p.contact, p100:p.pricing.p100, p500:p.pricing.p500, p1000:p.pricing.p1000, p2000:p.pricing.p2000 });
   url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
   }
   document.getElementById("resultName").textContent = p.name;
