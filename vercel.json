@@ -1,8 +1,9 @@
 {
   "version": 2,
+  "redirects": [
+    { "source": "/", "destination": "/dashboard.html", "permanent": false }
+  ],
   "routes": [
-    { "src": "/api/quote", "dest": "/api/quote.js" },
-    { "src": "/(.*\\.html)", "dest": "/$1" },
-    { "src": "/", "dest": "/index.html" }
+    { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }
