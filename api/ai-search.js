@@ -1,7 +1,6 @@
 export const config = { runtime: 'edge' };
 
 const CORS = { 'Content-Type': 'application/json' };
-
 const ALLOWED_ORIGINS = [
   'https://xp.byronbaysilentdisco.com',
   'https://quotes.byronbaysilentdisco.com',
@@ -10,7 +9,7 @@ const ALLOWED_ORIGINS = [
 
 export default async function handler(req) {
   const origin = req.headers.get('origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) || origin.includes('localhost') || origin.includes('vercel.app');
+  const allowed = ALLOWED_ORIGINS.includes(origin) || origin.includes('vercel.app') || origin.includes('localhost');
   const corsHeaders = {
     ...CORS,
     'Access-Control-Allow-Origin': allowed ? origin : ALLOWED_ORIGINS[0],
@@ -25,7 +24,7 @@ export default async function handler(req) {
   if (!eventName) return new Response(JSON.stringify({ error: 'eventName required' }), { status: 400, headers: corsHeaders });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return new Response(JSON.stringify({ error: 'API key not configured' }), { status: 500, headers: corsHeaders });
+  if (!apiKey) return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured in Vercel env vars' }), { status: 500, headers: corsHeaders });
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
