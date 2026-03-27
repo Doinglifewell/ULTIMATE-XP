@@ -297,16 +297,16 @@ async function generateQuote() {
       p2000: parseFloat(document.getElementById("p2000").value) || 13,
     }
   };
-  try {
-    const r = await fetch("/api/events", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(p) });
-    const d = await r.json();
-    if (d.url) url = d.url;
-  } catch(e) {}
-  if (!url) {
-    const QUOTES_BASE = 'https://quotes.byronbaysilentdisco.com';
-    const params = new URLSearchParams({ n:p.name, s:p.start, e:p.end, l:p.location, t:p.type, c:p.contact, p100:p.pricing.p100, p500:p.pricing.p500, p1000:p.pricing.p1000, p2000:p.pricing.p2000 });
-    url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
-  }
+  // Build quote URL directly — no API call needed
+  const QUOTES_BASE = 'https://quotes.byronbaysilentdisco.com';
+  const params = new URLSearchParams({
+    n: p.name, s: p.start, e: p.end, l: p.location,
+    t: p.type, c: p.contact,
+    p100: p.pricing.p100, p500: p.pricing.p500,
+    p1000: p.pricing.p1000, p2000: p.pricing.p2000
+  });
+  const url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
+
   document.getElementById("resultName").textContent = p.name;
   document.getElementById("resultUrl").textContent  = url;
   const result = document.getElementById("result");
@@ -314,10 +314,11 @@ async function generateQuote() {
   setTimeout(() => result.scrollIntoView({ behavior:"smooth", block:"nearest" }), 80);
   btn.classList.remove("busy");
   window._p = p;
+  window._quoteUrl = url;
 }
 
 function copyUrl() {
-  navigator.clipboard.writeText(url).then(() => {
+  navigator.clipboard.writeText(window._quoteUrl||'').then(() => {
     const el = document.getElementById("copied");
     el.classList.add("on");
     setTimeout(() => el.classList.remove("on"), 3000);
