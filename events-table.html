@@ -388,25 +388,33 @@ function switchTab(tab){
 function seedDemoData(){
   if(!allEvents.length){
     allEvents=[
-      {id:'demo1',name:'Woodford Folk Festival 2026/27',start:'2026-12-27',end:'2027-01-01',location:'Woodfordia, QLD',type:'Folk / Cultural Festival',quoteType:'event',createdAt:Date.now()-86400000*2,views:12,shares:3,analytics:{
+      {id:'demo1',name:'[DEMO] Woodford Folk Festival 2026/27',start:'2026-12-27',end:'2027-01-01',location:'Woodfordia, QLD',type:'Folk / Cultural Festival',quoteType:'event',createdAt:Date.now()-86400000*2,views:12,shares:3,analytics:{
         avgHS:1850,avgDays:3.2,avgTotal:66750,avgRate:15,avgScreenTime:247,p1p2Rate:.75,sliderRate:.82,downloads:2,
         datesSelected:{'27 Dec':8,'28 Dec':9,'29 Dec':10,'30 Dec':7,'31 Dec':11,'1 Jan':6},
         priceClicks:{'$15':2,'$20':4,'$25':9,'$30':6,'$40':8,'Custom':3},
         sessions:[{ts:Date.now()-3600*1000*5,hs:2000},{ts:Date.now()-3600*1000*8,hs:1500},{ts:Date.now()-86400000,hs:1000},{ts:Date.now()-86400000*2,hs:2200},{ts:Date.now()-86400000*2+3600000,hs:1800}]
       }},
-      {id:'demo2',name:'Splendour in the Grass 2026',start:'2026-07-18',end:'2026-07-20',location:'North Byron Parklands',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*5,views:4,shares:0,analytics:{
+      {id:'demo2',name:'[DEMO] Splendour in the Grass 2026',start:'2026-07-18',end:'2026-07-20',location:'North Byron Parklands',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*5,views:4,shares:0,analytics:{
         avgHS:2400,avgDays:2.1,avgTotal:82800,avgRate:18,avgScreenTime:183,p1p2Rate:.5,sliderRate:.6,downloads:0,
         datesSelected:{'18 Jul':3,'19 Jul':4,'20 Jul':2},
         priceClicks:{'$20':1,'$25':3,'$30':2,'$40':1},
         sessions:[{ts:Date.now()-86400000*2,hs:2500},{ts:Date.now()-86400000*3,hs:2200}]
       }},
-      {id:'demo3',name:'Byron Bay Bluesfest 2026',start:'2026-04-01',end:'2026-04-05',location:'Tyagarah Tea Tree Farm, NSW',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*10,views:0,shares:0,analytics:{}},
+      {id:'demo3',name:'[DEMO] Byron Bay Bluesfest 2026',start:'2026-04-01',end:'2026-04-05',location:'Tyagarah Tea Tree Farm, NSW',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*10,views:0,shares:0,analytics:{}},
     ];
+  }
+  // Load any real quotes saved from self-quote tool
+  const saved = JSON.parse(localStorage.getItem('bbsd_quotes') || '[]');
+  if(saved.length) {
+    const realEvents = saved.filter(q=>q.quoteType==='event'||!q.quoteType);
+    const realParties = saved.filter(q=>q.quoteType==='party');
+    if(realEvents.length) allEvents = [...realEvents, ...allEvents.map(e=>({...e,name:e.name}))];
+    if(realParties.length) allParties = [...realParties, ...allParties];
   }
   if(!allParties.length){
     allParties=[
-      {id:'party1',name:'Sarah\'s Hens Night',location:'Byron Bay',type:'Hens Party',quoteType:'party',createdAt:Date.now()-86400000*1,views:3,shares:1,headsets:25,analytics:{avgHS:25}},
-      {id:'party2',name:'Tom\'s 30th Birthday',location:'Gold Coast',type:'Birthday Party',quoteType:'party',createdAt:Date.now()-86400000*3,views:1,shares:0,headsets:40,analytics:{avgHS:40}},
+      {id:'party1',name:'[DEMO] Sarah\'s Hens Night',location:'Byron Bay',type:'Hens Party',quoteType:'party',createdAt:Date.now()-86400000*1,views:3,shares:1,headsets:25,analytics:{avgHS:25}},
+      {id:'party2',name:'[DEMO] Tom\'s 30th Birthday',location:'Gold Coast',type:'Birthday Party',quoteType:'party',createdAt:Date.now()-86400000*3,views:1,shares:0,headsets:40,analytics:{avgHS:40}},
     ];
   }
 
@@ -720,7 +728,7 @@ function calcProfit(){
   const rate=parseFloat(document.getElementById('pcRate').value)||15;
   const revenue=hs*nights*rate+2000;
   const djRate=parseFloat(document.querySelector('[data-key=djRate]').value)||0;
-  const staffCount=hs<500?2:Math.max(3,Math.floor(hs/1000)*4);
+  const staffCount=Math.min(8,hs<=500?4:4+Math.ceil((hs-500)/200));
   document.getElementById('pcStaff').textContent=staffCount;
   const staffRate=parseFloat(document.querySelector('[data-key=staffRate]').value)||0;
   const mgrRate=parseFloat(document.querySelector('[data-key=mgrRate]').value)||0;

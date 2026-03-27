@@ -213,6 +213,17 @@ hr{border:none;border-top:.5px solid var(--bdr);margin:28px 0}
     <textarea id="evtNotes" placeholder="e.g. Referred by Nathanael · expects 1,500 headsets · follow up in 5 days if no response…"></textarea>
   </div>
 
+  <hr>
+
+  <!-- Staff Roles (internal only) -->
+  <div class="field" style="margin-bottom:0">
+    <label style="display:flex;align-items:center;justify-content:space-between">
+      <span>Staff roles &amp; day rates <span style="font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;font-family:var(--mono)">Internal only</span></span>
+      <button type="button" onclick="addRoleRow()" style="background:none;border:.5px dashed rgba(179,84,241,.4);border-radius:6px;padding:3px 10px;font-family:var(--mono);font-size:10px;color:var(--violet);cursor:pointer;transition:all .18s">+ Add role</button>
+    </label>
+    <div id="rolesContainer" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+
   <!-- Generate -->
   <button class="gen" id="genBtn" onclick="generateQuote()">
     <div class="gen-spin"></div>
@@ -307,6 +318,23 @@ async function generateQuote() {
   });
   const url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
 
+  // Save to localStorage so Quote Tracker picks it up
+  try {
+    const saved = JSON.parse(localStorage.getItem('bbsd_quotes') || '[]');
+    const entry = {
+      id: 'q_' + Date.now(),
+      name: p.name, start: p.start, end: p.end,
+      location: p.location, type: p.type, contact: p.contact,
+      quoteType: 'event', createdAt: Date.now(),
+      views: 0, shares: 0, url,
+      analytics: {}, roles: window._roles || []
+    };
+    // Remove old entry for same event if exists
+    const filtered = saved.filter(q => q.name !== p.name);
+    filtered.unshift(entry);
+    localStorage.setItem('bbsd_quotes', JSON.stringify(filtered.slice(0, 50)));
+  } catch(e) {}
+
   document.getElementById("resultName").textContent = p.name;
   document.getElementById("resultUrl").textContent  = url;
   const result = document.getElementById("result");
@@ -316,6 +344,44 @@ async function generateQuote() {
   window._p = p;
   window._quoteUrl = url;
 }
+
+// ── Default roles ──
+const DEFAULT_ROLES = [
+  { role: 'Event Manager',    rate: 450 },
+  { role: 'DJ (×3)',          rate: 500 },
+  { role: 'Event Staff',      rate: 250 },
+];
+
+function renderRoles() {
+  const container = document.getElementById('rolesContainer');
+  if (!container) return;
+  const roles = window._roles || [];
+  container.innerHTML = roles.map((r, i) => `
+    <div style="display:flex;gap:8px;align-items:center">
+      <input value="${r.role}" oninput="window._roles[${i}].role=this.value"
+        style="flex:1;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--text);outline:none;font-family:var(--font)"
+        placeholder="Role title">
+      <div style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:.5px solid var(--bdr);border-radius:8px;padding:8px 11px">
+        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">$</span>
+        <input type="number" value="${r.rate}" oninput="window._roles[${i}].rate=parseInt(this.value)||0"
+          style="width:70px;background:none;border:none;font-family:var(--mono);font-size:13px;color:var(--text);outline:none" placeholder="450">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">/day</span>
+      </div>
+      <button onclick="window._roles.splice(${i},1);renderRoles()"
+        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;line-height:1;transition:color .15s"
+        onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='var(--muted)'">×</button>
+    </div>`).join('');
+}
+
+function addRoleRow() {
+  if (!window._roles) window._roles = [...DEFAULT_ROLES];
+  window._roles.push({ role: '', rate: 0 });
+  renderRoles();
+}
+
+// Init default roles
+window._roles = [...DEFAULT_ROLES];
+setTimeout(renderRoles, 0);
 
 function copyUrl() {
   navigator.clipboard.writeText(window._quoteUrl||'').then(() => {
