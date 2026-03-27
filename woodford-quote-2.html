@@ -760,6 +760,10 @@ function doPrint(theme){
   if(p.get('p500'))  window._p500  = parseFloat(p.get('p500'));
   if(p.get('p1000')) window._p1000 = parseFloat(p.get('p1000'));
   if(p.get('p2000')) window._p2000 = parseFloat(p.get('p2000'));
+  // Staff day rates from self-quote
+  if(p.get('dr_dj'))    window._djRate    = parseFloat(p.get('dr_dj'));
+  if(p.get('dr_staff')) window._staffRate = parseFloat(p.get('dr_staff'));
+  if(p.get('dr_mgr'))   window._mgrRate   = parseFloat(p.get('dr_mgr'));
 })();
 
 // ── State ──
@@ -949,17 +953,29 @@ function calc(){
   const days = selectedDates.length;
   const rate = rateFor(headsets);
   const total = headsets * days * rate;
-  const djCost = 'Incl.';
-  const staffCount = headsets < 500 ? 3 : headsets < 1000 ? 4 : 5;
+  // Real staff count formula: 4 for ≤500, +1 per 200 after, max 8
+  const staffCount = Math.min(8, headsets <= 500 ? 4 : 4 + Math.ceil((headsets - 500) / 200));
+  // Day rates — pulled from URL params if set by self-quote, else defaults
+  const djDayRate    = window._djRate    || 500;  // per DJ per night
+  const staffDayRate = window._staffRate || 250;  // per staff per night
+  const mgrDayRate   = window._mgrRate   || 450;  // manager per night
+  const mobCost      = window._mobCost   || 300;  // flat mobilisation cost
+  const hsCostPerUnit = window._hsCost   || 0;    // headset hire cost if applicable
+
+  const djTotal    = 3 * djDayRate * days;
+  const staffTotal = staffCount * staffDayRate * days;
+  const mgrTotal   = mgrDayRate * days;
+  const mobTotal   = mobCost;
+  const ourCost    = djTotal + staffTotal + mgrTotal + mobTotal + (hsCostPerUnit * headsets * days);
 
   // Invoice
-  document.getElementById('inv-hs-qty').textContent = `${headsets.toLocaleString()} × ${days}`;
-  document.getElementById('inv-hs-total').textContent = fmt(headsets * days * (rate * 0.45));
-  document.getElementById('inv-dj-qty').textContent = `3 DJs × ${days} nights`;
-  document.getElementById('inv-dj-total').textContent = fmt(headsets * days * (rate * 0.25));
-  document.getElementById('inv-staff-qty').textContent = `${staffCount} staff × ${days} nights`;
-  document.getElementById('inv-staff-total').textContent = fmt(headsets * days * (rate * 0.2));
-  document.getElementById('inv-mob-total').textContent = fmt(headsets * days * (rate * 0.1));
+  document.getElementById('inv-hs-qty').textContent = `${headsets.toLocaleString()} × ${days} nights`;
+  document.getElementById('inv-hs-total').textContent = fmt(total);
+  document.getElementById('inv-dj-qty').textContent = `3 DJs × $${djDayRate} × ${days} nights`;
+  document.getElementById('inv-dj-total').textContent = fmt(djTotal);
+  document.getElementById('inv-staff-qty').textContent = `${staffCount} staff × $${staffDayRate} × ${days} nights`;
+  document.getElementById('inv-staff-total').textContent = fmt(staffTotal);
+  document.getElementById('inv-mob-total').textContent = fmt(mgrTotal + mobTotal);
   document.getElementById('inv-rate-note').textContent = 'Rate per headset / day';
   document.getElementById('inv-rate-val').textContent = '$' + rate;
   document.getElementById('inv-calc-note').textContent = 'Calculation';

@@ -505,7 +505,7 @@ function renderTable(){
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="tbl-btn analytics" onclick="openAnalytics('${e.id}')">📊 Analytics</button>
-          <button class="tbl-btn open" onclick="(window.top||window).open('${link}','_blank')">↗ Open</button>
+          <button class="tbl-btn open" onclick="safeOpen('${link}')">↗ Open</button>
           <button class="tbl-btn copy" onclick="copyLink('${link}',this)">📋 Copy</button>
         </div>
       </td>
@@ -789,6 +789,24 @@ function addCostRow(){
 
 // Backwards compat alias
 function loadEvents(){ loadAll(); }
+
+// Open a URL without triggering popup blockers (works inside iframes too)
+function safeOpen(url) {
+  try {
+    // Try creating a temporary anchor and dispatching a click — bypasses popup blocker
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 100);
+  } catch(e) {
+    // Fallback
+    (window.top || window).location.href = url;
+  }
+}
 
 // Boot: seed demos, load real quotes from localStorage, render
 seedDemoData();

@@ -310,11 +310,21 @@ async function generateQuote() {
   };
   // Build quote URL directly — no API call needed
   const QUOTES_BASE = 'https://quotes.byronbaysilentdisco.com';
+  // Extract staff day rates from roles for P2
+  const roles = window._roles || [];
+  const djRole    = roles.find(r => r.role.toLowerCase().includes('dj'));
+  const staffRole = roles.find(r => r.role.toLowerCase().includes('staff'));
+  const mgrRole   = roles.find(r => r.role.toLowerCase().includes('manager'));
+
   const params = new URLSearchParams({
     n: p.name, s: p.start, e: p.end, l: p.location,
     t: p.type, c: p.contact,
     p100: p.pricing.p100, p500: p.pricing.p500,
-    p1000: p.pricing.p1000, p2000: p.pricing.p2000
+    p1000: p.pricing.p1000, p2000: p.pricing.p2000,
+    // Staff day rates (internal, passed to P2 cost calc)
+    dr_dj:    djRole    ? djRole.rate    : 500,
+    dr_staff: staffRole ? staffRole.rate : 250,
+    dr_mgr:   mgrRole   ? mgrRole.rate   : 450,
   });
   const url = QUOTES_BASE + "/woodford-quote-p1.html?" + params.toString();
 
