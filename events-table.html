@@ -385,6 +385,22 @@ function switchTab(tab){
 }
 
 /* ── Load all data ── */
+function loadSavedQuotes(){
+  // Always reload from localStorage so new quotes appear immediately
+  try {
+    const saved = JSON.parse(localStorage.getItem('bbsd_quotes') || '[]');
+    const realEvents = saved.filter(q => q.quoteType==='event' || !q.quoteType);
+    const realParties = saved.filter(q => q.quoteType==='party');
+    // Prepend real quotes before demo data
+    if(realEvents.length){
+      allEvents = [...realEvents, ...allEvents.filter(e => e.id.startsWith('demo'))];
+    }
+    if(realParties.length){
+      allParties = [...realParties, ...allParties.filter(p => p.id.startsWith('party'))];
+    }
+  } catch(e){}
+}
+
 function seedDemoData(){
   if(!allEvents.length){
     allEvents=[
@@ -403,14 +419,6 @@ function seedDemoData(){
       {id:'demo3',name:'[DEMO] Byron Bay Bluesfest 2026',start:'2026-04-01',end:'2026-04-05',location:'Tyagarah Tea Tree Farm, NSW',type:'Music Festival',quoteType:'event',createdAt:Date.now()-86400000*10,views:0,shares:0,analytics:{}},
     ];
   }
-  // Load any real quotes saved from self-quote tool
-  const saved = JSON.parse(localStorage.getItem('bbsd_quotes') || '[]');
-  if(saved.length) {
-    const realEvents = saved.filter(q=>q.quoteType==='event'||!q.quoteType);
-    const realParties = saved.filter(q=>q.quoteType==='party');
-    if(realEvents.length) allEvents = [...realEvents, ...allEvents.map(e=>({...e,name:e.name}))];
-    if(realParties.length) allParties = [...realParties, ...allParties];
-  }
   if(!allParties.length){
     allParties=[
       {id:'party1',name:'[DEMO] Sarah\'s Hens Night',location:'Byron Bay',type:'Hens Party',quoteType:'party',createdAt:Date.now()-86400000*1,views:3,shares:1,headsets:25,analytics:{avgHS:25}},
@@ -422,6 +430,7 @@ function seedDemoData(){
 
 function loadAll(){
   seedDemoData();
+  loadSavedQuotes();
   safeRender();
   // Background API fetch — won't block or break the page
   setTimeout(async()=>{
@@ -476,7 +485,9 @@ function renderTable(){
     const avgHS=e.analytics?.avgHS||0;
     const avgTot=e.analytics?.avgTotal||0;
     const isEvent=activeTab==='events';
-    const link=`${window.location.origin}/${isEvent?'SelfQuote-Funnel-Page1.html?id='+e.id:'quote-party.html?id='+e.id}`;
+    const link = e.url || (isEvent
+      ? 'https://quotes.byronbaysilentdisco.com/woodford-quote-p1.html?n='+encodeURIComponent(e.name||'')+'&s='+(e.start||'')+'&e='+(e.end||'')+'&l='+encodeURIComponent(e.location||'')
+      : window.location.origin+'/quote-party.html?id='+e.id);
     const dates=e.start&&e.end
       ? new Date(e.start+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' – '+new Date(e.end+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'})
       : e.start||'—';
@@ -494,7 +505,7 @@ function renderTable(){
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="tbl-btn analytics" onclick="openAnalytics('${e.id}')">📊 Analytics</button>
-          <button class="tbl-btn open" onclick="window.open('${link}','_blank')">↗ Open</button>
+          <button class="tbl-btn open" onclick="(window.top||window).open('${link}','_blank')">↗ Open</button>
           <button class="tbl-btn copy" onclick="copyLink('${link}',this)">📋 Copy</button>
         </div>
       </td>
