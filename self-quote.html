@@ -335,8 +335,23 @@ async function generateQuote() {
     localStorage.setItem('bbsd_quotes', JSON.stringify(filtered.slice(0, 50)));
   } catch(e) {}
 
+  // Try to create a short link
+  let displayUrl = url;
+  try {
+    const sr = await fetch('/api/q', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: p.name, url })
+    });
+    if (sr.ok) {
+      const sd = await sr.json();
+      if (sd.shortUrl) displayUrl = sd.shortUrl;
+    }
+  } catch(e) {}
+
   document.getElementById("resultName").textContent = p.name;
-  document.getElementById("resultUrl").textContent  = url;
+  document.getElementById("resultUrl").textContent  = displayUrl;
+  window._quoteUrl = displayUrl;
   const result = document.getElementById("result");
   result.style.display = "block";
   setTimeout(() => result.scrollIntoView({ behavior:"smooth", block:"nearest" }), 80);
@@ -384,7 +399,7 @@ window._roles = [...DEFAULT_ROLES];
 setTimeout(renderRoles, 0);
 
 function copyUrl() {
-  navigator.clipboard.writeText(window._quoteUrl||'').then(() => {
+  navigator.clipboard.writeText(document.getElementById('resultUrl').textContent||window._quoteUrl||'').then(() => {
     const el = document.getElementById("copied");
     el.classList.add("on");
     setTimeout(() => el.classList.remove("on"), 3000);
